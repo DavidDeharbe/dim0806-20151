@@ -1,0 +1,12 @@
+# (PDF)LaTeX generated files #
+##############################
+*.aux
+*.toc
+*.snm
+*.nav
+*.out
+
+# Editor back-up #
+##################
+*~
+
