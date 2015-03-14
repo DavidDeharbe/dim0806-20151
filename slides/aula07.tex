@@ -1,0 +1,267 @@
+\documentclass{beamer}
+\setbeamertemplate{footline}[frame number]
+%\documentclass{beamer}
+
+\input{preamble}
+
+\title{Aula 07: Algoritmos de busca em arranjos lineares}
+\author{David Déharbe \\
+  Programa de Pós-graduação em Sistemas e Computação \\
+  Universidade Federal do Rio Grande do Norte \\
+  Centro de Ciências Exatas e da Terra \\
+  Departamento de Informática e Matemáica Aplicada}
+\date{09 de março de 2015}
+
+\begin{document}
+\selectlanguage{brazil}
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\section{Introdução}
+
+\begin{frame}
+
+  \frametitle{Algoritmos}
+  \framesubtitle{Busca em arranjo}
+
+  \begin{description}
+    \item[Entrada]
+      \begin{itemize}
+        \item uma sequência linear $A = \langle A_1, \dots A_n \rangle$,
+        \item um valor $v$
+      \end{itemize}
+    \item[Saída] 
+      \begin{itemize}
+        \item se $\exists j \mid 1 \le j \le n \cdot A_j = v$ então o menor $1 \le i \le n$ tal que $A_i = v$, ou
+        \item se $\forall j \mid 1 \le j \le n \cdot A_j \neq v$ então $\const{nil}$.
+      \end{itemize}
+
+    \item[Algoritmos]
+      \begin{itemize}
+      \item busca linear em arranjo 
+      \item busca em arranjo ordenado
+        \begin{itemize}
+        \item busca linear
+        \item busca binária
+        \end{itemize}
+      \end{itemize}
+
+  \end{description}
+
+\end{frame}
+
+\section{Busca linear}
+
+\begin{frame}
+  \frametitle{Algoritmo de busca linear}
+
+\begin{codebox}
+\Procname{$\proc{Linear-Search}(A, v)$}
+\zi \Comment \assert{$\{ A = \langle a_1, a_2, \ldots, a_n \rangle \}$}
+\li $j \gets 1$
+\li \While $A[j] \neq v$ and $j \le \id{length}(A)$
+\li \Do
+      $j \gets j+1$
+    \End
+\li \If $j \le \id{length}(A)$
+\li \Then
+      \Return $j$
+\li \Else
+      \Return \const{nil}
+    \End
+\zi \Comment \assert{$\{ \begin{array}[t]{l}
+      \left(1 \le r \le n \Leftrightarrow a_r = v \land \left(\forall i : 1 \le i < r \Rightarrow a_i \neq v \right) \right) \land \\
+      \left(r = \const{nil} \Leftrightarrow \left(\forall i : 1 \le i \le n \Rightarrow a_i \neq v \right)\right) \}
+      \end{array}$}
+\end{codebox}  
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Algoritmo de busca linear}
+
+\begin{itemize}
+
+  \item Complexidade no melhor caso
+
+  \item Complexidade no pior caso
+
+  \item Complexidade no caso médio
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Algoritmo de busca linear}
+  \framesubtitle{Assumindo o arranjo ordenado}
+
+\begin{codebox}
+\Procname{$\proc{Linear-Search}(A, v)$}
+\zi \Comment \assert{$\{ A = \langle a_1, a_2, \ldots, a_n \rangle \land
+\left( \forall i \mid 1 \le i < n \cdot a_i \le a_{i+1} \right) \} $}
+\li $j \gets 1$
+\li \While $j \le \id{length}(A)$ and $A[j] \alert{<} v$ 
+\li \Do
+      $j \gets j+1$
+    \End
+\li \If $j \le \id{length}(A)$ \alert{and $A[j] = v$}
+\li \Then
+      \Return $j$
+\li \Else
+      \Return \const{nil}
+    \End
+\zi \Comment \assert{$\{ \begin{array}[t]{l}
+      \left(1 \le r \le n \Leftrightarrow a_r = v \land \left(\forall i : 1 \le i < r \Rightarrow a_i \neq v \right) \right) \land \\
+      \left(r = \const{nil} \Leftrightarrow \left(\forall i : 1 \le i \le n \Rightarrow a_i \neq v \right)\right) \}
+      \end{array}$}
+\end{codebox}  
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Algoritmo não recursivo de busca binária em arranjo ordenado}
+  \framesubtitle{Assumindo o arranjo ordenado}
+
+\begin{small}
+\begin{codebox}
+\Procname{$\proc{Binary-Search}(A, v)$}
+\zi \Comment \assert{$\{ A = \langle a_1, a_2, \ldots, a_n \rangle \land
+\left( \forall i \mid 1 \le i < n \cdot a_i \le a_{i+1} \right) \} $}
+\li $l \gets 1$
+\li $u \gets \id{length}(A)$
+\li $m \gets \lfloor (\id{length}(A)/2 \rfloor$
+\li \While $l \le u$ and $v \neq A[m]$
+\li \Do
+\li    \If $v < A[m]$
+\li    \Then
+         $u \gets m-1$
+\li    \Else
+         $l \gets m+1$
+       \End
+\only<1-2>{\li    $m \gets (u + l)/2$} \only<2>{\alert{$\Longleftarrow$ Bug (aritmética em harware)}}
+\only<3>{\li $m \gets l + \lfloor (u + 1 - l)/2 \rfloor$}
+    \End
+\li \If $v = A[m]$
+\li \Then
+      \Return $m$
+\li \Else
+      \Return \const{nil}
+    \End
+\zi \Comment \assert{$\{ \begin{array}[t]{l}
+      \left(1 \le r \le n \Leftrightarrow a_r = v \right) \land \\
+      \left(r = \const{nil} \Leftrightarrow \left(\forall i : 1 \le i \le n \Rightarrow a_i \neq v \right)\right) \}
+      \end{array}$}
+\end{codebox}  
+\end{small}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Algoritmo não recursivo de busca binária}
+
+\begin{itemize}
+
+  \item Complexidade no melhor caso
+
+  \item Complexidade no pior caso
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Algoritmo recursivo de busca binária}
+  \framesubtitle{Assumindo o arranjo ordenado}
+
+\begin{codebox}
+\Procname{$\proc{Binary-Search}(A, v)$}
+\zi \Comment \assert{$\{ A = \langle a_1, a_2, \ldots, a_n \rangle \land
+\left( \forall i \mid 1 \le i < n \cdot a_i \le a_{i+1} \right) \} $}
+\li \Return $\proc{Binary-Search-Range}(A, v, 1, \id{length}(A))$
+\zi \Comment \assert{$\{ \begin{array}[t]{l}
+      \left(1 \le r \le n \Leftrightarrow a_r = v \right) \land \\
+      \left(r = \const{nil} \Leftrightarrow \left(\forall i : 1 \le i \le n \Rightarrow a_i \neq v \right)\right) \} \end{array}$}
+\end{codebox}  
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Algoritmo de busca binária}
+  \framesubtitle{Assumindo o arranjo ordenado}
+\begin{small}
+\begin{codebox}
+\Procname{$\proc{Binary-Search-Range}(A, v, l, u)$}
+\zi \Comment \assert{$\begin{array}[t]{l}
+\{ A = \langle a_1, a_2, \ldots, a_n \rangle \land \left( \forall i \mid 1 \le i < n \cdot a_i \le a_{i+1} \right) \} \land \\
+1 \le u, l \le n \end{array}$}
+\li \If $l > u$
+\li \Then
+      \Return \const{nil}
+\li \Else
+\li   $m \gets l + \lfloor (u + 1 - l)/2 \rfloor$
+\li   \If $v = A[m]$
+\li   \Then \Return $m$
+\li   \ElseIf $v < A[m]$
+\li   \Then \Return $\proc{Binary-Search-Range}(A, v, l, m-1)$
+\li   \ElseNoIf
+\li \Return $\proc{Binary-Search-Range}(A, v, m+1, u)$
+      \End
+    \End
+\zi \Comment \assert{$\{ \begin{array}[t]{l}
+      \left(l \le r \le u \Leftrightarrow a_r = v \right) \land \\
+      \left(r = \const{nil} \Leftrightarrow \left(\forall i : l \le i \le u \Rightarrow a_i \neq v \right)\right)  \} \end{array}$}
+\end{codebox}  
+\end{small}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Algoritmo de busca binária}
+  \framesubtitle{Assumindo o arranjo ordenado}
+
+\begin{itemize}
+
+  \item Complexidade no melhor caso
+
+  \item Complexidade no pior caso
+
+    \begin{itemize}
+
+    \item $T(n) = T(n/2) + f(n)$, onde $f \in \Theta(1)$.
+
+    \item Teorema Master, caso 2
+
+    \item $T(N) \in \Theta(\log n)$
+
+    \end{itemize}
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Exercício}
+
+Considere o problema de contar o número de ocorrências de um valor $v$ em uma sequência $A$.
+
+\begin{enumerate}
+
+\item Assume $A$ não ordenado. 
+\begin{enumerate}
+\item Escreva um algoritmo que solucione o problema. 
+\item Determine a complexidade no melhor caso, e no pior caso.
+\end{enumerate}
+\item Assume $A$ ordenado.
+\begin{enumerate}
+\item Adapte o algoritmo anterior para levar esta hipótese em conta.
+\item Determine a complexidade no melhor caso, e no pior caso.
+\item Escreva um novo algoritmo, inspirado do algoritmo da busca binária.
+\item Determine a complexidade, no pior caso, do novo algoritmo.
+\end{enumerate}
+\end{enumerate}
+
+
+\end{frame}
+
+\end{document}

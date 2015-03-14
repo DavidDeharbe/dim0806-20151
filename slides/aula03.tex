@@ -1,0 +1,308 @@
+\documentclass[handout]{beamer}
+%\documentclass{beamer}
+\setbeamertemplate{footline}[frame number]
+
+\input{preamble}
+
+\usepackage{pgf}
+\usepackage{tikz}
+
+\title{Aula 03: Análise de algoritmos --- melhor caso, pior caso e caso médio}
+\author{David Déharbe \\
+  Programa de Pós-graduação em Sistemas e Computação \\
+  Universidade Federal do Rio Grande do Norte \\
+  Centro de Ciências Exatas e da Terra \\
+  Departamento de Informática e Matemáica Aplicada}
+\date{23 de fevereiro de 2015}
+
+\begin{document}
+\selectlanguage{brazil}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+  \frametitle{Plano da aula}
+  \tableofcontents
+\end{frame}
+
+\section{Pior caso, melhor caso, caso médio, análise amortizada}
+
+\begin{frame}
+\frametitle{Pior caso, melhor caso, caso médio}
+
+\begin{itemize}
+\item A complexidade do algoritmo de \emph{ordenação por inserção} depende não
+  só do tamanho da entrada, mas também do valor desta entrada.
+\item A complexidade do algoritmo de \emph{busca linear} depende não só do
+  tamanho da entrada, mas também do valor desta entrada.
+\end{itemize}
+\pause
+\begin{description}
+\item[pior caso] é a função que relaciona o tamanho da entrada $n$ ao maior tempo de execução possível para tratar uma entrada de tamanho $n$.
+\item[melhor caso] é a função que relaciona o tamanho da entrada $n$ ao menor tempo de execução possível para tratar uma entrada de tamanho $n$.
+\item[caso médio] é a função que relaciona o tamanho da entrada $n$ ao tempo médio de execução possível para tratar uma entrada de tamanho $n$, \emph{assumindo uma distribuição probabilística} das entradas possíveis.
+\end{description}
+\end{frame}
+
+\begin{frame}
+\frametitle{Pior caso}
+
+\begin{block}{Como calcular?}
+Determinar uma entrada, de tamanho $n$, tal que a operação básica é executada a maior quantidade de vezes possível.
+\end{block}
+
+\begin{block}{Exemplo}
+\begin{codebox}
+\Procname{$\proc{Linear-Search}(A, v)$}
+\li $j \gets 1$
+\li \While \textcolor{blue}{$A[j] \neq v$ and $j \le \id{length}(A)$}
+\li \Do
+      $j \gets j+1$
+    \End
+\li \If $j \le \id{length}(A)$
+\li \Then
+      \Return $j$
+\li \Else
+      \Return \const{nil}
+    \End
+\end{codebox}
+No pior caso, $v \not\in A$ e o número de vezes que a operação básica é
+executada é $n+1$.
+\end{block}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Melhor caso}
+
+\begin{block}{Como calcular?}
+Determinar uma entrada, de tamanho $n$, tal que a operação básica é executada a menor quantidade de vezes possível.
+\end{block}
+
+\begin{block}{Exemplo}
+\begin{codebox}
+\Procname{$\proc{Linear-Search}(A, v)$}
+\li $j \gets 1$
+\li \While \textcolor{blue}{$A[j] \neq v$ and $j \le \id{length}(A)$}
+\li \Do
+      $j \gets j+1$
+    \End
+\li \If $j \le \id{length}(A)$
+\li \Then
+      \Return $j$
+\li \Else
+      \Return \const{nil}
+    \End
+\end{codebox}
+No melhor caso, $v = A[1]$ e o número de vezes que a operação básica é
+executada é $1$.
+\end{block}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Complexidade média}
+
+\begin{block}{Como calcular?}
+  O cálculo é feito assumindo uma distribuição probabilística das entradas (ou
+  classes de entradas) possíveis de tamanho $n$. É então realizada uma média
+  ponderada do custo para aquela entrada (ou classe de entrada) com a
+  probabilidade correspondente.
+\end{block}
+
+\begin{block}{Exemplo}
+\begin{codebox}
+\Procname{$\proc{Linear-Search}(A, v)$}
+\li $j \gets 1$
+\li \While \textcolor{blue}{$A[j] \neq v$ and $j \le \id{length}(A)$}
+\li \Do
+      $j \gets j+1$
+    \End
+\li \If $j \le \id{length}(A)$
+\li \Then
+      \Return $j$
+\li \Else
+      \Return \const{nil}
+    \End
+\end{codebox}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Complexidade média (busca linear)}
+
+Assume:
+\begin{enumerate}
+\item $0 \le p \le 1$ é a probabilidade de $v$ estar em $A$, 
+\item $p/n$ é a probabilidade de $v$ estar em cada $A[i]$.
+\end{enumerate}
+
+\begin{itemize}
+\item O custo do algoritmo quando $v$ está em $A[i]$ é $i$.
+\item O custo do algoritmo quando $v$ não está em $A$ é $n+1$.
+\end{itemize}
+
+A complexidade média é:
+\begin{eqnarray*}
+(1-p).(n+1) + \sum_{i=1}^{n} i.\frac{p}{n}
+& = & (1-p).(n+1) + \frac{p}{n}\times(\sum_{i=1}^{n} i) \\
+& = & (1-p).(n+1) + \frac{p}{n}\times\frac{n.(n+1)}{2} \\
+& = & (1-p).(n+1) + \frac{p.(n+1)}{2} \\
+& = & \frac{(n+1).(2 - p)}{2}
+\end{eqnarray*}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Complexidade média (busca linear)}
+
+$$\frac{(n+1).(2 - p)}{2}$$
+
+Note que
+\begin{itemize}
+\item se $p=1$, a busca é sempre bem-sucedida, e o valor $\frac{n+1}{2}$ faz sentido.
+\item se $p=0$, a busca é sempre mal-sucedida, e o valor $n+1$ faz sentido.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Considerações sobre essas medidas de complexidade}
+
+\begin{block}{Pontos chaves}
+  \begin{itemize}
+  \item A complexidade média é geralmente a mais importante, e a mais difícil
+    de ser analisada.
+
+  \item A complexidade no pior caso é também muito importante pois não raramente
+    se aproxima da complexidade em média. Ela é essencial
+
+  \item A complexidade no melhor caso não é tão importante, mas pode ser
+    suficiente para \emph{descartar} um algoritmo.
+
+  \item A complexidade média \alert{não} é a média da complexidade no pior caso
+    e da complexidade no melhor caso.
+  \end{itemize}
+\end{block}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Exercício}
+
+Como um algoritmo de ordenação qualquer pode ser alterado de tal forma que seu
+custo no melhor caso seja $n-1$ para ordenar uma sequência de tamanho $n$?
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Análise amortizada}
+
+\begin{itemize}
+\item A complexidade amortizada considera uma série de execuções de um algoritmo
+sobre alguma \emph{estrutura de dados}.
+\item Tem como objetivo determinar o custo médio por operação.
+\item Não necessita de nenhuma distribuição probabilística.
+\end{itemize}
+
+\pause
+Métodos de resolução
+\begin{itemize}
+\item método agregado \only<3>{\alert{$\leftarrow$}}
+\item método do contador
+\item método do potencial
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Método agregado}
+
+\begin{itemize}
+\item Considere uma série de $n$ operações em alguma estrutura de dados, $n$
+  qualquer.
+
+\item Determina o custo $T(n)$ desta série de operações.
+
+\item O custo médio de cada operação é $T(n)/n$.
+
+\item Exemplo: contador binário
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Método agregado: um exemplo}
+
+  \begin{codebox}
+    \Procname{$\proc{Increment}(A)$}
+    \zi \Comment $A$ é um arranjo de $k$ bits
+    \li $i \gets 0$
+    \li \While $i < \id{length}[A] \mbox{ and } A[i] = 1$
+    \li \Do 
+    \li   $A[i] \gets 0$
+    \li   $i \gets i + 1$
+        \End
+    \li \If $i < \id{length}[A]$
+    \li \Then
+    \li    $A[i] \gets 1$
+        \End
+  \end{codebox}
+
+\begin{itemize}
+\item O tamanho da entrada é $k$;
+\item O custo da execução da $\proc{Increment}$ é proporcional ao número de bits
+  invertidos.
+\item No pior caso, a complexidade é proporcional a $k$;
+\item Logo, uma sequência de $n$ operações é proporcional a $n \times k$.
+\pause
+\item Podemos prover uma análise mais precisa?
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Método agregado: um exemplo}
+
+Em uma série de $n$ execuções de $\proc{Increment}$:
+\begin{itemize}
+\item $A[0]$ é invertido $n/2$ vezes;
+\item $A[1]$ é invertido $n/4$ vezes;
+\item $A[2]$ é invertido $n/8$ vezes;
+\item $A[k-1]$ é invertido $n/2^{k-1}$ vezes;
+\end{itemize}
+O custo total para $n$ operações é 
+\begin{eqnarray*}
+T(n) & = & \sum_{i=1}^{\lfloor \lg n \rfloor} n/2^i \\
+T(n) & < & \sum_{i=1}^{\infty} n/2^i \\
+T(n) & < & n \times \sum_{i=1}^{\infty} 1/2^i = n
+\end{eqnarray*}
+
+Logo o custo amortizado de $\proc{Increment}$ é $T(n)/n = 1$: é \alert{constante}.
+
+\end{frame}
+
+\section{Conclusão}
+
+\begin{frame}
+\frametitle{Síntese}
+\begin{itemize}
+\item A complexidade temporal tanto quanto a complexidade espacial são
+funções do tamanho da entrada.
+\item A complexidade temporal, ou complexidade, é determinado pelo número
+de vezes que a operação básica do algoritmo é executada.
+\item A complexidade de um algoritmo pode variar consideravelmente para
+entradas de mesmo tamanho. 
+
+Nestes casos, deve-se distinguir melhor caso, pior caso, e complexidade média.
+\item O arcabouço teórico da análise de algoritmos baseia-se na noção de
+  crescimento assintótico de funções.
+\end{itemize}
+\end{frame}
+
+\end{document}

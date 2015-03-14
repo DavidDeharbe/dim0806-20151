@@ -1,0 +1,459 @@
+\documentclass{beamer}
+\setbeamertemplate{footline}[frame number]
+%\documentclass{beamer}
+
+\input{preamble}
+
+
+\title{Aula 09: Algoritmos de ordenação em arranjos}
+\subtitle{Ordenação por fusão}
+\author{David Déharbe \\
+  Programa de Pós-graduação em Sistemas e Computação \\
+  Universidade Federal do Rio Grande do Norte \\
+  Centro de Ciências Exatas e da Terra \\
+  Departamento de Informática e Matemáica Aplicada}
+\date{16 de março de 2015}
+
+
+\begin{document}
+\selectlanguage{brazil}
+\begin{frame}
+  \titlepage
+  Download me from \url{http://ufrn.academia.edu/DavidDeharbe}.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Plano da aula}
+  \tableofcontents
+\end{frame}
+
+\section{Fusão de faixas contíguas ordenadas}
+
+\subsection{Definição}
+
+\begin{frame}
+
+  \frametitle{Ordenação por fusão \textit{merge sort}}
+  \framesubtitle{Preâmbulo}
+
+\begin{itemize}
+
+\item Escreva um algoritmo $\proc{Merge}(A, l, m, u)$ tal que
+\begin{itemize}
+\item $A$ é um arranjo,
+\item $l$, $m$, e $u$ são três posições do arranjo, tais que $l \le m \le u$,
+\item as sub-faixas $l \twodots m$ e $m+1 \twodots u$ são ordenadas.
+\end{itemize}
+\item O resultado do algoritmo é que 
+\begin{itemize}
+\item a sub-faixa $l \twodots u$ de $A$ contenha os elementos inicialmente 
+  nas sub-faixas $l \twodots m$ e $m+1 \twodots u$;
+\item a sub-faixa $l \twodots u$ de $A$ esteja ordenada;
+\item as sub-faixas $1 \twodots l-1$ e $u+1 \twodots n$ permanecem inalteradas.
+\end{itemize}
+\item Restrição: o algoritmo deve ter complexidade linear.
+
+\end{itemize}
+
+\end{frame}
+
+\subsection{Algoritmo}
+
+\begin{frame}
+
+  \frametitle{Fusão de faixas ordenadas}
+  \framesubtitle{Um algoritmo}
+
+\begin{codebox}
+\Procname{$\proc{Merge}(A, l, m, u)$}
+\li $i \gets 1, j \gets l, k \gets m+1$
+\li \While $j \le m$ and $k \le u$ \Do
+\li \If $A[j] \le A[k]$
+\li   \Then $B[i] \gets A[j], j \gets j+1, i \gets i+1$
+\li   \Else $B[i] \gets A[k], k \gets k+1, i \gets i+1$
+      \End
+    \End
+\li \While $j \le m$
+\li \Do $B[i] \gets A[j], j \gets j+1, i \gets i+1$
+    \End
+\li \While $k \le u$
+\li \Do $B[i] \gets A[k], k \gets k+1, i \gets i+1$
+    \End
+\li \For $i \gets l$ \To $u$
+\li \Do $A[i] \gets B[i-l+1]$
+    \End
+\end{codebox}  
+
+\end{frame}
+
+\subsection{Simulação}
+
+\begin{frame}
+
+  \frametitle{Fusão de faixas ordenadas}
+  \framesubtitle{Simulação}
+
+\begin{small}
+\begin{codebox}
+\Procname{$\proc{Merge}(A, l, m, u)$}
+\li $i \gets 1, j \gets l, k \gets m+1$
+\li \While $j \le m$ and $k \le u$ \Do
+\li   \If $A[j] \le A[k]$
+\li   \Then $B[i] \gets A[j], j \gets j+1, i \gets i+1$
+\li   \Else $B[i] \gets A[k], k \gets k+1, i \gets i+1$
+      \End
+    \End
+\li \While $j \le m$
+\li \Do $B[i] \gets A[j], j \gets j+1, i \gets i+1$
+    \End
+\li \While $k \le u$
+\li \Do $B[i] \gets A[k], k \gets k+1, i \gets i+1$
+    \End
+\li \For $i \gets l$ \To $u$
+\li \Do $A[i] \gets B[i-l+1]$
+    \End
+\end{codebox}  
+\end{small}
+
+\alert{$$A = \langle 2, 4, 5, 5, 1, 2, 3, 5 \rangle, l = 1, m = 4, u = 8$$}
+
+\end{frame}
+
+\subsection{Complexidade}
+
+\begin{frame}
+
+  \frametitle{Fusão de faixas ordenadas}
+  \framesubtitle{Complexidade}
+
+  \begin{itemize}
+  \item Cada um dos três primeiros laços ou incrementa $j$, ou incrementa $k$.
+  \item Há, exatamente, $m-l$ incrementos de $j$ e $u-(m+1)$ incrementos de $k$
+  \item O custo acumulado dos três primeiros laços é $\Theta(m-l+u-(m+1))=
+    \Theta(u-l)$
+  \item O custo do quarto laço é $\Theta(u-l)$
+  \item Complexidade: $\Theta(u-l)$.
+  \end{itemize}
+
+\end{frame}
+
+\subsection{Correção}
+
+
+\begin{frame}
+
+  \frametitle{Fusão de faixas ordenadas}
+  \framesubtitle{Correção}
+
+\begin{definition}[$\id{sorted}$]
+$$
+  \id{sorted}(A, i, j) \equiv \forall k | i \le k < j \cdot A[k] \le A[k+1]
+$$
+\end{definition}
+
+\pause
+
+\begin{small}
+\begin{codebox}
+\Procname{$\proc{Merge}(A, l, m, u)$}
+\end{codebox}
+\end{small}
+
+  \begin{itemize}
+    \item pré-condição:
+      \assert{$\begin{array}[t]{l}
+      A = \langle a_1 , \ldots , a_n \rangle \land 1 \le l, m, u \le n \land \\
+      \id{sorted}(A, l, m) \land \id{sorted}(A, m+1, u)
+      \end{array}$}
+
+    \item pós-condição
+      \assert{$\begin{array}[t]{l}
+      A[1..l-1] = \langle a_1, \ldots, a_{l-1} \rangle \land
+      A[u+1..n] = \langle a_{u+1}, \ldots, a_n \rangle \\
+      A[l..u] \in \id{permutation}(\langle a_l, \ldots, a_u \rangle) \land \id{sorted}(A, l, u)
+      \end{array}$}
+
+  \end{itemize}
+
+\end{frame}
+
+\section{Ordenação por fusão}
+
+\subsection{Algoritmo}
+
+\begin{frame}
+
+  \frametitle{Ordenação por fusão \textit{merge sort}}
+  \framesubtitle{Algoritmo}
+
+(Cormen et al. 1990)
+
+\begin{codebox}
+\Procname{$\proc{Merge-Sort}(A, l, u)$}
+\li \If $l < u$
+\li \Then $m \gets l + (u - l) / 2$
+\li    $\proc{Merge-Sort}(A, l, m)$
+\li    $\proc{Merge-Sort}(A, m+1, u)$
+\li    $\proc{Merge}(A, l, m, u)$
+\zi \End
+\end{codebox}  
+
+$\Longrightarrow \proc{Merge-Sort}(A, 1, \id{length}(A))$
+
+\end{frame}
+
+\subsection{Simulação}
+
+\begin{frame}
+
+  \frametitle{Ordenação por fusão}
+  \framesubtitle{Simulação}
+
+\begin{codebox}
+\Procname{$\proc{Merge-Sort}(A, l, u)$}
+\li \If $l < u$
+\li \Then    $m \gets l + (u - l) / 2$
+\li    $\proc{Merge-Sort}(A, l, m)$
+\li    $\proc{Merge-Sort}(A, m+1, u)$
+\li    $\proc{Merge}(A, l, m, u)$
+\zi \End
+\end{codebox}  
+
+$\Longrightarrow \proc{Merge-Sort}(A, 1, \id{length}(A))$
+
+\alert{$$A = \langle 5, 2, 4, 6, 1, 3, 2, 6 \rangle$$}
+
+\end{frame}
+
+\subsection{Complexidade}
+
+\begin{frame}
+
+  \frametitle{Ordenação por fusão}
+  \framesubtitle{Complexidade}
+
+  \begin{itemize}
+  \item $T(n) = 2 \times T(n / 2) + \Theta(n)$ \pause
+  \item Teorema master \pause
+  \item $T(n) = a T(\frac{n}{b}) + f(n)$, onde $a \ge 1, b \ge 1$;
+  \item Se existe $k \ge 0$ tal que $f(n) \in \Theta(n^{c} \log^{k} n)$ onde $c = \log_b a$ então $T(n) \in \Theta(n^{c} \log^{k+1} n)$. \pause
+  \item $c = \log_2 2 = 1$ \pause
+  \item $n = n^1 \times \log^0 n$, logo $k = 0$ satisfaz a condição.\pause
+  \item Então $T(n) \in \Theta(n \log n)$.
+  \end{itemize}
+
+\end{frame}
+
+\subsection{Complexidade}
+
+\begin{frame}
+
+  \frametitle{Ordenação por fusão}
+  \framesubtitle{Correção}
+
+\begin{codebox}
+\Procname{$\proc{Merge-Sort}(A, l, u)$}
+\li \If $l < u$
+\li \Then $m \gets l + (u - l) / 2$
+\li    $\proc{Merge-Sort}(A, l, m)$
+\li    $\proc{Merge-Sort}(A, m+1, u)$
+\li    $\proc{Merge}(A, l, m, u)$
+\zi \End
+\end{codebox}  
+
+    \begin{itemize}
+    \item pré-condição
+      \only<2->{
+        \assert{$A = \langle a_1, \ldots a_n \rangle \land 1 \le l, u \le n$}
+      }
+    \item pós-condição
+      \only<3->{
+        \assert{$\begin{array}[t]{l}
+          A[1 \twodots l-1] = \langle a_1, \ldots a_{l-1} \rangle \land A[u+1 \twodots n] = \langle a_{u+1}, \ldots a_{n} \rangle \land \\
+          A[l \twodots u] \in \id{permutation}(\langle a_l, \ldots, a_u \rangle) \land
+          \id{sorted}(A, l, u)
+        \end{array}$}
+      }
+    \end{itemize}
+
+\end{frame}
+
+\subsection{Verificação}
+
+\begin{frame}
+
+  \frametitle{Ordenação por fusão \textit{merge sort}}
+  \framesubtitle{Verificação}
+
+\only<2>{\assert{$\alert{\Gamma_1:} \id{Pre}(\proc{Merge-Sort}(A, l, u)) \land l \ge u \Rightarrow \id{Pos}(\proc{Merge-Sort}(A, l, u)$}}
+
+
+\begin{small}
+\begin{codebox}
+\Procname{$\proc{Merge-Sort}(A, l, u)$}
+\li \If $l < u$
+\li \Then $m \gets l + (u - l) / 2$
+
+\only<3->{\zi \assert{$A_0$}}
+\only<4>{\zi \assert{$\alert{\Gamma_2:} 
+\begin{array}[t]{rl}
+& l < u \land m = l + \frac{u-l}{2} \land \\
+& \id{Pre}(\proc{Merge-Sort}(A_0, l, u)) \\
+\Rightarrow & \id{Pre}(\proc{Merge-Sort}(A_0, l, m))
+\end{array}$}}
+
+\li    $\proc{Merge-Sort}(A, l, m)$
+
+\only<3->{\zi \assert{$A_1$}}
+
+\only<5>{\zi \assert{$\alert{\Gamma_3:} 
+\begin{array}[t]{rl}
+& l < u \land m = l + \frac{u-l}{2} \land \\
+& \id{Pre}(\proc{Merge-Sort}(A_0, l, u)) \land \\
+& \id{Pos}(\proc{Merge-Sort}(A_1, l, m)) \\
+\Rightarrow & \id{Pre}(\proc{Merge-Sort}(A_1, m+1, u))
+\end{array}$}}
+
+\li    $\proc{Merge-Sort}(A, m+1, u)$
+
+\only<3->{\zi \assert{$A_2$}}
+
+\only<6>{\zi \assert{$\alert{\Gamma_4:} 
+\begin{array}[t]{rl}
+& l < u \land m = l + \frac{u-l}{2} \land \\
+& \id{Pre}(\proc{Merge-Sort}(A_0, l, u)) \land \\
+& \id{Pos}(\proc{Merge-Sort}(A_1, l, m)) \land \\
+& \id{Pos}(\proc{Merge-Sort}(A_2, m+1, u)) \\
+\Rightarrow & \id{Pre}(\proc{Merge}(A_2, l, m, u))
+\end{array}$}}
+
+\li    $\proc{Merge}(A, l, m, u)$
+
+\only<3->{\zi \assert{$A_3$}}
+
+\only<7>{\zi \assert{$\alert{\Gamma_5:} 
+\begin{array}[t]{rl}
+& l < u \land m = l + \frac{u-l}{2} \land \\
+& \id{Pre}(\proc{Merge-Sort}(A_0, l, u)) \land \\
+& \id{Pos}(\proc{Merge-Sort}(A_1, l, m)) \land \\
+& \id{Pos}(\proc{Merge-Sort}(A_2, m+1, u)) \land \\
+& \id{Pos}(\proc{Merge}(A_3, l, m, u)) \\
+\Rightarrow & \id{Pos}(\proc{Merge-Sort}(A_3, l, u))
+\end{array}$}}
+
+\zi \End
+\end{codebox}  
+\end{small}
+
+\end{frame}
+
+\begin{frame}
+
+\only<1-2>{
+$$
+\begin{array}[t]{lrl}
+\alert{\Gamma_1:} 
+&      & A = \langle a_1, \ldots a_n \rangle \land 1 \le l, u \le n  \\
+& \land & l \ge u \\
+& \Rightarrow & A[1 \twodots l-1] = \langle a_1, \ldots a_{l-1} \rangle \\
+& \land & A[u+1 \twodots n] = \langle a_{u+1}, \ldots a_{n} \rangle \land \\
+& \land & A[l \twodots u] \in \id{permutation}(\langle a_l, \ldots, a_u \rangle) \\
+& \land & \id{sorted}(A, l, u)
+\end{array}
+$$
+}
+
+\only<2>{$H \Rightarrow P \land Q \equiv H \Rightarrow P, H \Rightarrow Q$}
+
+\only<3-8>{
+$$
+\begin{array}[t]{lrl}
+\only<3-4>{\alert{\Gamma_{1,1}:} 
+& & \alert<4>{A = \langle a_1, \ldots a_n \rangle} \land 1 \le l, u \le n  \\
+& \land & l \ge u \\
+& \Rightarrow & \alert<4>{A[1 \twodots l-1] = \langle a_1, \ldots a_{l-1} \rangle}
+\\
+\hline}
+\only<3-5>{\alert{\Gamma_{1,2}:} 
+& & \alert<5>{A = \langle a_1, \ldots a_n \rangle} \land 1 \le l, u \le n  \\
+& \land & l \ge u \\
+& \Rightarrow & \alert<5>{A[u+1 \twodots n] = \langle a_{u+1}, \ldots a_{n} \rangle}
+\\
+\hline}
+\alert{\Gamma_{1,3}:} 
+& & A = \langle a_1, \ldots a_n \rangle \land 1 \le l, u \le n  \\
+& \land & l \ge u \\
+& \Rightarrow & A[l \twodots u] \in \id{permutation}(\langle a_l, \ldots, a_u \rangle)
+\\
+\hline
+\alert{\Gamma_{1,4}:} 
+& & A = \langle a_1, \ldots a_n \rangle \land 1 \le l, u \le n  \\
+& \land & l \ge u \\
+& \Rightarrow & \id{sorted}(A, l, u)
+\end{array}
+$$
+}
+\only<7-8>{$l \ge u \Leftrightarrow l = u \lor l > u$}
+\only<8>{$H \land (P_1 \lor P_2) \Rightarrow Q \equiv H \land P_1 \Rightarrow Q, H \land P_2 \Rightarrow Q$}
+
+\only<9->{
+$$
+\begin{array}[t]{lrl}
+\only<9-16>{\alert{\Gamma_{1,3,1}:} 
+& & \alert<12>{A = \langle a_1, \ldots a_n \rangle} \land 1 \le l, u \le n  \\
+& \land & \alert<10>{l = u} \\
+& \Rightarrow & \only<9-10>{A[l \twodots u] \in \id{permutation}(\langle a_l, \ldots, a_u \rangle)}
+\only<11-12>{A[l \twodots l] \in \id{permutation}(\langle a_l \rangle)}
+\only<13-14>{\alert<14>{\langle a_1, \ldots a_n \rangle [l \twodots l]} \in \id{permutation}(\langle a_l \rangle)}
+\only<15>{\langle a_l \rangle \in \id{permutation}(\langle a_l \rangle)}
+\only<16>{\id{true}}
+\\
+\hline}
+\only<9-19>{\alert{\Gamma_{1,3,2}:} 
+& & \alert<17>{A = \langle a_1, \ldots a_n} \rangle \land 1 \le l, u \le n  \\
+& \land & \alert<17>{l > u} \\
+& \Rightarrow & \alert<17>{\only<9-17>{A[l \twodots u] \in \id{permutation}(\langle a_l, \ldots, a_u \rangle)}}
+\only<18>{\langle \rangle \in \id{permutation}(\langle \rangle)}
+\only<19>{\id{true}}
+\\
+\hline}
+\alert{\Gamma_{1,4,1}:} 
+& & A = \langle a_1, \ldots a_n \rangle \land 1 \le l, u \le n  \\
+& \land & l = u \\
+& \Rightarrow & \id{sorted}(A, l, u)
+\\
+\hline
+\alert{\Gamma_{1,4,2}:} 
+& & A = \langle a_1, \ldots a_n \rangle \land 1 \le l, u \le n  \\
+& \land & l > u \\
+& \Rightarrow & \id{sorted}(A, l, u)
+\end{array}
+$$
+}
+\only<20>{\alert{idem}}
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Exercício}
+
+  \begin{enumerate}
+  \item A ordenação por fusão lança mão de um arranjo auxiliar $B$ na
+    operação de fusão, em cada nível da recursão.
+    \begin{enumerate}
+      
+    \item Determine a complexidade espacial do algoritmo $\proc{Merge-Sort}$.
+    
+    \item Descreve as adaptações necessárias para ter um algoritmo
+      similar com complexidade espacial \emph{linear}.
+
+    \end{enumerate}
+
+  \item Escreva por extenso as obrigações de prova $\Gamma_2$, 
+    $\Gamma_3$, $\Gamma_4$, $\Gamma_5$.
+
+    Verifique se elas são passíveis de serem provadas válidas.
+  \end{enumerate}
+\end{frame}
+
+\end{document}

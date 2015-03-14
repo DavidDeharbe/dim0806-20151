@@ -5,6 +5,7 @@
 *.snm
 *.nav
 *.out
+*.log
 
 # Editor back-up #
 ##################

@@ -1,0 +1,91 @@
+\documentclass[a4wide]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+
+\title {DIM0806 - Estruturas de Dados e Algoritmos \\
+  Lista de exercícios 1}
+\author{David Déharbe\thanks{\textbf{Fonte:} \textit{Introduction to Algorithms}. Thomas H. Cormen, 
+Charles E. Leiserson, Ronald R. Rivest. Capítulo 1, seções 1 e 2.
+}}
+
+\newcounter{ExCounter}
+\newcommand{\exercicio}[0]{%
+\stepcounter{ExCounter}
+\paragraph{ex \theExCounter.}
+}
+
+\begin{document}
+
+\maketitle
+
+
+\exercicio\label{ex:algo-poli}
+
+Considere o problema de calcular o valor de uma função polinomial em 
+um dado ponto. Dados $n$ coeficientes $a_0, a_1, \ldots a_{n-1}$ e um número
+real $x$, queremos calcular $\sum_{i=0}^{n-1} a_i x^i$. 
+
+Escreva um algoritmo em pseudo-código para este problema.
+
+\exercicio\label{ex:algo-selection}
+
+Queremos ordenar $N$ números armazenados em um arranjo $A$ da seguinte
+forma.  Primeiro encontre o menor número em $A$ e coloque ele na
+primeira posição. Em seguinda, encontre o segundo menor número em $A$,
+e coloque ele na segunda menor posição. Repita para cada um dos $N$
+elementos de $A$.
+
+Escreva um algoritmo em pseudo-código para este algoritmo, conhecido
+como ordenação por seleção (\textit{selection sort}).
+
+\exercicio
+
+Expresse a função $n^{3}/1000 - 100n^{2} - 100n + 3$ usando a notação $\Theta$.
+
+\exercicio
+
+Como podemos modificar qualquer algoritmo para ter um bom melhor tempo
+de execução (da ordem de $\Theta(n)$, onde $n$ é o tamanho da entrada?
+
+\exercicio
+
+Considere o algoritmo em pseudo-código que você desenvolveu no exercício~2. Dê o
+tempo de execução deste algoritmo no melhor caso e no pior caso utilizando a
+notação $\Theta$.
+
+\exercicio
+
+Considere o algoritmo da busca linear dos slides. Quantos elementos da
+sequência de entrada devem ser testados em média, assumindo que o
+elemento sendo pesquisado tem a mesma probabilidade de estar em
+qualquer posição da sequência? O que caracteriza o pior caso, e qual
+quantidade de comparações são necessárias??
+
+Quais são o pior tempo e o tempo médio de execução do algoritmo
+utilizando a notação $\Theta$? Justifique.
+
+\exercicio
+
+Considere o problema de determinar se há números repetidos em uma
+sequência qualquer (não necessariamente ordenada). 
+
+Mostre que isto pode ser realizado em $\Theta(n \lg n)$.
+
+\exercicio
+
+Expresse o tempo de execução do algoritmo que você desenvolveu na
+questão~1 utilizando a notação
+$\Theta$?\footnote{Assumimos que os números são implantados com uma
+  representação de ponto-flutuante, e que o custo de cada operação
+  aritmética é constante.}.
+
+Considere agora a seguinte forma de calcular o mesmo resultado:
+\begin{eqnarray*}
+\sum_{i=0}^{n-1} a_i x^i & = & (\cdots(a_{n-1}x + a_{n-2})x + \cdots + a_1)x + a_0.
+\end{eqnarray*}
+Utilize este método (regra de Horner) para escrever um algoritmo em
+pseudo-código para este mesmo problema, cujo tempo de execução é
+$\Theta(n)$.
+
+\end{document}
