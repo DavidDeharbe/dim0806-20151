@@ -1,0 +1,61 @@
+\documentclass{article}
+\usepackage[pdftex,active,tightpage]{preview}
+\setlength\PreviewBorder{2mm}
+ 
+\usepackage{tikz}
+\usetikzlibrary{shapes.multipart, calc} 
+
+\begin{document}
+\begin{preview}
+\begin{tikzpicture}[array/.style={rectangle split,rectangle split horizontal, rectangle split parts=#1,draw, anchor=center, fill=white}]
+\node[array=12] (a) {
+\nodepart{one}67
+\nodepart{two}62
+\nodepart{three}58
+\nodepart{four}45
+\nodepart{five}47
+\nodepart{six}31
+\nodepart{seven}38
+\nodepart{eight}40
+\nodepart{nine}31
+\nodepart{ten}19
+\nodepart{eleven}7
+\nodepart{twelve}17
+};
+\node[color=gray, anchor=north, yshift=-2] at (a.one)   {\footnotesize $1$};
+\node[color=gray, anchor=north, yshift=-2] at (a.two)   {\footnotesize $2$};
+\node[color=gray, anchor=north, yshift=-2] at (a.three) {\footnotesize $3$};
+\node[color=gray, anchor=north, yshift=-2] at (a.four)  {\footnotesize $4$};
+\node[color=gray, anchor=north, yshift=-2] at (a.five)  {\footnotesize $5$};
+\node[color=gray, anchor=north, yshift=-2] at (a.six)  {\footnotesize $6$};
+\node[color=gray, anchor=north, yshift=-2] at (a.seven)  {\footnotesize $7$};
+\node[color=gray, anchor=north, yshift=-2] at (a.eight)  {\footnotesize $8$};
+\node[color=gray, anchor=north, yshift=-2] at (a.nine)  {\footnotesize $9$};
+\node[color=gray, anchor=north, yshift=-2] at (a.ten)  {\footnotesize $10$};
+\node[color=gray, anchor=north, yshift=-2] at (a.eleven)  {\footnotesize $11$};
+\node[color=gray, anchor=north, yshift=-2] at (a.twelve)  {\footnotesize $12$};
+\end{tikzpicture}
+\end{preview}
+\end{document}
+The MIT License
+
+Copyright (c) 2012-2013 Martin Thoma
+Copyright (c) 2015 David Deharbe
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE

@@ -1,0 +1,426 @@
+\documentclass{article}
+\usepackage[pdftex,active,tightpage]{preview}
+\setlength\PreviewBorder{2mm}
+ 
+\usepackage{tikz}
+\usetikzlibrary{arrows,positioning, calc} 
+\tikzstyle{vertex}=[draw,fill=black!15,circle,minimum size=18pt,inner sep=0pt]
+
+
+\begin{document}
+% 1
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [vertex] (r){$4$}
+  child {
+    node [vertex] (a) {$1$}
+    child {
+      node [vertex] {$2$}
+      child { node [vertex] {$14$} } 
+      child { node [vertex] {$8$} } 
+    }
+    child {
+      node [vertex] {$16$}
+      child { node [vertex] {$7$} } 
+    }
+  }
+  child {
+    node [vertex] {$3$}
+    child { node [vertex] {$9$} }
+    child { node [vertex] {$10$} }
+  };
+\end{tikzpicture}
+\end{preview}
+% 2
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [vertex] (r){$4$}
+  child {
+    node [vertex] (a) {$1$}
+    child {
+      node [vertex] {$2$}
+      child { node [color=blue, vertex] {$14$} } 
+      child { node [color=blue, vertex] {$8$} } 
+    }
+    child {
+      node [vertex] {$16$}
+      child { node [color=blue, vertex] {$7$} } 
+    }
+  }
+  child {
+    node [vertex] {$3$}
+    child { node [color=blue, vertex] {$9$} }
+    child { node [color=blue, vertex] {$10$} }
+  };
+\end{tikzpicture}
+\end{preview}
+% 3
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [vertex] (r){$4$}
+  child {
+    node [vertex] (a) {$1$}
+    child {
+      node [vertex] {$2$}
+      child { node [color=blue, vertex] {$14$} } 
+      child { node [color=blue, vertex] {$8$} } 
+    }
+    child {
+      node [color=red, vertex] {$16$}
+      child { node [color=blue, vertex] {$7$} } 
+    }
+  }
+  child {
+    node [vertex] {$3$}
+    child { node [color=blue, vertex] {$9$} }
+    child { node [color=blue, vertex] {$10$} }
+  };
+\end{tikzpicture}
+\end{preview}
+% 4
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [vertex] (r){$4$}
+  child {
+    node [vertex] (a) {$1$}
+    child {
+      node [vertex] {$2$}
+      child { node [color=blue, vertex] {$14$} } 
+      child { node [color=blue, vertex] {$8$} } 
+    }
+    child {
+      node [color=blue, vertex] {$16$}
+      child { node [color=blue, vertex] {$7$} } 
+    }
+  }
+  child {
+    node [vertex] {$3$}
+    child { node [color=blue, vertex] {$9$} }
+    child { node [color=blue, vertex] {$10$} }
+  };
+\end{tikzpicture}
+\end{preview}
+% 5
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [vertex] (r){$4$}
+  child {
+    node [vertex] (a) {$1$}
+    child {
+      node [color=red, vertex] {$2$}
+      child { node [color=blue, vertex] {$14$} } 
+      child { node [color=blue, vertex] {$8$} } 
+    }
+    child {
+      node [color=blue, vertex] {$16$}
+      child { node [color=blue, vertex] {$7$} } 
+    }
+  }
+  child {
+    node [vertex] {$3$}
+    child { node [color=blue, vertex] {$9$} }
+    child { node [color=blue, vertex] {$10$} }
+  };
+\end{tikzpicture}
+\end{preview}
+% 6
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [vertex] (r){$4$}
+  child {
+    node [vertex] (a) {$1$}
+    child {
+      node [color=blue, vertex] {$14$}
+      child { node [color=blue, vertex] {$2$} } 
+      child { node [color=blue, vertex] {$8$} } 
+    }
+    child {
+      node [color=blue, vertex] {$16$}
+      child { node [color=blue, vertex] {$7$} } 
+    }
+  }
+  child {
+    node [vertex] {$3$}
+    child { node [color=blue, vertex] {$9$} }
+    child { node [color=blue, vertex] {$10$} }
+  };
+\end{tikzpicture}
+\end{preview}
+% 7
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [vertex] (r){$4$}
+  child {
+    node [vertex] (a) {$1$}
+    child {
+      node [color=blue, vertex] {$14$}
+      child { node [color=blue, vertex] {$2$} } 
+      child { node [color=blue, vertex] {$8$} } 
+    }
+    child {
+      node [color=blue, vertex] {$16$}
+      child { node [color=blue, vertex] {$7$} } 
+    }
+  }
+  child {
+    node [color=red, vertex] {$3$}
+    child { node [color=blue, vertex] {$9$} }
+    child { node [color=blue, vertex] {$10$} }
+  };
+\end{tikzpicture}
+\end{preview}
+% 8
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [vertex] (r){$4$}
+  child {
+    node [vertex] (a) {$1$}
+    child {
+      node [color=blue, vertex] {$14$}
+      child { node [color=blue, vertex] {$2$} } 
+      child { node [color=blue, vertex] {$8$} } 
+    }
+    child {
+      node [color=blue, vertex] {$16$}
+      child { node [color=blue, vertex] {$7$} } 
+    }
+  }
+  child {
+    node [color=blue, vertex] {$10$}
+    child { node [color=blue, vertex] {$9$} }
+    child { node [color=blue, vertex] {$3$} }
+  };
+\end{tikzpicture}
+\end{preview}
+% 9
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [vertex] (r){$4$}
+  child {
+    node [color=red, vertex] (a) {$1$}
+    child {
+      node [color=blue, vertex] {$14$}
+      child { node [color=blue, vertex] {$2$} } 
+      child { node [color=blue, vertex] {$8$} } 
+    }
+    child {
+      node [color=blue, vertex] {$16$}
+      child { node [color=blue, vertex] {$7$} } 
+    }
+  }
+  child {
+    node [color=blue, vertex] {$10$}
+    child { node [color=blue, vertex] {$9$} }
+    child { node [color=blue, vertex] {$3$} }
+  };
+\end{tikzpicture}
+\end{preview}
+% 10
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [vertex] (r){$4$}
+  child {
+    node [color=blue, vertex] (a) {$16$}
+    child {
+      node [color=blue, vertex] {$14$}
+      child { node [color=blue, vertex] {$2$} } 
+      child { node [color=blue, vertex] {$8$} } 
+    }
+    child {
+      node [color=red, vertex] {$1$}
+      child { node [color=blue, vertex] {$7$} } 
+    }
+  }
+  child {
+    node [color=blue, vertex] {$10$}
+    child { node [color=blue, vertex] {$9$} }
+    child { node [color=blue, vertex] {$3$} }
+  };
+\end{tikzpicture}
+\end{preview}
+% 11
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [vertex] (r){$4$}
+  child {
+    node [color=blue, vertex] (a) {$16$}
+    child {
+      node [color=blue, vertex] {$14$}
+      child { node [color=blue, vertex] {$2$} } 
+      child { node [color=blue, vertex] {$8$} } 
+    }
+    child {
+      node [color=blue, vertex] {$7$}
+      child { node [color=red, vertex] {$1$} } 
+    }
+  }
+  child {
+    node [color=blue, vertex] {$10$}
+    child { node [color=blue, vertex] {$9$} }
+    child { node [color=blue, vertex] {$3$} }
+  };
+\end{tikzpicture}
+\end{preview}
+% 12
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [vertex] (r){$4$}
+  child {
+    node [color=blue, vertex] (a) {$16$}
+    child {
+      node [color=blue, vertex] {$14$}
+      child { node [color=blue, vertex] {$2$} } 
+      child { node [color=blue, vertex] {$8$} } 
+    }
+    child {
+      node [color=blue, vertex] {$7$}
+      child { node [color=blue, vertex] {$1$} } 
+    }
+  }
+  child {
+    node [color=blue, vertex] {$10$}
+    child { node [color=blue, vertex] {$9$} }
+    child { node [color=blue, vertex] {$3$} }
+  };
+\end{tikzpicture}
+\end{preview}
+% 13
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [color=red, vertex] (r){$4$}
+  child {
+    node [color=blue, vertex] (a) {$16$}
+    child {
+      node [color=blue, vertex] {$14$}
+      child { node [color=blue, vertex] {$2$} } 
+      child { node [color=blue, vertex] {$8$} } 
+    }
+    child {
+      node [color=blue, vertex] {$7$}
+      child { node [color=blue, vertex] {$1$} } 
+    }
+  }
+  child {
+    node [color=blue, vertex] {$10$}
+    child { node [color=blue, vertex] {$9$} }
+    child { node [color=blue, vertex] {$3$} }
+  };
+\end{tikzpicture}
+\end{preview}
+% 14
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [color=blue, vertex] (r){$16$}
+  child {
+    node [color=red, vertex] (a) {$4$}
+    child {
+      node [color=blue, vertex] {$14$}
+      child { node [color=blue, vertex] {$2$} } 
+      child { node [color=blue, vertex] {$8$} } 
+    }
+    child {
+      node [color=blue, vertex] {$7$}
+      child { node [color=blue, vertex] {$1$} } 
+    }
+  }
+  child {
+    node [color=blue, vertex] {$10$}
+    child { node [color=blue, vertex] {$9$} }
+    child { node [color=blue, vertex] {$3$} }
+  };
+\end{tikzpicture}
+\end{preview}
+% 15
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [color=blue, vertex] (r){$16$}
+  child {
+    node [color=blue, vertex] (a) {$14$}
+    child {
+      node [color=red, vertex] {$4$}
+      child { node [color=blue, vertex] {$2$} } 
+      child { node [color=blue, vertex] {$8$} } 
+    }
+    child {
+      node [color=blue, vertex] {$7$}
+      child { node [color=blue, vertex] {$1$} } 
+    }
+  }
+  child {
+    node [color=blue, vertex] {$10$}
+    child { node [color=blue, vertex] {$9$} }
+    child { node [color=blue, vertex] {$3$} }
+  };
+\end{tikzpicture}
+\end{preview}
+% 16
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [color=blue, vertex] (r){$16$}
+  child {
+    node [color=blue, vertex] (a) {$14$}
+    child {
+      node [color=blue, vertex] {$8$}
+      child { node [color=blue, vertex] {$2$} } 
+      child { node [color=red, vertex] {$4$} } 
+    }
+    child {
+      node [color=blue, vertex] {$7$}
+      child { node [color=blue, vertex] {$1$} } 
+    }
+  }
+  child {
+    node [color=blue, vertex] {$10$}
+    child { node [color=blue, vertex] {$9$} }
+    child { node [color=blue, vertex] {$3$} }
+  };
+\end{tikzpicture}
+\end{preview}
+% 17
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [color=blue, vertex] (r){$16$}
+  child {
+    node [color=blue, vertex] (a) {$14$}
+    child {
+      node [color=blue, vertex] {$8$}
+      child { node [color=blue, vertex] {$2$} } 
+      child { node [color=blue, vertex] {$4$} } 
+    }
+    child {
+      node [color=blue, vertex] {$7$}
+      child { node [color=blue, vertex] {$1$} } 
+    }
+  }
+  child {
+    node [color=blue, vertex] {$10$}
+    child { node [color=blue, vertex] {$9$} }
+    child { node [color=blue, vertex] {$3$} }
+  };
+\end{tikzpicture}
+\end{preview}
+
+\end{document}
+
+The MIT License
+
+Copyright (c) 2012-2013 Martin Thoma
+Copyright (c) 2015 David Deharbe
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE

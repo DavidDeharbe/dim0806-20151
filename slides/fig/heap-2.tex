@@ -1,0 +1,377 @@
+\documentclass{article}
+\usepackage[pdftex,active,tightpage]{preview}
+\setlength\PreviewBorder{2mm}
+ 
+\usepackage{tikz}
+\usetikzlibrary{arrows,positioning, calc} 
+\tikzstyle{vertex}=[draw,fill=black!15,circle,minimum size=18pt,inner sep=0pt]
+
+
+\begin{document}
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [vertex] (r){$67$}
+  child {
+    node [vertex] (a) {$62$}
+    child {
+      node [vertex] {$45$}
+      child {
+        node [vertex] {$40$}
+      } 
+      child {
+        node [vertex] {$31$}
+      }
+    }
+    child {
+      node [vertex] {$47$}
+      child {node [vertex] {$19$}}
+      child {node [vertex] {$7$}}
+    }
+  }
+  child {
+    node [vertex] {$58$}
+    child {
+      node [vertex] {$31$}
+      child {node [vertex] {$17$}}
+    }
+    child {
+      node [vertex] {$38$}
+    }
+  };
+\end{tikzpicture}
+\end{preview}
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [color=white,vertex] (r){$67$}
+  child {
+    node [vertex] (a) {$62$}
+    child {
+      node [vertex] {$45$}
+      child {
+        node [vertex] {$40$}
+      } 
+      child {
+        node [vertex] {$31$}
+      }
+    }
+    child {
+      node [vertex] {$47$}
+      child {node [vertex] {$19$}}
+      child {node [vertex] {$7$}}
+    }
+  }
+  child {
+    node [vertex] {$58$}
+    child {
+      node [vertex] {$31$}
+      child {node [color=blue, very thin, vertex] {$17$}}
+    }
+    child {
+      node [vertex] {$38$}
+    }
+  };
+\end{tikzpicture}
+\end{preview}
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [color=red, vertex] (r){$17$}
+  child {
+    node [vertex] (a) {$62$}
+    child {
+      node [vertex] {$45$}
+      child {
+        node [vertex] {$40$}
+      } 
+      child {
+        node [vertex] {$31$}
+      }
+    }
+    child {
+      node [vertex] {$47$}
+      child {node [vertex] {$19$}}
+      child {node [vertex] {$7$}}
+    }
+  }
+  child {
+    node [vertex] {$58$}
+    child {
+      node [vertex] {$31$}
+    }
+    child {
+      node [vertex] {$38$}
+    }
+  };
+\end{tikzpicture}
+\end{preview}
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [color=red, vertex] (r){$17$}
+  child {
+    node [color=blue,vertex] (a) {$62$}
+    child {
+      node [vertex] {$45$}
+      child {
+        node [vertex] {$40$}
+      } 
+      child {
+        node [vertex] {$31$}
+      }
+    }
+    child {
+      node [vertex] {$47$}
+      child {node [vertex] {$19$}}
+      child {node [vertex] {$7$}}
+    }
+  }
+  child {
+    node [vertex] {$58$}
+    child {
+      node [vertex] {$31$}
+    }
+    child {
+      node [vertex] {$38$}
+    }
+  };
+\end{tikzpicture}
+\end{preview}
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [color=blue, vertex] (r){$62$}
+  child {
+    node [color=red,vertex] (a) {$17$}
+    child {
+      node [vertex] {$45$}
+      child {
+        node [vertex] {$40$}
+      } 
+      child {
+        node [vertex] {$31$}
+      }
+    }
+    child {
+      node [vertex] {$47$}
+      child {node [vertex] {$19$}}
+      child {node [vertex] {$7$}}
+    }
+  }
+  child {
+    node [vertex] {$58$}
+    child {
+      node [vertex] {$31$}
+    }
+    child {
+      node [vertex] {$38$}
+    }
+  };
+\end{tikzpicture}
+\end{preview}
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [vertex] (r){$62$}
+  child {
+    node [color=red,vertex] (a) {$17$}
+    child {
+      node [vertex] {$45$}
+      child {
+        node [vertex] {$40$}
+      } 
+      child {
+        node [vertex] {$31$}
+      }
+    }
+    child {
+      node [color=blue,vertex] {$47$}
+      child {node [vertex] {$19$}}
+      child {node [vertex] {$7$}}
+    }
+  }
+  child {
+    node [vertex] {$58$}
+    child {
+      node [vertex] {$31$}
+    }
+    child {
+      node [vertex] {$38$}
+    }
+  };
+\end{tikzpicture}
+\end{preview}
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [vertex] (r){$62$}
+  child {
+    node [color=blue,vertex] (a) {$47$}
+    child {
+      node [vertex] {$45$}
+      child {
+        node [vertex] {$40$}
+      } 
+      child {
+        node [vertex] {$31$}
+      }
+    }
+    child {
+      node [color=red,vertex] {$17$}
+      child {node [vertex] {$19$}}
+      child {node [vertex] {$7$}}
+    }
+  }
+  child {
+    node [vertex] {$58$}
+    child {
+      node [vertex] {$31$}
+    }
+    child {
+      node [vertex] {$38$}
+    }
+  };
+\end{tikzpicture}
+\end{preview}
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [vertex] (r){$62$}
+  child {
+    node [vertex] (a) {$47$}
+    child {
+      node [vertex] {$45$}
+      child {
+        node [vertex] {$40$}
+      } 
+      child {
+        node [vertex] {$31$}
+      }
+    }
+    child {
+      node [color=red,vertex] {$17$}
+      child {node [vertex] {$19$}}
+      child {node [vertex] {$7$}}
+    }
+  }
+  child {
+    node [vertex] {$58$}
+    child {
+      node [vertex] {$31$}
+    }
+    child {
+      node [vertex] {$38$}
+    }
+  };
+\end{tikzpicture}
+\end{preview}
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [vertex] (r){$62$}
+  child {
+    node [vertex] (a) {$47$}
+    child {
+      node [vertex] {$45$}
+      child {
+        node [vertex] {$40$}
+      } 
+      child {
+        node [vertex] {$31$}
+      }
+    }
+    child {
+      node [color=red,vertex] {$17$}
+      child {node [color=blue,vertex] {$19$}}
+      child {node [vertex] {$7$}}
+    }
+  }
+  child {
+    node [vertex] {$58$}
+    child {
+      node [vertex] {$31$}
+    }
+    child {
+      node [vertex] {$38$}
+    }
+  };
+\end{tikzpicture}
+\end{preview}
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [vertex] (r){$62$}
+  child {
+    node [vertex] (a) {$47$}
+    child {
+      node [vertex] {$45$}
+      child {
+        node [vertex] {$40$}
+      } 
+      child {
+        node [vertex] {$31$}
+      }
+    }
+    child {
+      node [color=blue,vertex] {$19$}
+      child {node [color=red,vertex] {$17$}}
+      child {node [vertex] {$7$}}
+    }
+  }
+  child {
+    node [vertex] {$58$}
+    child {
+      node [vertex] {$31$}
+    }
+    child {
+      node [vertex] {$38$}
+    }
+  };
+\end{tikzpicture}
+\end{preview}
+\begin{preview}
+\begin{tikzpicture}[very thick,level/.style={sibling distance=70mm/#1}]
+\node [vertex] (r){$62$}
+  child {
+    node [vertex] (a) {$47$}
+    child {
+      node [vertex] {$45$}
+      child {
+        node [vertex] {$40$}
+      } 
+      child {
+        node [vertex] {$31$}
+      }
+    }
+    child {
+      node [vertex] {$19$}
+      child {node [vertex] {$17$}}
+      child {node [vertex] {$7$}}
+    }
+  }
+  child {
+    node [vertex] {$58$}
+    child {
+      node [vertex] {$31$}
+    }
+    child {
+      node [vertex] {$38$}
+    }
+  };
+\end{tikzpicture}
+\end{preview}
+\end{document}
+
+The MIT License
+
+Copyright (c) 2012-2013 Martin Thoma
+Copyright (c) 2015 David Deharbe
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE

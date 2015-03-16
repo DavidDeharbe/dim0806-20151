@@ -1,0 +1,556 @@
+\documentclass{beamer}
+\setbeamertemplate{footline}[frame number]
+%\documentclass{beamer}
+
+\input{preamble}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows,positioning, calc} 
+\tikzstyle{vertex}=[draw,fill=black!15,circle,minimum size=18pt,inner sep=0pt]
+
+\title{Aula 10: Algoritmos de ordenação em arranjos}
+\subtitle{Ordenação por \textit{heap\/}}
+\author{David Déharbe \\
+  Programa de Pós-graduação em Sistemas e Computação \\
+  Universidade Federal do Rio Grande do Norte \\
+  Centro de Ciências Exatas e da Terra \\
+  Departamento de Informática e Matemáica Aplicada}
+\date{18 de março de 2015}
+
+
+\begin{document}
+\selectlanguage{brazil}
+\begin{frame}
+  \titlepage
+  Download me from \url{http://ufrn.academia.edu/DavidDeharbe}.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Plano da aula}
+  \tableofcontents
+\end{frame}
+
+\begin{frame}
+  \frametitle{Introdução}
+
+  \begin{itemize}
+    \item Ordenação em $\Theta(n \log n)$ (como ordenação por fusão);
+    \item Sem arranjo auxiliar (como ordenação por inserção);
+    \item Baseado no conceito de \textit{heap\/}.
+      \begin{itemize}
+        \item Listas de prioridade
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\section{Heap}
+
+\begin{frame}
+
+  \frametitle{\textit{Heap}}
+  \framesubtitle{Conceito}
+
+{\center \includegraphics[height=.5\textheight]{fig/heap.pdf}}
+
+\begin{itemize}
+\only<1>{
+\item Árvore binária
+  \begin{itemize}
+  \item $\id{value}(N)$: valor no nó $N$;
+  \item $\id{left}(N)$: filho esquerdo do nó $N$ (ou $\const{Nil}$);
+  \item $\id{right}(N)$: filho direito do nó $N$ (ou $\const{Nil}$).
+  \end{itemize}
+}
+\only<2>{
+\item Árvore binária cheia, e o último nível é preenchido da esquerda
+  para a direita. \alert{Propriedade estrutural}
+}
+\only<3>{
+\item Em cada nó, o valor é maior ou igual aos valores nos nós filhos
+  \begin{itemize}
+  \item \alert{Propriedade de ordenação}
+  \item $\forall N \cdot \id{left}(N) = \const{Nil} \lor \id{value}(N) \ge
+    \id{value}(\id{left}(N))$;
+  \item $\forall N \cdot \id{right}(N) = \const{Nil} \lor \id{value}(N) \ge
+    \id{value}(\id{right}(N))$.
+  \item Corolário: o maior valor encontra-se sempre na raiz.
+  \end{itemize}
+}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{\textit{Heap}}
+  \framesubtitle{Exercício}
+
+{\center \includegraphics[height=.5\textheight]{fig/heap.pdf}}
+
+\begin{itemize}
+\item Seja um \textit{heap\/} com $n$ elementos.
+\item Qual é a quantidade máxima de elementos no nível $i$ (assumindo que 1 é o nível da raiz, 2 o nível seguinte, etc.)?
+\item Qual é a altura máxima do \textit{heap\/}?
+\item O que podemos dizer de cada sub-árvore de um \textit{heap\/}?
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{\textit{Heap}}
+  \framesubtitle{Representação dos dados}
+
+{\center \includegraphics[height=.4\textheight]{fig/heap.pdf}}
+
+\begin{itemize}
+\item Representação em um arranjo, digamos $\id{A}$:
+  \begin{itemize}
+    \item seja $N_i$ o nó na posição $i$;
+    \item $N_i$: $\id{value}(N_i) = \id{A}[i]$, $\id{left}(N_i) = 2i$, $\id{right}(N_i) = 2i+1$, $\id{up}(N_i) = \lfloor i / 2 \rfloor$.
+    \item A raiz fica na posição $1$.
+  \end{itemize}
+\end{itemize}
+
+{\center \includegraphics[width=\textwidth]{fig/heap-array.pdf}}
+\end{frame}
+
+\section{Listas de prioridade}
+
+\begin{frame}
+
+  \frametitle{\textit{Heap} para listas de prioridade}
+  \framesubtitle{Especificação}
+
+A lista de prioridade é uma coleção de elementos com as seguintes operações:
+\begin{enumerate}
+\item Obter elemento de maior prioridade
+\item Inserir um novo elemento
+\item Retirar o elemento de maior prioridade
+\item Construir a lista a partir de uma sequência qualquer inicial
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{\textit{Heap} para listas de prioridade}
+  \framesubtitle{Representação dos dados}
+
+Um arranjo $A$ onde
+\begin{itemize}
+\item $\id{num}(A)$: número de elementos na lista
+\item $\id{size}(A)$: capacidade máxima da lista
+\item $0 \le \id{num}(A) \le \id{size}(A)$
+\item $\forall i | 2 \le i \le \id{num}(A) \cdot A(i) \le A(\lfloor i/2 \rfloor)$
+\item Exemplo:
+{\center \includegraphics[width=\textwidth]{fig/heap-array-2.pdf}}
+\begin{itemize}
+\item $\id{num} = 12$
+\item $\id{size} = 16$
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{\textit{Heap} para listas de prioridade}
+  \framesubtitle{Obtenção do maior elemento}
+
+\begin{codebox}
+\Procname{$\proc{Get-Min}(H)$}
+\zi \Comment \assert{$H = \langle a_1, \ldots, a_{\id{size}(H)} \rangle \land 0 < \id{num}(H)$}
+\li \Return $H[1]$
+\zi \Comment \assert{$\id{r} = \mathbf{max} \{a_1, \ldots, a_{\id{num}(H)}\}$}
+    \End
+\end{codebox}  
+
+\end{frame}
+
+\begin{frame}{\textit{Heap} para listas de prioridade}
+  \framesubtitle{Inserção de um elemento: princípio e exemplo}
+
+\only<1>{
+  {\center \includegraphics[width=\textwidth]{fig/heap-insert-1.pdf}}
+  \begin{itemize}
+    \item Inserir 60.
+  \end{itemize}
+}
+\only<2>{
+  {\center \includegraphics[width=\textwidth]{fig/heap-insert-2.pdf}}
+  \begin{itemize}
+  \item Restrição: Preservar a propriedade estrutural.
+  \item Criar uma nova folha a direita no último nível.
+  \end{itemize}
+}
+\only<3>{
+  {\center \includegraphics[width=\textwidth]{fig/heap-insert-3.pdf}}
+  \begin{itemize}
+    \item Restrição 2: Reestabelecer a propriedade de ordenação.
+  \item Ideia: trocar valores com pai.
+  \end{itemize}
+}
+\only<4>{
+  {\center \includegraphics[width=\textwidth]{fig/heap-insert-4.pdf}}
+  Continuar enquanto o valor ``subindo''
+  \begin{itemize}
+  \item está em um nó com nó pai;
+  \item é maior que o valor do pai.
+  \end{itemize}
+}
+\only<5>{
+  {\center \includegraphics[width=\textwidth]{fig/heap-insert-5.pdf}}
+}
+\only<6->{
+  {\center \includegraphics[width=\textwidth]{fig/heap-insert-6.pdf}}
+\pause
+Exercício:
+\begin{itemize}
+  \item Desenhar o estado do \textit{heap\/} após uma, duas, três,... remoções do maior elemento.
+\end{itemize}
+}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{\textit{Heap} para listas de prioridade}
+  \framesubtitle{Algoritmo}
+
+\begin{codebox}
+\Procname{$\proc{Insert}(H, v)$}
+\zi \Comment \assert{$H = \langle a_1, \ldots, a_{\id{size}(H)} \rangle \land \id{num}(H) < \id{size}(H)$}
+\li $\id{num}(H) \gets \id{num}(H) + 1$
+\li $H[\id{num}(H)] \gets v$
+\li $\proc{Sift-Up}(H, \id{num}(H))$
+    \End
+\end{codebox}
+
+\begin{codebox}
+\Procname{$\proc{Sift-Up}(H, i)$}
+\li \If $i > 1$ and $H[i] > H[\id{up}(i)]$
+\li   \Then
+        $\proc{Swap}(H, i, \id{up}(i))$
+\li     $\proc{Sift-Up}(H, \id{up}(i))$
+    \End
+\end{codebox}
+
+\begin{itemize}
+\item Complexidade no pior caso
+\begin{itemize}
+  \item Uma chamada por nível da árvore
+  \item $\Theta(\log \id{Num}(H))$
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{\textit{Heap} para listas de prioridade}
+  \framesubtitle{Remoção do maior elemento: princípio e exemplo}
+
+\only<1>{
+  {\center \includegraphics[width=\textwidth]{fig/heap-2-1.pdf}}
+  \begin{itemize}
+    \item O elemento 67 deve ser removido.
+  \end{itemize}
+}
+\only<2>{
+  {\center \includegraphics[width=\textwidth]{fig/heap-2-2.pdf}}
+  \begin{itemize}
+  \item Restrição: Preserva a propriedade estrutural.
+  \item A folha a mais a direita é o único nó que pode ser removido.
+  \item Mover o elemento nesta para raiz e eliminar o nó.
+  \end{itemize}
+}
+\only<3>{
+  {\center \includegraphics[width=\textwidth]{fig/heap-2-3.pdf}}
+  \begin{itemize}
+    \item Restrição 2: Reestabelecer a propriedade de ordenação.
+  \end{itemize}
+}
+\only<4>{
+  {\center \includegraphics[width=\textwidth]{fig/heap-2-4.pdf}}
+  \begin{itemize}
+  \item Restrição 2: Reestabelecer a propriedade de ordenação.
+  \item Ideia: trocar valores com filho que tem maior elemento.
+  \end{itemize}
+}
+\only<5>{
+  {\center \includegraphics[width=\textwidth]{fig/heap-2-5.pdf}}
+}
+\only<6>{
+  {\center \includegraphics[width=\textwidth]{fig/heap-2-6.pdf}}
+  Continuar enquanto o valor ``descendo''
+  \begin{itemize}
+  \item tem um ou dois filhos;
+  \item é menor que o maior dos filhos.
+  \end{itemize}
+}
+\only<7>{
+  {\center \includegraphics[width=\textwidth]{fig/heap-2-7.pdf}}
+}
+\only<8>{
+  {\center \includegraphics[width=\textwidth]{fig/heap-2-8.pdf}}
+}
+\only<9>{
+  {\center \includegraphics[width=\textwidth]{fig/heap-2-9.pdf}}
+}
+\only<10>{
+  {\center \includegraphics[width=\textwidth]{fig/heap-2-10.pdf}}
+}
+\only<11->{
+  {\center \includegraphics[width=\textwidth]{fig/heap-2-11.pdf}}
+\pause
+Exercício:
+\begin{itemize}
+  \item Desenhar o estado do \textit{heap\/} após inserir 50, 73, 65.
+\end{itemize}
+}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{\textit{Heap} para listas de prioridade}
+  \framesubtitle{Algoritmo}
+
+\begin{codebox}
+\Procname{$\proc{Remove-Min}(H)$}
+\zi \Comment \assert{$H = \langle a_1, \ldots, a_{\id{size}(H)} \rangle \land 0 < \id{num}(H)$}
+\li $H[1] \gets H[\id{num}(H)]$
+\li $\id{num}(H) \gets \id{num}(H) - 1$
+\li $\proc{Sift-Down}(H, 1)$
+    \End
+\end{codebox}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{\textit{Heap} para listas de prioridade}
+  \framesubtitle{Algoritmo}
+
+\begin{codebox}
+\Procname{$\proc{Sift-Down}(H, i)$}
+\li \If $\proc{Left}(i) > \id{num}(H)$
+\li   \Then \Return
+\li   \ElseIf $\proc{Left}(i) = \id{num}(H)$ and $H[i] > H[\proc{Left}(i)]$
+\li   \Then 
+         $\proc{Swap}(H, i, \proc{Left}(i))$
+\li      $\proc{Sift-Down}(H, \proc{Left}(i))$
+\li   \ElseNoIf
+\li       \If $H[\proc{Left}(i)] \ge H[\proc{Right}(i)]$
+\li       \Then $m \gets \proc{Left}(i)$
+\li       \Else $m \gets \proc{Right}(i)$
+        \End
+\li     \If $H[\proc{Left}(i)] > H[m]$
+\li       \Then 
+            $\proc{Swap}(H, i, \proc{Left}(i))$
+\li         $\proc{Sift-Down}(H, \proc{Left}(i))$
+          \End 
+      \End
+\end{codebox}  
+
+\begin{itemize}
+\item Complexidade no pior caso
+\begin{itemize}
+  \item Uma chamada por nível da árvore: $\Theta(\log \id{Num}(H))$
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{\textit{Heap} para listas de prioridade}
+  \framesubtitle{Construção}
+
+  \only<1>{
+    \includegraphics[width=\textwidth]{fig/heap-build-1.pdf}
+
+    \begin{itemize}
+      \item Considerando uma sequência de valores em uma ordem qualquer, 
+        como construir um \textit{heap\/}?
+      \item Se os valores estão em um arranjo, a propriedade estrutural
+        é inicialmente satisfeita.
+    \end{itemize}
+  }
+
+  \only<2>{
+    \includegraphics[width=\textwidth]{fig/heap-build-2.pdf}
+    \begin{itemize}
+    \item Inicialmente, as folhas formam sub-árvores que são
+      \textit{heaps\/}.
+    \end{itemize}
+  }
+
+  \only<3>{
+    \includegraphics[width=\textwidth]{fig/heap-build-3.pdf}
+    \begin{itemize}
+    \item Cada nó interno cujas sub-árvores são \textit{heaps} é analizado.
+    \end{itemize}
+  }
+
+  \only<4>{
+    \includegraphics[width=\textwidth]{fig/heap-build-4.pdf}
+    \begin{itemize}
+    \item Se é maior que os filhos, nada é feito.
+    \end{itemize}
+  }
+
+  \only<5>{
+    \includegraphics[width=\textwidth]{fig/heap-build-5.pdf}
+    \begin{itemize}
+    \item Senão, a sub-árvore é corrigida aplicando $\proc{Sift-Down}$.
+    \end{itemize}
+  }
+
+  \only<6>{
+    \includegraphics[width=\textwidth]{fig/heap-build-6.pdf}
+    \begin{itemize}
+    \item A sub-árvore passa a ser um \textit{heap\/}.
+    \end{itemize}
+  }
+
+  \only<7>{
+    \includegraphics[width=\textwidth]{fig/heap-build-7.pdf}
+    \begin{itemize}
+    \item E assim sucessivamente...
+    \end{itemize}
+  }
+
+  \only<8>{
+    \includegraphics[width=\textwidth]{fig/heap-build-8.pdf}
+  }
+
+  \only<9>{
+    \includegraphics[width=\textwidth]{fig/heap-build-9.pdf}
+  }
+
+  \only<10>{
+    \includegraphics[width=\textwidth]{fig/heap-build-10.pdf}
+  }
+
+  \only<11>{
+    \includegraphics[width=\textwidth]{fig/heap-build-11.pdf}
+  }
+
+  \only<12>{
+    \includegraphics[width=\textwidth]{fig/heap-build-12.pdf}
+  }
+
+  \only<13>{
+    \includegraphics[width=\textwidth]{fig/heap-build-13.pdf}
+  }
+
+  \only<14>{
+    \includegraphics[width=\textwidth]{fig/heap-build-14.pdf}
+  }
+
+  \only<15>{
+    \includegraphics[width=\textwidth]{fig/heap-build-15.pdf}
+  }
+
+  \only<16>{
+    \includegraphics[width=\textwidth]{fig/heap-build-16.pdf}
+  }
+
+  \only<17>{
+    \includegraphics[width=\textwidth]{fig/heap-build-17.pdf}
+    \begin{itemize}
+      \item Finalmente, o arranjo forma um \textit{heap\/}.
+    \end{itemize}
+  }
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{\textit{Heap} para listas de prioridade}
+  \framesubtitle{Algoritmo de construção}
+
+\begin{codebox}
+\Procname{$\proc{Build}(H)$}
+\li \For $i \gets \id{num}(H)/2$ \Downto $1$
+\li   \Do 
+        $\proc{Sift-Down}(H, i)$
+      \End
+\end{codebox}
+
+\begin{itemize}
+\item Complexidade
+\begin{itemize}
+\item $n$ nós,
+\item Há, no máximo, $n/2^{h+1}$ nós na altura $h$,
+\item O custo na altura $h$ é $O(h)$,
+\item $\begin{array}[t]{rcl}
+    T(n) & = & \sum_{h=0}^{\lfloor \lg n \rfloor} \lceil n / 2^{h+1} \rceil O(h) \\
+    & = & O(n \sum_{h=0}^{\lfloor \lg n \rfloor} h/2^h) \\
+    & = & O(n \sum_{h=0}^{\infty} h/2^h)
+  \end{array}$
+\item $\sum_{k=0}^{\infty} k x^k = \frac{x}{(1-x)^2}$ ($|x| < 1$)
+\item $T(n) = O(n)$
+\end{itemize}
+\end{itemize}
+  
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Listas de prioridade e \textit{heaps\/}}
+\framesubtitle{Síntese da complexidade no pior caso}
+
+\begin{enumerate}
+\item Obter elemento de maior prioridade $\Theta(1)$
+\item Inserir um novo elemento $\Theta(\lg n)$
+\item Retirar o elemento de maior prioridade  $\Theta(\lg n)$
+\item Construir a lista a partir de uma sequência qualquer inicial $\Theta(n)$
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Ordenação e \textit{heaps\/}}
+
+{\center \includegraphics[height=.4\textheight]{fig/heap.pdf}}
+
+{\center \includegraphics[width=\textwidth]{fig/heap-array-2.pdf}}
+
+\begin{itemize}
+\item Como utilizar o conceito de \textit{heap\/} para ordenar o arranjo em
+  ordem crescente?
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Ordenação e \textit{heaps\/}}
+\framesubtitle{Princípios}
+
+{\center \includegraphics[height=.4\textheight]{fig/heap.pdf}}
+
+\begin{itemize}
+\item O maior valor está na posição 1 do \textit{heap\/}.
+\item Deve ficar na última posição do arranjo ordenado.
+\pause
+\item Inverter o conteúdo das posições 1 e $\id{num}(H)$.
+\item Decrementar $\id{num}(H)$.
+\item Reestabelecer a propriedade de ordenação aplicando $\proc{Sift-Down}$
+  à posição 1.
+\item Repetir enquanto $\id{num}(H) > 2$.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Ordenação e \textit{heaps\/}}
+\framesubtitle{Complexidade}
+
+\begin{itemize}
+\item Há $\Theta(n)$ chamadas a $\proc{Sift-Down}$
+\item Cada chamada custa $O(\lg n)$.
+\item Logo o custo total é $O(n \lg n)$
+\end{itemize}
+
+\end{frame}
+
+\end{document}
+

@@ -271,19 +271,19 @@ Métodos de resolução
 
 Em uma série de $n$ execuções de $\proc{Increment}$:
 \begin{itemize}
-\item $A[0]$ é invertido $n/2$ vezes;
-\item $A[1]$ é invertido $n/4$ vezes;
-\item $A[2]$ é invertido $n/8$ vezes;
+\item $A[0]$ é invertido $n$ vezes;
+\item $A[1]$ é invertido $n/2$ vezes;
+\item $A[2]$ é invertido $n/4$ vezes;
 \item $A[k-1]$ é invertido $n/2^{k-1}$ vezes;
 \end{itemize}
 O custo total para $n$ operações é 
 \begin{eqnarray*}
-T(n) & = & \sum_{i=1}^{\lfloor \lg n \rfloor} n/2^i \\
-T(n) & < & \sum_{i=1}^{\infty} n/2^i \\
-T(n) & < & n \times \sum_{i=1}^{\infty} 1/2^i = n
+T(n) & = & \sum_{i=1}^{\lfloor \lg n \rfloor} n/2^{i-1} \\
+T(n) & < & \sum_{i=1}^{\infty} n/2^{i-1} \\
+T(n) & < & n \times \sum_{i=1}^{\infty} 1/2^{i-1} = 2n
 \end{eqnarray*}
 
-Logo o custo amortizado de $\proc{Increment}$ é $T(n)/n = 1$: é \alert{constante}.
+Logo o custo amortizado de $\proc{Increment}$ é $T(n)/n = 2 \in \Theta(1)$: é \alert{constante}.
 
 \end{frame}
 
