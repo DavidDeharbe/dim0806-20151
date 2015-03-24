@@ -1,0 +1,646 @@
+%%
+%% TODO 
+%% # Recursion trees
+%%  - best case
+%%  - constant proportion (9/1)
+%%  - alternating worst/best
+%% # Algorithm simulation
+%%  - Division
+%%
+%% IMPROVE
+%% - define loop invariant in division
+%% - improve simulation of quick-sort
+%%
+
+\documentclass{beamer}
+\setbeamertemplate{footline}[frame number]
+%\documentclass{beamer}
+
+\input{preamble}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows,positioning, calc} 
+\tikzstyle{vertex}=[draw,fill=black!15,circle,minimum size=18pt,inner sep=0pt]
+
+\title{Aula 11: Algoritmos de ordenação em arranjos}
+\subtitle{O algoritmo \textit{Quick-Sort\/}}
+\author{David Déharbe \\
+  Programa de Pós-graduação em Sistemas e Computação \\
+  Universidade Federal do Rio Grande do Norte \\
+  Centro de Ciências Exatas e da Terra \\
+  Departamento de Informática e Matemática Aplicada}
+\date{23 de março de 2015}
+
+
+\begin{document}
+\selectlanguage{brazil}
+\begin{frame}
+  \titlepage
+  Download me from \url{http://ufrn.academia.edu/DavidDeharbe}.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Plano da aula}
+  \tableofcontents
+\end{frame}
+
+\section{Introdução}
+
+\begin{frame}
+  \frametitle{Introdução}
+
+  Ref: Cormen et al. Seção 4.1 (método da substituição), Capítulo 8 (\textit{quicksort}.
+
+  \begin{itemize}
+    \item Sem arranjo auxiliar (como ordenação por inserção);
+    \item Baseado no conceito de divisão e conquista.
+      \begin{itemize}
+        \item Processamento é realizado \emph{antes\/} da divisão.
+      \end{itemize}
+    \item No pior caso, ordenação em $\Theta(n^2)$;
+    \item Em média, ordenação em $\Theta(n \lg n)$;
+    \item Provavelmente o mais utilizado nas aplicações.
+      \pause
+    \item C.A.R. Hoare, 1960.
+  \end{itemize}
+
+\end{frame}
+
+\section{O algoritmo}
+
+\begin{frame}
+
+  \frametitle{O algoritmo}
+  \framesubtitle{Princípio}
+
+  Seja $A$ um arranjo, para ordenar a faixa $A[l \twodots u]$ ($l < u$):
+  \begin{enumerate}
+    \item Escolhe um valor na faixa: $A[l]$ (\alert{pivô\/}).
+    \item Remaneje os valores da faixa em duas sub-faixas $A[l \twodots m-1]$
+      e $A[m \twodots u]$ tais que
+      \begin{itemize}
+        \item todos os valores na faixa $A[l \twodots m-1]$ são menores que $A[l]$;
+        \item todos os valores na faixa $A[m \twodots u]$ são maiores ou iguais a
+          $A[l]$;
+        \item o índice $m$ é um dos resultados do remanejamento.
+        \item caso particular: $A[l]$ é o menor valor da faixa, e neste caso
+          $m=l+1$.
+      \end{itemize}
+    \item Aplique recursivamente o mesmo processamento às duas sub-faixas
+      $A[l \twodots m-1]$ e $A[m \twodots u]$.
+  \end{enumerate}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{O algoritmo \textit{Quick-Sort}}
+  \framesubtitle{Simulação (chamadas recursivas com faixa de um elemento são omitidas)}
+
+  $$
+  \begin{array}{cccc}
+    A & l & u & m \\
+    \langle \assert{\alert{37}, 41, 21, 14, 18, 25, 50, 11} \rangle & 1 & 8 & \\
+    \only<2->{\langle 11, 21, 14, 18, 25, 50, 41, 37 \rangle & & & 6 } \\
+    \only<3->{\langle \assert{\alert{11}, 21, 14, 18, 25}, 50, 41, 37 \rangle & 1 & 5 & } \\
+    \only<3->{\langle 11, 21, 14, 18, 25, 50, 41, 37 \rangle & & & 2 } \\
+    \only<4->{\langle 11, \assert{\alert{21}, 14, 18, 25}, 50, 41, 37 \rangle & 2 & 5 & } \\
+    \only<5->{\langle 11, 18, 14, 25, 21, 50, 41, 37 \rangle & & & 4} \\
+    \only<6->{\langle 11, \assert{\alert{18}, 14}, 25, 21, 50, 41, 37 \rangle & 2 & 3 & } \\
+    \only<7->{\langle 11, 14, 18, \assert{\alert{25}, 21}, 50, 41, 37 \rangle & 4 & 5 & } \\
+    \only<8->{\langle 11, 14, 18, 21, 25, \assert{\alert{50}, 41, 37} \rangle & 6 & 8 & } \\
+    \only<9->{\langle 11, 14, 18, 21, 25, 37, 41, 50 \rangle & & & 8 } \\
+    \only<11->{\langle 11, 14, 18, 21, 25, \assert{\alert{37}, 41}, 50 \rangle & 6 & 7 & } \\
+    \only<12->{\langle 11, 14, 18, 21, 25, 37, 41, 50 \rangle &  &  & 7 }
+  \end{array}
+  $$
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{O algoritmo \textit{Quick-Sort}}
+
+\begin{codebox}
+\Procname{$\proc{Quick-Sort}(A, l, u)$}
+\li \If $l < u$
+\li \Then $m \gets \proc{Division}(A, l, u)$
+\li   $\proc{Quick-Sort}(A, l, m-1)$
+\li   $\proc{Quick-Sort}(A, m, u)$
+    \End
+\end{codebox}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{O algoritmo \textit{Quick-Sort}}
+  \framesubtitle{O algoritmo de divisão}
+
+  \begin{itemize}
+  \item Dê uma especificação ao algoritmo de divisão (remanejamento dos
+    elementos da faixa).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{O algoritmo \textit{Quick-Sort}}
+  \framesubtitle{O algoritmo de divisão --- especificação}
+
+  \begin{itemize}
+  \item Pré-condição
+    \assert{$A = \langle a_1, \ldots, a_n \rangle \land 1 \le l < u \le n$}
+    \pause
+  \item Pós-condição
+    \assert{$\begin{array}[t]{rl}
+        & A[1 \twodots l-1] = \langle a_1, \ldots a_{l-1} \rangle \\
+        \land & A[u+1 \twodots n] = \langle a_{u+1}, \ldots a_n \rangle \\
+        \land & A[l \twodots u] \in \mathit{permutation}\langle a_l, \ldots, a_u \rangle \\
+        \land & l < m \le u \\
+        \land & \forall i, j | l \le i < m \le j \le u \cdot A[i] \le A[j]
+      \end{array}$}
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{O algoritmo \textit{Quick-Sort}}
+  \framesubtitle{O algoritmo de divisão}
+
+  \begin{itemize}
+  \item Dê uma definição do algoritmo de divisão.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{O algoritmo \textit{Quick-Sort}}
+  \framesubtitle{O algoritmo de divisão}
+
+\begin{minipage}[l]{.45\textwidth}
+\begin{codebox}
+\Procname{$\proc{Division}(A, l, u)$}
+\li $\id{pivot} \gets \alert<4>{A[l]}$
+\li $i \gets l-1$
+\li $j \gets u+1$
+\li \While $\const{True}$
+\li   \Do \Repeat
+\li          $j \gets j-1$
+\li       \Until $\alert<4>{A[j]} \le \id{pivot}$
+\li       \Repeat 
+\li          $i \gets i+1$
+\li       \Until $\alert<4>{A[i]} \ge \id{pivot}$
+\li       \If $i < j$
+\li       \Then \alert<4>{$\proc{Swap}(A, i, j)$}
+\li       \Else \Return \alert<4>{$i$}
+          \End
+      \End
+\end{codebox}
+\end{minipage}
+\hfill
+\only<2>{\begin{minipage}[l]{.5\textwidth}
+Simulação 
+$$A[l..u] = \langle 5, 3, 2, 6, 4, 1, 3, 7 \rangle$$
+\end{minipage}}
+\only<3-6>{
+\begin{minipage}[l]{.5\textwidth}
+  Condições de correção \only<3>{\alert{???}}\only<4->{:
+  \begin{enumerate}
+  \item $A$ sempre é acessado em uma posição válida
+    \only<5->{
+    \item $j \neq u$ quando termina o algoritmo
+    }
+    \only<6>{
+    \item cada elemento de $A[l \twodots j]$ é menor que cada elemento de $A[j+1 \twodots u]$ quando termina o algoritmo
+    }
+  \end{enumerate}}
+\end{minipage}
+}
+\only<7-8>{
+\begin{minipage}[l]{.5\textwidth}
+  \begin{itemize}
+  \item Qual é a complexidade do algoritmo de divisão?
+    \only<8>{
+    \begin{itemize}
+    \item Observe que $i$ nunca ultrapassa $u$ e $j$ nunca fica menor que $l$.
+    \item O número de incrementos e decrementos pertence a \alert{$\Theta(l-u)$}.
+    \end{itemize}
+    }
+  \end{itemize}
+\end{minipage}
+}
+
+\end{frame}
+
+\section{Análise}
+
+\begin{frame}
+
+  \frametitle{O algoritmo \textit{Quick-Sort}}
+  \framesubtitle{Alguns questionamentos}
+
+  \begin{itemize}
+  \item Adaptar o algoritmo para tratar elementos repetidos
+    \only<2>{
+    \item Dividir a faixa em três sub-faixas: 
+      \begin{enumerate}
+      \item elementos menores que o pivô, 
+      \item elementos iguais ao pivô, 
+      \item elementos maiores que o pivô.
+      \end{enumerate}
+    }
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{O algoritmo \textit{Quick-Sort}}
+  \framesubtitle{Alguns questionamentos}
+
+  \begin{itemize}
+  \item Qual arranjo inicial corresponde ao pior caso deste algoritmo?
+    \only<2>{
+\begin{minipage}[c]{\textwidth}
+      \begin{minipage}[l]{.7\textwidth}
+        \includegraphics[width=\textwidth]{fig/quick-sort-worst-case-recursion-tree.pdf}
+      \end{minipage}
+      \hfill
+      \begin{minipage}[l]{.25\textwidth}
+      $\Longrightarrow$ Quando o arranjo é inicialmente ordenado.
+      \end{minipage}
+      \end{minipage}
+    }
+    \only<3->{
+    \item Como modificar o algoritmo para evitar isto?
+      \only<4>{
+        
+      $\Longrightarrow$ Escolher outro elemento que o primeiro.
+    }
+  }
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Análise de complexidade}
+  \framesubtitle{Melhor caso: divisão perfeita}
+
+  \begin{itemize}
+    \item No melhor caso, cada divisão de uma faixa de $n$ elementos
+      produz duas sub-faixas de tamanho $n/2$.
+    \item O custo é $T(n) = 2.T(n/2) + \Theta(n)$.
+    \item Teorema mestre (caso 2): $T(n) = \Theta(n \lg n)$.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Análise de complexidade}
+  \framesubtitle{Divisão proporcional}
+
+  \begin{itemize}
+
+    \item Objetivo: argumentar que o caso médio se aproxima do melhor caso.
+
+    \item Exemplo: imagine que a divisão produz uma repartição de 9 para 1.
+
+    \item Qual a complexidade neste caso?
+
+    \item $T(n) = T(9n/10) + T(n/10) + \Theta(n)$
+
+    \item O custo de cada nível de recursão é $O(n)$.
+
+    \item Há $\log_{10/9} n \in \Theta(\lg n)$ níveis.
+
+    \item Logo, $T(n) \in O(n \lg n)$.
+
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Análise de complexidade}
+  \framesubtitle{Comportamento médio}
+
+  \begin{itemize}
+
+    \item Objetivo: mostrar que o caso médio se aproxima do melhor caso.
+
+    \item Exemplo: imagine que a divisão ora produz a pior repartição possível,
+      ora produz a melhor repartição possível.
+
+    \item Qual a complexidade neste caso?
+
+    \item $T(n) = T(1) + T(n-1/2) + T(n-1/2) + \Theta(n) = 2T(n-1/2) + \Theta(n)$
+
+    \item Logo, $T(n) \in O(n \lg n)$.
+
+  \end{itemize}
+
+\end{frame}
+
+\section{Estratégias para evitar o pior caso}
+
+\begin{frame}
+
+  \frametitle{Estratégias para evitar o pior caso}
+  \framesubtitle{Randomização}
+
+  \begin{itemize}
+
+    \item Assumimos a existência de uma sub-rotina $\proc{Random}(l, u)$ que
+      retorna um número $k$, entre $l \le k \le u$ com probabilidade
+      $1/(u-l+1)$, e de custo $\Theta(1)$.
+
+    \item Solução 1: permutar aleatoriamente os elementos da faixa antes de
+      fazer a divisão
+
+      \pause Defina um algoritmo de complexidade linear que faz esta
+      permutação
+
+      \pause
+
+    \item Solução 2: permutar o primeiro elemento da faixa com um elemento
+      qualquer da faixa.
+
+\begin{codebox}
+\Procname{$\proc{Random-Division}(A, l, u)$}
+\li $\proc{Swap}(A, l, \proc{Random}(l, u))$
+\li $\proc{Division}(A, l, u)$
+\end{codebox}
+
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Análise no caso médio}
+
+  \begin{itemize}
+
+    \item Análise informal: se a divisão separar uma proporção mínima de
+      elementos,
+      \begin{itemize}
+        \item a profundidade da recursão é $\Theta(\lg n)$, e
+        \item o custo em cada nível é $\Theta n$, logo
+        \item o custo total é $\Theta(n \lg n)$.
+      \end{itemize}
+
+    \item Análise rigorosa da versão randomizada:
+
+      \begin{itemize}
+
+        \item análise da divisão
+
+        \item estabelecer recorrência do tempo médio para ordenar um
+          arranjo de $n$ elementos
+
+        \item resolução da recorrência
+
+      \end{itemize}
+
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Análise da divisão, caso inicial}
+
+  \begin{itemize}
+
+    \item Seja $n$ o tamanho da faixa.
+
+    \item Seja $\id{Pos}(p)$ a posição do pivô na ordem dos elementos da faixa.
+
+    \item Se $\id{Pos}(p) = 1$, então a primeira sub-faixa tem tamanho 1 (\alert{probabilidade: $1/n$}).
+
+    \item Se $\id{Pos}(p) = i > 1$, então a primeira sub-faixa tem tamanho
+      $1, 2, \ldots n-1$ (\alert{probabilidade: $1/n$}).
+
+    \item Probabilidade da primeira sub-faixa ter tamanho 1: $2/n$.
+
+    \item Probabilidade da primeira sub-faixa ter tamanho $1 < i < n$: $1/n$.
+
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Análise do algoritmo randomizado}
+
+  \begin{itemize}
+
+    \item Seja $T(n)$ o custo de ordenar uma faixa de tamanho $n$.
+
+    \item Caso de base $T(1) \in \Theta(1)$.
+
+    \item Em geral:
+
+      \begin{small}
+      \begin{eqnarray*}
+      T(n) & = &
+      \frac{1}{n}\left(\sum_{m=1}^{n-1} (T(m) + T(n-m)) \right) + \Theta(n) \\
+      T(n) & = &
+      \frac{2}{n}\left(\sum_{m=1}^{n-1} T(m) \right) + \Theta(n)
+      \end{eqnarray*}
+      \end{small}
+
+    \item Resolução pelo \alert{método de substituição} ($\approx$ indução)
+
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{( O método de substituição )}
+\framesubtitle{Princípios}
+\begin{itemize}
+  \item Dedução de limite superior de funções definidas por recorrência.
+  \item Se aplica se temos uma ideia da fórmula fechada da recorrência:
+    \alert{conjectura}.
+  \item A conjectura vira \alert{teorema} se
+    \begin{itemize}
+    \item no(s) caso(s) de base, a fórmula é correta;
+    \item no caso geral, substituindo os termos menores na relação, 
+      pode-se provar que o termo maior satisfaz a fórmula fechada.
+    \end{itemize}
+\end{itemize}
+\alert{Cormen, 4.1}
+\end{frame}
+
+\begin{frame}
+
+\frametitle{( O método de substituição )}
+\framesubtitle{Exemplo}
+\begin{itemize}
+\item $T(1) = 1$ e $T(n) = 2 T (\lfloor n/2 \rfloor) + n$, se $n>1$.
+\item Conjectura: $T(n) \le c n \lg n$ para alguma constante $c > 0$.
+\item Prova:
+  \begin{itemize}
+  \item Caso geral:
+    $\begin{array}[t]{rcl}
+    T(n) & = & 2 T (\lfloor n/2 \rfloor) + n \\
+    & \le & 2 c \lfloor n/2 \rfloor \lg \lfloor n / 2 \rfloor + n \\
+    & \le & c n \lg(n / 2) + n \\
+    & = & c n \lg n - c n \lg 2 + n \\
+    & = & c n \lg n - c n + n \\
+    & \le & c n \lg n \mbox{ escolhendo $c > 1$}
+    \end{array}$
+    \pause
+  \item Caso de base:
+    Supondo $T(1) = 1$, então como $c \lg 1 = 0$, a prova \alert{fracassa}.
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+
+\frametitle{( O método de substituição )}
+\framesubtitle{Exemplo: segunda tentativa}
+\begin{itemize}
+\item $T(1) = 1$ e $T(n) = 2 T (\lfloor n/2 \rfloor) + n$, se $n>1$.
+\item Conjectura: $\forall n \ge n_0 \cdot T(n) \le c n \lg n$ para algumas constantes $c > 0$, 
+  e $n_0 \ge 1$.
+\end{itemize}
+
+Prova:
+\begin{itemize}
+\item Caso geral: idem
+  \pause
+\item Caso de base: vamos escolher $c$ e $n_0$ para funcionar!
+  \begin{itemize}
+  \item $T(1) = 1$, então $T(2) = 4$, e $T(3) = 5$
+  \item Para $n_0 = 2$, escolhemos $c$ tal que $T(2) = 4 \le c 2 \lg 2 = 2c$
+    \pause \assert{$\Longrightarrow c = 2$}
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Análise do algoritmo randomizado}
+
+  \begin{itemize}
+
+    \item Conjectura: \alert<3-4>{$T(n) \le a n \lg n + b$}, com $a > 0$ e $b > 0$ a determinar.
+
+\only<1>{    \item Caso de base $T(1) \in \Theta(1)$.
+
+\begin{itemize}
+  \item \assert{OK}
+\end{itemize}
+}
+
+\only<2->{
+    \item Em geral:
+
+      \begin{small}
+      \begin{eqnarray*}
+      T(n) 
+\only<2-3>{ & = & \frac{1}{n}\left(\sum_{m=1}^{n-1} T(m) + T(n-m)\right) + \Theta(n) \\}
+\only<3-4>{ & = & \frac{2}{n}\left(\sum_{m=1}^{n-1} T(m) \right) + \Theta(n) \\}
+\only<4-5>{ & \le & \frac{2}{n}\left(\sum_{m=1}^{n-1} a m \lg m + b \right) + \Theta(n) \\}
+\only<5-6>{ & \le & \frac{2a}{n} \sum_{m=1}^{n-1} m \lg m + \frac{2b}{n}(n-1) + \Theta(n) \\}
+\only<6-7>{ & \le & \frac{2a}{n} \left( \frac{1}{2} n^2 \lg n - \frac{1}{8}n^2 \right) + \frac{2b}{n}(n-1) + \Theta(n) \\}
+\only<7-8>{ & \le & a n \lg n - \frac{a}{4}n + 2b + \Theta(n) \\}
+\only<8-9>{ & \le & a n \lg n + b + \left(\Theta(n) + b - \frac{a}{4}n \right) \\}
+\only<9-10>{ & \le & a n \lg n + b.}
+     \end{eqnarray*}
+      \end{small}
+}
+
+  \end{itemize}
+
+\only<6>{\alert{$\sum_{m=1}^{n-1} m \lg m \le \frac{1}{2} n^2 \lg n - \frac{1}{8}n^2.$}}
+\only<9>{Tomando $a$ grande o suficiente para que $\frac{a}{4}n > \Theta(n) + b$.}
+\only<10>{O que conclui a prova pelo método de substituição.}
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Análise do algoritmo randomizado}
+  \framesubtitle{Justificando $\sum_{m=1}^{n-1} m \lg m \le \frac{1}{2} n^2 \lg n - \frac{1}{8}n^2$}
+
+  $$
+  \begin{array}{rcl}
+    \sum_{m=1}^{n-1} m \lg m & = & \only<2->{\sum_{m=1}^{\lceil n/2 \rceil -1} m \lg m + \sum_{m=\lceil n/2 \rceil}^{n-1} m \lg m} \\
+    \only<3->{ & \le & (\lg n - 1) \sum_{m=1}^{\lceil n/2 \rceil -1} m +
+      \lg n \sum_{m = \lceil n/2 \rceil}^{n-1} m} \\
+    \only<4->{ & = & \lg n \sum_{m=1}^{n-1} m - \sum_{m = 1}^{\lceil n/2 \rceil-1} m}  \\
+    \only<5->{ & \le & \frac{1}{2}n(n-1)\lg n - \frac{1}{2}(\frac{n}{2} - 1)\frac{n}{2} }\\
+    \only<6->{ & \le & \assert{\frac{1}{2}n^2\lg n - \frac{1}{8}N^2}}
+    \end{array}
+  $$
+  \only<2>{\begin{itemize}
+      \item separação em duas partes do somatório
+    \end{itemize}}
+  \only<3>{
+    \begin{itemize}
+      \item substituição por um termo maior ou igual: $\lg(n/2)$ no
+        primeiro somatório, e $\lg n$ no segundo;
+      \item fatoração;
+      \item propriedade do logaritmo: $\lg(n/2) = \lg n - \lg 2 = \lg n - 1$.
+    \end{itemize}
+  }
+  \only<4>{
+    \begin{itemize}
+      \item remanejamento dos termos (comutatividade da adição);
+      \item junção dos somatórios.
+    \end{itemize}
+  }
+  \only<5>{
+    \begin{itemize}
+      \item simplificação da soma dos termos de progressões aritméticas.
+    \end{itemize}
+  }
+  
+\end{frame}
+\section{Aperfeiçoamentos práticos}
+
+\begin{frame}
+
+  \frametitle{Estratégias para evitar o pior caso}
+  \framesubtitle{Valor mediano}
+
+  \begin{itemize}
+
+    \item Pivô escolhido é o elemento com valor mediano entre
+      $A[l]$, $A[u]$ e $A[l+u/2]$.
+
+
+\begin{codebox}
+\Procname{$\proc{Med-3}(A, l, u)$}
+\li $m \gets l + (u-l)/2$
+\li \If $A[l] < A[m]$
+\li \Then \If $A[m] < A[u]$ \> \> \> \Then \Return $m$
+\li       \Else \If $A[l] < A[u]$ \> \> \> \Then \Return $u$
+\li         \Else \Return $l$
+            \End
+          \End
+\li \Else \If $A[m] > A[u]$ \> \> \> \Then \Return $m$
+\li    \Else \If $A[l] < A[u]$ \> \> \> \Then \Return $l$
+\li      \Else \Return $u$
+         \End
+       \End
+    \End
+\end{codebox}
+
+\item Se a faixa for grande, pode ser escolhido o valor mediano
+  entre mais que três posições).
+
+\item Ler uma implementação da função \textit{qsort} da biblioteca padrão da
+  linguagem C.
+  \end{itemize}
+
+\end{frame}
+
+\end{document}
+
