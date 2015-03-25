@@ -1,0 +1,150 @@
+%%
+%% IMPROVE:
+%%  - make height of B array the same as A array
+%%  - learn tikz and refactor for better maintainability
+%%
+\documentclass{article}
+\usepackage[pdftex,active,tightpage]{preview}
+\setlength\PreviewBorder{2mm}
+ 
+\usepackage{tikz}
+\usetikzlibrary{calc,shapes.multipart,chains,arrows,positioning}
+
+\tikzset{
+    index/.style={
+      align=right,
+      scale=.7
+    },
+    cell/.style={
+      very thick,
+      minimum width=\widthof{0.00}+4pt,
+      minimum height=\heightof{0.00}+4pt,
+      inner sep=4pt, text=black
+    },
+    list/.style={
+      thick, rectangle split, 
+      rectangle split parts=2, draw, 
+      rectangle split horizontal, minimum size=12pt,
+      inner sep=2pt, text=black,
+      rectangle split part fill={red!20, blue!20}
+    },
+    endlist/.style={
+      thick, rectangle split, 
+      rectangle split parts=2, draw, 
+      rectangle split horizontal, minimum size=12pt,
+      inner sep=2pt, text=black,
+      rectangle split part fill={red!20, blue!80}
+    }
+}
+
+
+\begin{document}
+\begin{preview}
+\begin{tikzpicture}[stack/.style={rectangle split, rectangle split parts=#1,draw, anchor=center, start chain}]
+\node[cell,stack=10,label=above:A,fill=red!20] (A) {
+.78
+\nodepart {two} .17
+\nodepart {three} .39
+\nodepart {four} .26
+\nodepart {five} .72
+\nodepart {six} .94
+\nodepart {seven} .21
+\nodepart {eight} .12
+\nodepart {nine} .23
+\nodepart {ten} .68
+};
+\node [index, left=3mm of A.one,anchor=base ] {1};
+\node [index, left=3mm of A.two, anchor=base] {2};
+\node [index, left=3mm of A.three, anchor=base] {3};
+\node [index, left=3mm of A.four, anchor=base] {4};
+\node [index, left=3mm of A.five, anchor=base] {5};
+\node [index, left=3mm of A.six, anchor=base] {6};
+\node [index, left=3mm of A.seven, anchor=base] {7};
+\node [index, left=3mm of A.eight, anchor=base] {8};
+\node [index, left=3mm of A.nine, anchor=base] {9};
+\node [index, left=3mm of A.ten, anchor=base] {10};
+
+\node[cell,stack=10,label=above:B,right=of A,
+  rectangle split part fill={blue!80,blue!20,blue!20,blue!20,blue!80,blue!20,blue!20,blue!80,blue!20}] (B) {
+\nodepart {one} {}
+\nodepart {two} {}
+\nodepart {three} {}
+\nodepart {four} {}
+\nodepart {five} {}
+\nodepart {six} {}
+\nodepart {seven} {}
+\nodepart {eight} {}
+\nodepart {nine} {}
+\nodepart {ten} {}
+};
+\node [index,left=5mm of B.one,anchor=base] {0};
+\node [index,left=5mm of B.two,anchor=base] {1};
+\node [index,left=5mm of B.three,anchor=base] {2};
+\node [index,left=5mm of B.four,anchor=base] {3};
+\node [index,left=5mm of B.five,anchor=base] {4};
+\node [index,left=5mm of B.six,anchor=base] {5};
+\node [index,left=5mm of B.seven,anchor=base] {6};
+\node [index,left=5mm of B.eight,anchor=base] {7};
+\node [index,left=5mm of B.nine,anchor=base] {8};
+\node [index,left=5mm of B.ten,anchor=base] {9};
+
+\node[list,on chain, right=of B.two] (c) {.12};
+\node[endlist,on chain] (d) {.17};
+\draw[*->] (B.two) -- (c);
+\draw[*->] let \p1 = (c.two), \p2 = (c.center) in (\x1,\y2) -- (d);
+
+\node[list,on chain, right=of B.third] (e) {.21};
+\node[list,on chain] (f) {.23};
+\node[endlist,on chain] (g) {.16};
+\draw[*->] (B.third) -- (e);
+\draw[*->] let \p1 = (e.two), \p2 = (e.center) in (\x1,\y2) -- (f);
+\draw[*->] let \p1 = (f.two), \p2 = (f.center) in (\x1,\y2) -- (g);
+
+\node[endlist,on chain, right=of B.fourth] (h) {.39};
+\draw[*->] (B.fourth) -- (h);
+
+\node[endlist,on chain, right=of B.seven] (i) {.68};
+\draw[*->] (B.seven) -- (i);
+
+\node[list,on chain, right=of B.eight] (j) {.72};
+\node[endlist,on chain] (k) {.78};
+\draw[*->] (B.eight) -- (j);
+\draw[*->] let \p1 = (j.two), \p2 = (j.center) in (\x1,\y2) -- (k);
+
+\node[endlist,on chain, right=of B.ten] (l) {.94};
+\draw[*->] (B.ten) -- (l);
+
+\end{tikzpicture}
+\end{preview}
+\end{document}
+
+\begin{preview}
+\begin{tikzpicture}[
+        array/.style={
+            very thick, rectangle split,
+            rectangle split parts=10, draw,
+            rectangle split horizontal, minimum size=18pt,
+            inner sep=4pt, text=black
+        },
+        list/.style={
+            very thick, rectangle split, 
+            rectangle split parts=2, draw, 
+            rectangle split horizontal, minimum size=18pt,
+            inner sep=4pt, text=black,
+            rectangle split part fill={red!20, blue!20}
+        }, 
+        ->, start chain, very thick
+      ]
+
+  \node[array] (a) {.78};
+
+  \node[list,on chain, right=of a] (A) {12};
+  \node[list,on chain] (B) {99};
+  \node[list,on chain] (C) {37};
+  \node[squarecross]   (D) [right=of C] {};
+  \draw[*->] let \p1 = (A.two), \p2 = (A.center) in (\x1,\y2) -- (B);
+  \draw[*->] let \p1 = (B.two), \p2 = (B.center) in (\x1,\y2) -- (C);
+  \draw[*->] let \p1 = (C.two), \p2 = (C.center) in (\x1,\y2) -- (D);
+\end{tikzpicture}
+\end{preview}
+\end{document}
