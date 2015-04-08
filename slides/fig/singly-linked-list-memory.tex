@@ -1,0 +1,80 @@
+\documentclass{article}
+\usepackage[pdftex,active,tightpage]{preview}
+\setlength\PreviewBorder{0mm}
+ 
+\usepackage{tikz}
+\usetikzlibrary{shapes.multipart, calc} 
+
+\newcommand{\address}[1]{\footnotesize{\texttt #1}}
+
+\begin{document}
+
+%% 1. initial
+
+\begin{preview}
+\begin{tikzpicture}[array/.style={very thick,
+      rectangle split,
+      rectangle split parts=16,
+      draw,
+      text=black,
+      rectangle split part fill={black!20, 
+         blue!20, 
+         red!20, 
+         black!20, 
+         blue!20, 
+         red!20, 
+         black!20, 
+         black!20, 
+         black!20, 
+         blue!20, 
+         red!20, 
+         black!20, 
+         black!20, 
+         black!20, 
+         blue!20, 
+         blue!20
+      },
+      draw, 
+      anchor=center},
+  ]
+\node[array] (m) {
+\nodepart{one}
+\nodepart{two} {\tt 0x0114}
+\nodepart{three} 12
+\nodepart{four}
+\nodepart[color=red]{five} {\tt 0x0000}
+\nodepart{six} 37
+\nodepart{seven} 
+\nodepart{eight}
+\nodepart{nine} 
+\nodepart{ten} {\tt 0x0128}
+\nodepart{eleven} 99
+\nodepart{twelve}
+\nodepart{thirteen}
+\nodepart{fourteen}
+\nodepart{fifteen} {\tt 0x0128}
+\nodepart{sixteen} {\tt 0x0134}
+};
+\node[color=gray, anchor=west, xshift=20] at (m.one)   {\footnotesize \tt0x013a};
+\node[color=gray, anchor=west, xshift=33] at (m.two)   {\footnotesize \tt0x0138};
+\node[color=gray, anchor=west, xshift=23] at (m.three) {\footnotesize \tt0x0134};
+\node[color=gray, anchor=west, xshift=20] at (m.four)  {\footnotesize \tt0x0130};
+\node[color=gray, anchor=west, xshift=33] at (m.five)  {\footnotesize \tt0x012a};
+\node[color=gray, anchor=west, xshift=23] at (m.six)   {\footnotesize \tt0x0128};
+\node[color=gray, anchor=west, xshift=20] at (m.seven) {\footnotesize \tt0x0124};
+\node[color=gray, anchor=west, xshift=20] at (m.eight) {\footnotesize \tt0x0120};
+\node[color=gray, anchor=west, xshift=20] at (m.nine) {\footnotesize \tt0x011a};
+\node[color=gray, anchor=west, xshift=33] at (m.ten) {\footnotesize \tt0x0118};
+\node[color=gray, anchor=west, xshift=23] at (m.eleven) {\footnotesize \tt0x0114};
+\node[color=gray, anchor=west, xshift=20] at (m.twelve) {\footnotesize \tt0x0110};
+\node[color=gray, anchor=west, xshift=20] at (m.thirteen) {\footnotesize \tt0x010a};
+\node[color=gray, anchor=west, xshift=20] at (m.fourteen) {\footnotesize \tt0x0108};
+\node[color=gray, anchor=west, xshift=33] at (m.fifteen) {\footnotesize \tt0x0104};
+\node[color=gray, anchor=west, xshift=33] at (m.sixteen) {\footnotesize \tt0x0100};
+\node[anchor=east, xshift=-10] at (m.fifteen) {it};
+\node[anchor=east, xshift=-10] at (m.sixteen) {hd};
+\end{tikzpicture}
+\end{preview}
+
+
+\end{document}

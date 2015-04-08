@@ -1,0 +1,50 @@
+\documentclass{article}
+\usepackage[pdftex,active,tightpage]{preview}
+\setlength\PreviewBorder{2mm}
+ 
+\usepackage{tikz}
+\usetikzlibrary{calc,shapes.multipart,chains,arrows}
+
+\tikzset{
+    squarecross/.style={
+        draw, rectangle,minimum size=18pt, fill=orange!80,
+        inner sep=0pt, text=black,
+        path picture = {
+            \draw[black]
+            (path picture bounding box.north west) -- 
+            (path picture bounding box.south east)
+            (path picture bounding box.south west) -- 
+            (path picture bounding box.north east);
+        }
+    }
+}
+
+\begin{document}
+\begin{preview}
+\begin{tikzpicture}[
+        list/.style={
+            very thick, rectangle split, 
+            rectangle split parts=3, draw, 
+            rectangle split horizontal, minimum size=24pt,
+            inner sep=4pt, text=black,
+            rectangle split part fill={blue!20, red!20, blue!20}
+        }, 
+        sentinel/.style={
+            very thick, rectangle split, 
+            rectangle split parts=3, draw, 
+            rectangle split horizontal, minimum size=24pt,
+            inner sep=4pt, text=black,
+            rectangle split part fill={blue!20, red!80, blue!20}
+        }, 
+        ->, start chain, very thick
+      ]
+  \node[sentinel,on chain] (S) {};
+  \node (nil) [below=of S] {\sc Nil};
+  \path
+    (S) edge[loop left] node {\sf prev} (S)
+    (S) edge[loop right] node {\sf next} (S)
+    (nil) edge (S) ;
+  
+\end{tikzpicture}
+\end{preview}
+\end{document}

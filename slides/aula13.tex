@@ -14,7 +14,7 @@
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
   Departamento de Informática e Matemática Aplicada}
-\date{30 de março de 2015}
+\date{06 de abril de 2015}
 
 
 \begin{document}
@@ -223,26 +223,26 @@
 
   \begin{center}
     \begin{tabular}{cc}
-      \includegraphics[width=.5\textwidth]{fig/stack-array-1.pdf}
+      \includegraphics[width=.4\textwidth]{fig/stack-array-1.pdf}
       \pause
       &
       $\id{Pop}$ \pause
       \\
-      \includegraphics[width=.5\textwidth]{fig/stack-array-2.pdf}
+      \includegraphics[width=.4\textwidth]{fig/stack-array-2.pdf}
       \pause
       &
       $\id{Push}(25)$ \pause
       \\
-      \includegraphics[width=.5\textwidth]{fig/stack-array-3.pdf}
+      \includegraphics[width=.4\textwidth]{fig/stack-array-3.pdf}
       \pause
       &
       $\id{Push}(9)$ \pause
       \\
-      \includegraphics[width=.5\textwidth]{fig/stack-array-4.pdf}
+      \includegraphics[width=.4\textwidth]{fig/stack-array-4.pdf}
       &
       $\id{Pop}$ \pause
       \\
-      \includegraphics[width=.5\textwidth]{fig/stack-array-5.pdf}
+      \includegraphics[width=.4\textwidth]{fig/stack-array-5.pdf}
       &
     \end{tabular}
   \end{center}
@@ -371,7 +371,7 @@
           \end{itemize}
         \item Remoção (\textit{dequeue\/})
           \begin{itemize}
-            \item elemento com mais tempo na fila (\textit{LIFO\/})
+            \item elemento com mais tempo na fila (\textit{FIFO\/})
             \item falha em fila vazia
           \end{itemize}
         \item Acesso  (\textit{head\/})
@@ -394,13 +394,14 @@
   \framesubtitle{Filas}
 
   \begin{codebox}
-    \zi \attrib{Q}{Data} \> \> \> \Comment arranjo com os elementos na pilha
+    \zi \attrib{Q}{Data} \> \> \> \Comment arranjo com os elementos na fila
     \zi \attrib{Q}{Hd}   \> \> \> \Comment posição do primeiro elemento
     \zi \attrib{Q}{Tl}   \> \> \> \Comment posição do próximo elemento a entrar
-    \zi \attrib{P}{Size} \> \> \> \Comment número máximo de elementos na pilha
+    \zi \attrib{P}{Size} \> \> \> \Comment número máximo de elementos na fila
     \zi $1 \le \attrib{Q}{Tl} \le \attrib{Q}{Size}$
     \zi $1 \le \attrib{Q}{Hd} \le \attrib{Q}{Size}$
-    \zi $\attrib{Q}{Hd} \neq \attrib{Q}{Tl}$
+    \zi $\left( \attrib{Q}{Tl} - \attrib{Q}{Hd} \right) \mod \attrib{Q}{Size} = n$
+    \zi \Comment $n$ sendo o número de elementos atualmente na fila.
   \end{codebox}
   \begin{itemize}
   \item Posições ocupadas: $\attrib{Q}{Hd}, \attrib{Q}{Hd}+1, \ldots
@@ -417,30 +418,30 @@
   \begin{center}
     \begin{tabular}{ccc}
       $\langle 67, 62, 58 \rangle$ &
-      \includegraphics[width=.5\textwidth]{fig/queue-array-1.pdf}
+      \includegraphics[width=.4\textwidth]{fig/queue-array-1.pdf}
       \pause
       &
       $\id{Dequeue}$ \pause
       \\
       $\langle 62, 58 \rangle$ &
-      \includegraphics[width=.5\textwidth]{fig/queue-array-2.pdf}
+      \includegraphics[width=.4\textwidth]{fig/queue-array-2.pdf}
       \pause
       &
       $\id{Enqueue}(25)$ \pause
       \\
       $\langle 62, 58, 25 \rangle$ &
-      \includegraphics[width=.5\textwidth]{fig/queue-array-3.pdf}
+      \includegraphics[width=.4\textwidth]{fig/queue-array-3.pdf}
       \pause
       &
       $\id{Enqueue}(25)$ \pause
       \\
       $\langle 62, 58, 25, 9 \rangle$ &
-      \includegraphics[width=.5\textwidth]{fig/queue-array-4.pdf}
+      \includegraphics[width=.4\textwidth]{fig/queue-array-4.pdf}
       &
       $\id{Dequeue}$ \pause
       \\
       $\langle 58, 25, 9 \rangle$ &
-      \includegraphics[width=.5\textwidth]{fig/queue-array-5.pdf}
+      \includegraphics[width=.4\textwidth]{fig/queue-array-5.pdf}
       &
     \end{tabular}
   \end{center}
@@ -580,7 +581,8 @@
     \zi \attrib{P}{Size} \> \> \> \Comment número máximo de elementos na pilha
     \zi $1 \le \attrib{Q}{Tl} \le \attrib{Q}{Size}$
     \zi $1 \le \attrib{Q}{Hd} \le \attrib{Q}{Size}$
-    \zi $\attrib{Q}{Hd} \neq \attrib{Q}{Tl}$
+    \zi $\left( \attrib{Q}{Tl} - \attrib{Q}{Hd} \right) \mod \attrib{Q}{Size} = n$
+    \zi \Comment $n$ sendo o número de elementos atualmente na fila.
   \end{codebox}
   \begin{itemize}
   \item Posições ocupadas: $\attrib{Q}{Hd}, \attrib{Q}{Hd}+1, \ldots
@@ -592,7 +594,7 @@
 
 \begin{frame}
   \frametitle{Simulação}
-  \framesubtitle{Filas}
+  \framesubtitle{Deques}
 
   \begin{center}
     \begin{tabular}{ccc}

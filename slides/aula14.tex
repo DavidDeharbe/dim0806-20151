@@ -1,0 +1,753 @@
+\documentclass{beamer}
+\setbeamertemplate{footline}[frame number]
+%\documentclass{beamer}
+
+\input{preamble}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows,positioning, calc} 
+\tikzstyle{vertex}=[draw,fill=black!15,circle,minimum size=18pt,inner sep=0pt]
+
+\title{Aula 14: Estruturas de dados básicas, parte 2}
+\author{David Déharbe \\
+  Programa de Pós-graduação em Sistemas e Computação \\
+  Universidade Federal do Rio Grande do Norte \\
+  Centro de Ciências Exatas e da Terra \\
+  Departamento de Informática e Matemática Aplicada}
+\date{8 de abril de 2015}
+
+
+\begin{document}
+\selectlanguage{brazil}
+\begin{frame}
+  \titlepage
+  Download me from \url{http://ufrn.academia.edu/DavidDeharbe}.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Plano da aula}
+  \tableofcontents
+\end{frame}
+
+\section{Listas encadeadas}
+
+\begin{frame}
+  \frametitle{Listas encadeadas}
+
+  \begin{itemize}
+  \item simples
+  \item coleções homogêneas de dados
+  \item muitas variações
+    \begin{enumerate}
+      \item ordenada ou não ordenadas
+      \item simplesmente encadeada ou duplamente encadeada
+      \item circular ou não circular
+      \item sem sentinela ou com sentinela
+    \end{enumerate}
+  \item implementação:
+    \begin{itemize}
+      \item registros e ponteiros
+      \item arranjos
+    \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Listas simplesmente encadeadas}
+  \framesubtitle{Formalização 1/2}
+
+  \begin{itemize}
+    \item coleção homogênea: $\langle v_1, \ldots , v_n \rangle$
+    \item possivelmente vazia: $n \ge 0$
+  \end{itemize}
+
+  \begin{itemize}
+    \item a representação é um conjunto de \alert{células} de lista
+    \item cada valor é armazenado em uma célula
+      $$
+      \forall i \mid 1 \le i \le n \cdot \attrib{\id{cell}(v_i)}{val} = v_i
+      $$
+    \item cada valor é armazenado em uma célula \alert{diferente}
+      $$
+      \forall i, j \mid 1 \le i < j \le n \cdot \id{cell}(v_i) \neq \id{cell}(v_j)
+      $$
+    \item as células são \alert{encadeadas}
+      \begin{itemize}
+      \item cada célula possui uma referência para a célula seguinte:
+        $$
+        \forall i \mid 1 \le i < n \cdot \attrib{\id{cell}(v_i)}{next} = \id{cell}(v_{i+1})
+        $$
+      \item com exceção da última que referência um valor especial:
+        $$
+        \attrib{\id{cell}(v_n)}{next} = \const{Nil}
+        $$
+      \end{itemize}
+  \end{itemize}
+  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Listas simplesmente encadeadas}
+  \framesubtitle{Formalização 2/2}
+
+  \begin{itemize}
+    \item coleção homogênea: $\langle v_1, \ldots , v_n \rangle$
+    \item possivelmente vazia: $n \ge 0$
+  \end{itemize}
+
+  Seja $\id{hd}$ a representação da coleção
+  \begin{itemize}
+    
+    \item quando não vazia, o acesso à coleção é realizado pela primeira célula
+      $$
+      \id{hd} = \id{cell}(v_1)
+      $$
+    \item a coleção vazia é representada por um valor especial
+      $$
+      \id{hd} = \const{Nil}
+      $$
+  \end{itemize}
+  
+  Uma posição na coleção (iterador) na coleção é a célula que guarda o valor nesta
+  posição.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Listas simplesmente encadeadas}
+  \framesubtitle{Ilustração}
+
+  $\langle 12, 99, 37 \rangle$
+
+  \begin{center}
+    \includegraphics[width=.7\textwidth]{fig/singly-linked-list.pdf}
+  \end{center}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Listas simplesmente encadeadas}
+  \framesubtitle{Implementação usando registros e ponteiros}
+
+  \begin{center}
+    \begin{tabular}{rl}
+    \includegraphics[width=.7\textwidth]{fig/singly-linked-list.pdf}
+    &
+    \includegraphics[width=.25\textwidth]{fig/singly-linked-list-memory.pdf}
+    \end{tabular}
+  \end{center}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Processamento}
+  \framesubtitle{Listas simplesmente encadeadas}
+  
+  \begin{codebox}
+    \zi $\id{it} \gets \id{hd}$
+    \zi \While $\id{it} \neq \const{Nil}$
+    \zi \Do
+          \Comment process $\attrib{\id{it}}{val}$
+    \zi   $\id{it} \gets \attrib{\id{it}}{next}$
+        \End
+  \end{codebox}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Inserção}
+  \framesubtitle{Listas simplesmente encadeadas}
+
+  \begin{center}
+    \includegraphics[width=.7\textwidth]{fig/singly-linked-list.pdf}
+  \end{center}
+  \begin{itemize}
+    \item caso geral: \alert{após} uma dada posição
+    \item caso especial: em primeira posição
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Inserção: caso geral}
+  \framesubtitle{Listas simplesmente encadeadas}
+
+  \begin{center}
+    \begin{tabular}{ll}
+      & \raisebox{-.5\height}{\includegraphics[width=.4\textwidth]{fig/singly-linked-list-insert-after-1.pdf}} \pause \\
+      $\attrib{\id{c}}{next} \gets \attrib{\id{it}}{next}$ \pause 
+      & \raisebox{-.5\height}{\includegraphics[width=.4\textwidth]{fig/singly-linked-list-insert-after-2.pdf}} \pause\\
+      $\attrib{\id{it}}{next} \gets \id{c}$ \pause 
+      & \raisebox{-.5\height}{\includegraphics[width=.4\textwidth]{fig/singly-linked-list-insert-after-3.pdf}}
+    \end{tabular}
+  \end{center}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Inserção: caso especial}
+  \framesubtitle{Listas simplesmente encadeadas}
+
+  \begin{center}
+    \begin{tabular}{ll}
+      & \raisebox{-.5\height}{\includegraphics[width=.4\textwidth]{fig/singly-linked-list-insert-first-1.pdf}} \pause \\
+      $\attrib{\id{c}}{next} \gets \id{hd}$ \pause 
+      & \raisebox{-.5\height}{\includegraphics[width=.4\textwidth]{fig/singly-linked-list-insert-first-2.pdf}} \pause\\
+      $\id{hd} \gets \id{c}$ \pause 
+      & \raisebox{-.5\height}{\includegraphics[width=.4\textwidth]{fig/singly-linked-list-insert-first-3.pdf}}
+    \end{tabular}
+  \end{center}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Remoção}
+  \framesubtitle{Listas simplesmente encadeadas}
+
+  \begin{center}
+    \includegraphics[width=.7\textwidth]{fig/singly-linked-list.pdf}
+  \end{center}
+  \begin{itemize}
+    \item caso geral: \alert{após} uma dada posição
+    \item caso especial: em primeira posição
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Remoção: caso geral}
+  \framesubtitle{Listas simplesmente encadeadas}
+
+  \begin{center}
+    \begin{tabular}{ll}
+      & \raisebox{-.5\height}{\includegraphics[width=.4\textwidth]{fig/singly-linked-list-remove-after-1.pdf}} \pause \\
+      $\attrib{\id{it}}{next} \gets \attrib{\attrib{\id{it}}{next}}{next}$ \pause 
+      & \raisebox{-.5\height}{\includegraphics[width=.4\textwidth]{fig/singly-linked-list-remove-after-2.pdf}}
+    \end{tabular}
+  \end{center}
+  \pause
+  \begin{itemize}
+    \item se for necessário gerenciar os recursos de memória:
+  \begin{codebox}
+    \zi $\id{tmp} \gets \attrib{\id{it}}{next}$
+    \zi $\attrib{\id{it}}{next} \gets \attrib{\attrib{\id{it}}{next}}{next}$
+    \zi $\proc{Free}(\id{tmp})$
+  \end{codebox}
+
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Remoção: caso especial}
+  \framesubtitle{Listas simplesmente encadeadas}
+
+  \begin{center}
+    \begin{tabular}{ll}
+      & \raisebox{-.5\height}{\includegraphics[width=.4\textwidth]{fig/singly-linked-list-remove-first-1.pdf}} \pause \\
+      $\id{hd} \gets \attrib{\id{hd}}{next}$ \pause 
+      & \raisebox{-.5\height}{\includegraphics[width=.4\textwidth]{fig/singly-linked-list-remove-first-2.pdf}}
+    \end{tabular}
+  \end{center}
+
+  \pause
+  \begin{itemize}
+    \item se for necessário gerenciar os recursos de memória:
+  \begin{codebox}
+    \zi $\id{tmp} \gets \id{hd}$
+    \zi $\id{hd} \gets \attrib{\id{hd}}{next}$
+    \zi $\proc{Free}(\id{tmp})$
+  \end{codebox}
+
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Exercícios}
+  \framesubtitle{Listas encadeadas}
+
+  \begin{itemize}
+    \item Escrever um algoritmo de inserção
+      \begin{itemize}
+        \item assumindo a lista não ordenada
+        \item assumindo a lista ordenada
+      \end{itemize}
+    \item Escrever um algoritmo de remoção
+      \begin{itemize}
+        \item assumindo a lista não ordenada
+        \item assumindo a lista ordenada
+      \end{itemize}
+    \item Escrever um algoritmo de busca
+      \begin{itemize}
+        \item assumindo a lista não ordenada
+        \item assumindo a lista ordenada
+      \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Listas simplesmente encadeadas circulares}
+
+  \begin{itemize}
+
+    \item a última célula referência a primeira
+      $$
+      \attrib{\id{cell}(v_n)}{next} = \id{cell}(v_1)
+      $$
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Listas simplesmente encadeadas circulares}
+  \framesubtitle{Implementação usando registros e ponteiros}
+
+  \begin{center}
+    \begin{tabular}{rl}
+    \includegraphics[width=.7\textwidth]{fig/singly-linked-list-circular.pdf}
+    &
+    \includegraphics[width=.25\textwidth]{fig/singly-linked-list-circular-memory.pdf}
+    \end{tabular}
+  \end{center}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Processamento}
+  \framesubtitle{Listas simplesmente encadeadas circulares}
+  
+  \begin{codebox}
+    \zi \If $\id{hd} \neq \const{Nil}$
+    \zi \Then $\id{it} \gets \id{hd}$
+    \zi   \Repeat
+    \zi     \Comment process $\attrib{\id{it}}{val}$
+    \zi     $\id{it} \gets \attrib{\id{it}}{next}$
+    \zi   \Until $\id{it} \isequal \id{hd}$
+        \End
+  \end{codebox}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Exercícios}
+  \framesubtitle{Listas simplesmente encadeadas circulares}
+
+  Adapte os algoritmos de inserção, remoção e busca desenvolvidos para as
+  listas simplesmente encadeadas circulares.
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Listas duplamente encadeadas}
+
+  \begin{itemize}
+
+    \item acesso direto à posição anterior
+
+    \item remoção do item na posição 
+
+  \end{itemize}
+
+  \begin{center}
+    \includegraphics[width=.7\textwidth]{fig/doubly-linked-list.pdf}
+  \end{center}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Implementação usando registros e ponteiros}
+  \framesubtitle{Listas duplamente encadeadas}
+
+  \begin{center}
+    \begin{tabular}{cc}
+    \raisebox{-.5\height}{\includegraphics[width=.7\textwidth]{fig/doubly-linked-list.pdf}}
+    &
+    \raisebox{-.5\height}{\includegraphics[width=.25\textwidth]{fig/doubly-linked-list-memory.pdf}}
+    \end{tabular}
+  \end{center}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Formalização}
+  \framesubtitle{Listas duplamente encadeadas}
+
+  \begin{itemize}
+    \item as células são \alert{duplamente} encadeadas
+      \begin{itemize}
+      \item cada célula possui uma referência para a célula anterior:
+        $$
+        \forall i \mid 1 < i \le n \cdot \attrib{\id{cell}(v_i)}{prev} = \id{cell}(v_{i-1})
+        $$
+      \item com exceção da primeira que referência um valor especial:
+        $$
+        \attrib{\id{cell}(v_1)}{prev} = \const{Nil}
+        $$
+      \end{itemize}
+  \end{itemize}
+  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Inserção após a posição atual}
+  \framesubtitle{Listas duplamente encadeadas}
+
+  \begin{tabular}{cc}
+    & \raisebox{-.5\height}{\includegraphics[width=.7\textwidth]{fig/doubly-linked-list-insert-after-1.pdf}} \\
+    $\attrib{\id{c}}{next} \gets \attrib{\id{it}}{next}$ & 
+    \raisebox{-.5\height}{\includegraphics[width=.7\textwidth]{fig/doubly-linked-list-insert-after-2.pdf}}
+  \end{tabular}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Inserção após a posição atual}
+  \framesubtitle{Listas duplamente encadeadas}
+
+  \begin{tabular}{cc}
+    $\attrib{\id{c}}{next} \gets \attrib{\id{it}}{next}$ & 
+    \raisebox{-.5\height}{\includegraphics[width=.7\textwidth]{fig/doubly-linked-list-insert-after-2.pdf}} \pause \\
+    $\attrib{\id{c}}{prev} \gets \id{it}$ & 
+    \raisebox{-.5\height}{\includegraphics[width=.7\textwidth]{fig/doubly-linked-list-insert-after-3.pdf}}
+  \end{tabular}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Inserção após a posição atual}
+  \framesubtitle{Listas duplamente encadeadas}
+
+  \begin{tabular}{cc}
+    $\attrib{\id{c}}{next} \gets \attrib{\id{it}}{next}$ & \\
+    $\attrib{\id{c}}{prev} \gets \id{it}$ & 
+    \raisebox{-.5\height}{\includegraphics[width=.7\textwidth]{fig/doubly-linked-list-insert-after-3.pdf}} \\
+    $\attrib{\id{it}}{next} \gets \id{c}$ & 
+    \raisebox{-.5\height}{\includegraphics[width=.7\textwidth]{fig/doubly-linked-list-insert-after-4.pdf}}
+  \end{tabular}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Inserção após a posição atual}
+  \framesubtitle{Listas duplamente encadeadas}
+
+  \begin{tabular}{cc}
+    $\attrib{\id{c}}{next} \gets \attrib{\id{it}}{next}$ & \\
+    $\attrib{\id{c}}{prev} \gets \id{it}$ & \\ 
+    $\attrib{\id{it}}{next} \gets \id{c}$ & 
+    \raisebox{-.5\height}{\includegraphics[width=.7\textwidth]{fig/doubly-linked-list-insert-after-4.pdf}} \\
+    \begin{tabular}{l}
+      \If $\attrib{\id{c}}{next} \neq \const{Nil}$ \\
+      \quad $\attrib{\attrib{\id{c}}{next}}{prev} \gets \id{c}$ 
+    \end{tabular} & 
+    \raisebox{-.5\height}{\includegraphics[width=.7\textwidth]{fig/doubly-linked-list-insert-after-5.pdf}} \\
+  \end{tabular}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Inserção após a posição atual}
+  \framesubtitle{Listas duplamente encadeadas}
+
+  \begin{codebox}
+    \zi $\attrib{\id{c}}{next} \gets \attrib{\id{it}}{next}$
+    \zi $\attrib{\id{c}}{prev} \gets \id{it}$
+    \zi $\attrib{\id{it}}{next} \gets \id{c}$
+    \zi \If $\attrib{\id{c}}{next} \neq \const{Nil}$ 
+    \zi \Then $\attrib{\attrib{\id{c}}{next}}{prev} \gets \id{c}$ 
+    \End
+  \end{codebox}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Inserção antes da posição atual}
+  \framesubtitle{Listas duplamente encadeadas}
+
+  \begin{codebox}
+    \zi \only<1>{$\attrib{\id{c}}{\textcolor{gray}{next}} \gets \attrib{\id{it}}{\textcolor{gray}{next}}$}
+    \only<2->{$\attrib{\id{c}}{prev} \gets \attrib{\id{it}}{prev}$}
+    \zi \only<1-2>{$\attrib{\id{c}}{\textcolor{gray}{prev}} \gets \id{it}$}
+    \only<3->{$\attrib{\id{c}}{next} \gets \id{it}$}
+    \zi \only<1-3>{$\attrib{\id{it}}{\textcolor{gray}{next}} \gets \id{c}$}
+    \only<4->{$\attrib{\id{it}}{prev} \gets \id{c}$}
+    \zi \If \only<1-4>{$\attrib{\id{c}}{\textcolor{gray}{next}} \neq \const{Nil}$}
+            \only<5->{$\attrib{\id{c}}{prev} \neq \const{Nil}$}
+    \zi \Then \only<1-4>{$\attrib{\attrib{\id{c}}{\textcolor{gray}{next}}}{\textcolor{gray}{prev}} \gets \id{c}$}
+            \only<5->{$\attrib{\attrib{\id{c}}{prev}}{next} \gets \id{c}$}
+        \End
+    \only<6->{
+    \zi \If $\id{it} \isequal \id{hd}$
+    \zi \Then  $\id{hd} \gets \id{c}$
+        \End
+    }
+  \end{codebox}
+
+  \only<1>{\includegraphics[width=.7\textwidth]{fig/doubly-linked-list-insert-before-1.pdf}}
+  \only<2>{\includegraphics[width=.7\textwidth]{fig/doubly-linked-list-insert-before-2.pdf}}
+  \only<3>{\includegraphics[width=.7\textwidth]{fig/doubly-linked-list-insert-before-3.pdf}}
+  \only<4>{\includegraphics[width=.7\textwidth]{fig/doubly-linked-list-insert-before-4.pdf}}
+  \only<5>{\includegraphics[width=.7\textwidth]{fig/doubly-linked-list-insert-before-5.pdf}}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Listas duplamente encadeadas circulares}
+
+  \begin{itemize}
+
+    \item a primeira célula referência a última
+      $$
+      \attrib{\id{cell}(v_1)}{prev} = \id{cell}(v_n)
+      $$
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Implementação usando registros e ponteiros}
+  \framesubtitle{Listas duplamente encadeadas circulares}
+
+  \begin{center}
+    \begin{tabular}{rl}
+    \includegraphics[width=.7\textwidth]{fig/doubly-linked-list-circular.pdf}
+    &
+    \includegraphics[width=.25\textwidth]{fig/doubly-linked-list-circular-memory.pdf}
+    \end{tabular}
+  \end{center}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Inserção}
+  \framesubtitle{Listas duplamente encadeadas circulares}
+
+  \begin{itemize}
+    \item Todas as células possuem sucessor e predecessor
+    \item Algoritmos mais simples:
+    \item Inserção de $\id{c}$ após a posição $\id{it}$
+      \begin{codebox}
+        \zi $\attrib{\id{c}}{next} \gets \attrib{\id{it}}{next}$
+        \zi $\attrib{\id{c}}{prev} \gets \id{it}$
+        \zi $\attrib{\id{it}}{next} \gets \id{c}$
+        \zi $\attrib{\attrib{\id{c}}{next}}{prev} \gets \id{c}$
+      \end{codebox}
+    \item Inserção de $\id{c}$ antes da posição $\id{it}$
+      \begin{codebox}
+        \zi $\attrib{\id{c}}{prev} \gets \attrib{\id{it}}{prev}$
+        \zi $\attrib{\id{c}}{next} \gets \id{it}$
+        \zi $\attrib{\id{it}}{prev} \gets \id{c}$
+        \zi $\attrib{\attrib{\id{c}}{prev}}{next} \gets \id{c}$
+      \end{codebox}
+      \pause
+    \item Exercício: identifique as dependências entre os quatro comandos formando cada operação de inserção.
+  \end{itemize}
+  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Remoção}
+  \framesubtitle{Listas duplamente encadeadas circulares}
+
+  \begin{itemize}
+    \item Remoção da célula na posição $\id{it}$
+      \begin{codebox}
+        \zi \Comment quando a lista tem mais de um elemento
+        \zi \If $\attrib{\id{it}}{next} \neq \id{it}$
+        \zi \Then 
+              $\attrib{\attrib{\id{c}}{next}}{prev} \gets \attrib{\id{c}}{prev}$
+        \zi   $\attrib{\attrib{\id{c}}{prev}}{next} \gets \attrib{\id{c}}{next}$
+        \zi   \If $\id{it} \isequal \id{hd}$
+        \zi   \Then
+                $\id{hd} \gets \attrib{\id{it}}{next}$
+              \End
+        \zi \Comment quando a lista tem um único elemento
+        \zi \Else
+              $\id{hd} \gets \const{Nil}$
+            \End
+        \zi \textcolor{gray}{$\proc{Free}(\id{it})$}
+      \end{codebox}
+  \end{itemize}
+  
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Elemento sentinela}
+
+  \begin{itemize}
+    \item célula que não contem valor
+    \item localizada no início ou no fim da lista
+    \item simplifica os algoritmos de algumas operações
+    \item consumo extra de memória
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Formalização}
+  \framesubtitle{Elemento sentinela}
+  
+  
+  \begin{itemize}
+    \item $l = \langle v_1, \ldots, v_n \rangle$
+    \item $\forall i \cdot \id{cell}(v_i) \neq \id{nil}(l)$
+    \item se $n \ge 1$
+      \begin{itemize}
+        \item $\attrib{\id{nil}(l)}{next} = \id{cell}(v_1)$
+        \item $\attrib{\id{nil}(l)}{prev} = \id{cell}(v_n)$
+        \item $\attrib{\id{cell}(v_1)}{prev} = \id{nil}(l)$
+        \item $\attrib{\id{cell}(v_n)}{next} = \id{nil}(l)$
+      \end{itemize}
+    \item se $n = 0$
+      \begin{itemize}
+        \item $\attrib{\id{nil}(l)}{next} = \id{nil}(l)$
+        \item $\attrib{\id{nil}(l)}{prev} = \id{nil}(l)$
+      \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Ilustração}
+  \framesubtitle{Elemento sentinela}
+  
+
+  \begin{tabular}{cc}
+  $l = \langle 12, 99, 37 \rangle$
+    &
+    \raisebox{-.5\height}{\includegraphics[width=.7\textwidth]{fig/doubly-linked-list-sentinel-circular.pdf}}
+    \\
+    \hline
+    $l = \langle \rangle$
+    &
+    \raisebox{-.5\height}{\includegraphics[width=.4\textwidth]{fig/doubly-linked-list-sentinel-circular-empty.pdf}}
+  \end{tabular}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Processamento}
+  \framesubtitle{Listas duplamente encadeadas circulares com sentinela}
+
+  \begin{codebox}
+    \zi $\id{it} \gets \attrib{\id{Nil}(l)}{next}$
+    \zi \While $\id{it} \neq \id{Nil}(l)$
+    \zi   \Do \Comment Processar $\attrib{\id{it}}{val}$
+    \zi       $\id{it} \gets \attrib{\id{it}}{next}$
+          \End
+  \end{codebox}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Remoção de um item na posição atual}
+  \framesubtitle{Listas duplamente encadeadas circulares com sentinela}
+
+  \begin{codebox}
+    \zi \only<2->{$\attrib{\attrib{\id{it}}{prev}}{next} \gets \attrib{\id{it}}{next}$}
+    \zi \only<3->{$\attrib{\attrib{\id{it}}{next}}{prev} \gets \attrib{\id{it}}{prev}$}
+    \zi \only<4->{$\proc{Free}(\id{it})$}
+  \end{codebox}
+
+  \only<1>{\includegraphics[width=.7\textwidth]{fig/doubly-linked-list-sentinel-circular-remove-1.pdf}}
+  \only<2>{\includegraphics[width=.7\textwidth]{fig/doubly-linked-list-sentinel-circular-remove-2.pdf}}
+  \only<3>{\includegraphics[width=.7\textwidth]{fig/doubly-linked-list-sentinel-circular-remove-3.pdf}}
+  \only<4>{\includegraphics[width=.7\textwidth]{fig/doubly-linked-list-sentinel-circular-remove-4.pdf}}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Exercícios}
+
+  \begin{itemize}
+    \item Identifique qual tipo de lista é mais adequado para representar pilhas, filas e deques.
+    \item Projete um algoritmo que, dada duas listas, concatena o conteúdo da segunda no fim da primeira.
+      \begin{itemize}
+        \item Escolhe o tipo de lista que considerar mais adequado.
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Listas encadeadas e arranjos}
+
+  \begin{itemize}
+    \item O princípio de encadeamento não precisa ser restrito a ponteiros.
+    \item Os atributos $\id{next}$ (e $\id{prev}$) podem ser índices de um arranjo.
+    \item Observação:
+      \begin{itemize}
+        \item a memória do computador nada mais é que um arranjo, onde
+        \item os ponteiros são os índices deste arranjo.
+      \end{itemize}
+    \item Nem todas as posições do arranjo são ocupadas
+      \begin{itemize}
+        \item manter uma lista de posições livres.
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Ilustração: lista simplesmente encadeada}
+  \framesubtitle{Listas encadeadas e arranjos}
+
+  $\begin{array}{ccc}
+    \langle 37, 12, 99 \rangle &
+    \begin{array}{c||c|c|c||}
+      \mbox{índice} & \mbox{valor} & \mbox{next} \\
+      \cline{2-3}
+      1 & & 8 \\
+      \cline{2-3}
+      2 & & 1 \\
+      \cline{2-3}
+      3 & 12 & 7\\
+      \cline{2-3}
+      4 & & 5 \\
+      \cline{2-3}
+      5 & & 0 \\
+      \cline{2-3}
+      6 & 37 & 3 \\
+      \cline{2-3}
+      7 & 99 & 0 \\
+      \cline{2-3}
+      8 & & 4 \\
+      \cline{2-3}
+  \end{array}
+    &
+    \begin{array}{c}
+      \id{hd} = 6 \\
+      \id{free} = 2
+    \end{array}
+  \end{array}$
+
+  \begin{codebox}
+    \zi \If $\id{free} \isequal 0$
+    \zi \Then \Return
+      \End
+    \zi $\id{n} \gets \id{free}$
+    \zi $\id{free} \gets \attrib{A[\id{free}]}{next}$
+    \zi $\attrib{A[n]}{next} \gets \id{hd}$
+    \zi $\attrib{A[n]}{value} \gets \id{v}$
+    \zi $\id{hd} \gets \id{n}$
+  \end{codebox}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Exercício}
+
+  \begin{itemize}
+    \item Escrever algoritmo para calcular tamanho de uma lista
+    \item Escrever algoritmo para remover um valor
+    \item Escrever um algoritmo para compactar a representação de uma lista em um
+      arranjo: ao término, as posições ocupadas devem estar nas posições 1 até $i$.
+  \end{itemize}
+\end{frame}
+
+\end{document}
+
