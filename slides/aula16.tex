@@ -1,0 +1,633 @@
+\documentclass{beamer}
+\setbeamertemplate{footline}[frame number]
+%\documentclass{beamer}
+
+\input{preamble}
+
+\title{Aula 15: Árvores binárias de busca}
+\subtitle{Tabelas de dispersão, tabelas \textit{hash\/}}
+\author{David Déharbe \\
+  Programa de Pós-graduação em Sistemas e Computação \\
+  Universidade Federal do Rio Grande do Norte \\
+  Centro de Ciências Exatas e da Terra \\
+  Departamento de Informática e Matemática Aplicada}
+\date{15 de abril de 2015}
+
+
+\begin{document}
+\selectlanguage{brazil}
+\begin{frame}
+  \titlepage
+  Download me from \url{http://ufrn.academia.edu/DavidDeharbe}.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Plano da aula}
+  \tableofcontents
+
+  \alert{Referência}: Cormen et al. Capítulo 13.
+\end{frame}
+
+\section{Árvores binárias}
+
+\begin{frame}
+
+  \frametitle{Árvores binárias}
+  \framesubtitle{Introdução}
+
+  \begin{center}
+    \includegraphics[width=.5\textwidth]{fig/ab.pdf}
+  \end{center}
+  \begin{itemize}
+    
+  \item uma \alert{árvore binária} é formada por células (\alert{nós})
+    com atributos
+          
+    \begin{itemize}
+
+    \item $\attrib{x}{key}$ (chave do dado armazenado),
+
+    \item $\attrib{x}{left}$ (sub-árvore esquerda),
+      
+    \item $\attrib{x}{right}$  (sub-árvore direita),
+      
+    \item $\attrib{x}{up}$ (nó pai),
+
+    \end{itemize}
+
+  \item a \alert{raiz} é um nó destacado da árvore.
+
+  \item $\const{Nil}$ representa á árvore binária vazia (nenhuma célula)
+
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Árvores binárias}
+  \framesubtitle{Definições}
+
+  \begin{definition}
+    Nós descendentes a partir de $x$:
+
+    $\begin{array}{rcl}
+      \id{nodes}(x) & = & \{ x \} \cup
+    \id{nodes}(\attrib{x}{left}) \cup \id{nodes}(\attrib{x}{right}) \\
+      \id{nodes}(\const{Nil}) & = & \emptyset
+    \end{array}$
+  \end{definition}
+
+  \begin{definition}
+    Chaves armazenados em uma árvore enraizada em $x$:
+    $
+    \begin{array}[t]{rcl}
+      \id{values}(x) & = & \{ \{ \attrib{x}{key} \, | \, x \in \id{nodes}(\id{root}) \} \} \\
+      \id{values}(\const{Nil}) & = & \emptyset
+    \end{array}
+    $
+  \end{definition}
+
+  \begin{definition}
+    Altura da sub-árvore enraizada em $x$: 
+
+    $\alpha(x) = 
+    \begin{array}[t]{l}
+      0 \mbox{ se } x = \const{Nil}, \\
+      1 + \max \{ \alpha(\attrib{x}{left}), \alpha(\attrib{y}{right}) \} \mbox{ senão}
+    \end{array}$
+  \end{definition}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Árvores binárias}
+  \framesubtitle{Propriedades}
+
+  \begin{itemize}
+
+  \item célula raiz: $\attrib{\id{root}}{up} = \const{Nil}$
+
+  \item ausência de ciclos
+
+    $x \not\in \id{nodes}(\attrib{x}{left})$
+    
+    $x \not\in \id{nodes}(\attrib{x}{right})$
+    
+    $\attrib{x}{left} \cap \attrib{x}{right} = \emptyset$
+
+  \item $\attrib{x}{left} \neq \const{Nil} \Rightarrow 
+    x = \attrib{\attrib{x}{left}}{up}$
+
+    $\attrib{x}{right} \neq \const{Nil} \Rightarrow 
+    x = \attrib{\attrib{x}{right}}{up}$
+        
+
+  \item O número de atributos $\id{left}$ e $\id{right}$
+    iguais a $\const{Nil}$ é o número de nós mais um.
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Aplicação de árvore binária}
+
+\begin{itemize}
+
+  \item Qualquer árvore pode ser representada através de uma árvore binária
+
+    \begin{itemize}
+
+      \item $\attrib{n}{left}$: primeiro nó descendente
+
+      \item $\attrib{n}{right}$: próximo nó descendente
+
+      \item $\attrib{n}{up}$: nó ancestral
+
+    \end{itemize}
+
+  \item Árvores binárias de busca
+
+\end{itemize}
+
+\end{frame}
+
+%% TODO : Using binary trees to represent any tree
+
+\section{Árvores binárias de busca}
+
+\begin{frame}
+
+\frametitle{Árvores binárias de busca}
+\framesubtitle{Introdução}
+
+\begin{itemize}
+
+\item Representa coleção de dados $\id{values}(\id{root})$
+
+\item Um iterador sobre a coleção é uma referência a um nó da árvore.
+
+\item Operações
+
+      \begin{itemize}
+
+        \item Inserção de um dado;
+
+        \item Remoção de um dado;
+
+        \item Busca na coleção de um dado com uma determinada chave
+
+        \item Maior elemento
+
+        \item Menor elemento
+
+        \item Elemento seguinte
+
+        \item Elemento anterior
+
+\end{itemize}
+
+    \item $h = \alpha(\id{root})$: altura da árvore:
+
+      Custo no pior caso: $\Theta(h)$ em média.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Árvores binárias de busca}
+\framesubtitle{Especificação}
+
+\begin{itemize}
+\item representa a coleção $\id{values}(\id{root})$
+\item árvore binária
+\item com a seguinte propriedade de ordenação:
+$$
+\forall x \cdot 
+\forall y \cdot
+\begin{array}[t]{rl}
+y \in \id{nodes}(\attrib{x}{left}) \Rightarrow \attrib{x}{key} \ge \attrib{y}{key} & \land \\
+y \in \id{nodes}(\attrib{x}{right}) \Rightarrow \attrib{x}{key} \le \attrib{y}{key} &
+\end{array}
+$$
+
+\begin{eqnarray*}
+\id{bst}(x) & \equiv &
+x = \const{Nil} \lor
+\begin{array}[t]{ll}
+  (\attrib{x}{key} \ge \max \id{values}(\attrib{x}{left}) & \land \\
+  \attrib{x}{key} \le \min \id{values}(\attrib{x}{right}) & \land \\
+  \id{bst}{(\attrib{x}{left}}) \land \id{bst}({\attrib{x}{right}}) )
+\end{array}
+\end{eqnarray*}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Árvores binárias de busca}
+\framesubtitle{Ilustração}
+
+  Coleção: $2, 3, 5, 5, 7, 8$
+
+  \begin{itemize}
+\only<1>{
+    \item Uma árvore binária de busca de altura 3
+      \begin{center}
+        \includegraphics[width=.7\textwidth]{fig/abb-1.pdf}
+      \end{center}
+}
+\only<2>{
+    \item Uma árvore binária de busca de altura 4
+      \begin{center}
+        \includegraphics[width=.6\textwidth]{fig/abb-2.pdf}
+      \end{center}
+}
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Árvores binárias de busca}
+\framesubtitle{Processamento}
+
+\begin{itemize}
+\item Processamento \alert{em ordem} permite visitar os valores da
+  coleção em ordem crescente de chaves.
+
+\begin{codebox}
+  \Procname{$\proc{In-Order}(x, f)$}
+  \li \If $x \neq \const{Nil}$
+  \li \Then $\proc{In-Order}(\attrib{x}{left})$
+  \li $f(x)$
+  \li $\proc{In-Order}(\attrib{x}{right})$
+      \End
+\end{codebox}
+
+\item Complexidade: $\Theta(n)$
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Exercícios}
+
+\begin{enumerate}
+
+  \item Qual a altura máxima possível para uma árvore binária de busca
+    representando uma coleção de $n$ valores?
+
+  \item Seja $\proc{Make-Node}(k, l, r, u)$ uma sub-rotina que
+    constroi um nó $x$ de árvore binária, tal que $\attrib{x}{key} =
+    k$, $\attrib{x}{left} = l$, $\attrib{x}{right} = r$,
+    $\attrib{x}{up} = u$.
+
+    Projete um algoritmo utilize esta sub-rotina e ordenação em
+    arranjo para construir uma árvore binária de busca a partir
+    de uma coleção inicialmente em um arranjo. O algoritmo deverá
+    ter complexidade $\Theta(n \lg n)$.
+
+  \item Projete um algoritmo não recursivo para processar os valores
+    de uma árvore binária de busca em ordem, e em tempo $\Theta(n)$.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Busca}
+\frametitle{Operações de consulta}
+
+\begin{codebox}
+  \Procname{$\proc{Search}(x, k)$}
+  \zi \assert{\Comment $\id{bst}(x)$}
+  \li \If $x \isequal \const{Nil}$ or $\attrib{x}{key} \isequal k$
+  \li \Then \Return $x$
+  \li \Else 
+  \li   \If $k < \attrib{x}{key}$
+  \li   \Then \Return $\proc{Search}(\attrib{x}{left}, k)$
+  \li   \Else \Return $\proc{Search}(\attrib{x}{right}, k)$
+        \End
+      \End
+  \zi \assert{\Comment $\proc{Search}(x, k) = \const{Nil} \Leftrightarrow k \not\in \id{values}(x)$}
+  \zi \assert{\Comment $\proc{Search}(x, k) = y \neq \const{Nil} \Leftrightarrow \attrib{y}{key} = k \land y \in \id{nodes}(x)$}
+\end{codebox}
+
+Complexidade: $O(\alpha(\id{root}))$
+\pause
+
+Exercício: escrever um algoritmo não recursivo.
+
+\end{frame}
+
+\section{Operações de consulta}
+
+\begin{frame}
+
+\frametitle{Extremos}
+\frametitle{Operações de consulta}
+
+\begin{codebox}
+  \Procname{$\proc{Minimum}(x)$}
+  \zi \assert{\Comment $\id{bst}(x) \land x \neq \const{Nil}$}
+  \li \If $\attrib{x}{left} \isequal \const{Nil}$
+  \li \Then \Return $x$
+  \li \Else \Return $\proc{Minimum}(\attrib{x}{left}, x)$
+      \End
+  \zi \assert{\Comment $\proc{Minimum}(x) = \min \id{values}(x)$}
+\end{codebox}
+
+\begin{codebox}
+  \Procname{$\proc{Maximum}(x)$}
+  \zi \assert{\Comment $\id{bst}(x) \land x \neq \const{Nil}$}
+  \li \If $\attrib{x}{right} \isequal \const{Nil}$
+  \li \Then \Return $x$
+  \li \Else \Return $\proc{Maximum}(\attrib{x}{right}, x)$
+      \End
+  \zi \assert{\Comment $\proc{Maximum}(x) = \max \id{values}(x)$}
+\end{codebox}
+
+Complexidade: $O(\alpha(\id{root}))$
+\pause
+
+Exercício: escrever algoritmos não recursivas.
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Sucessor}
+\frametitle{Operações de consulta}
+
+\begin{codebox}
+  \Procname{$\proc{Successor}(x)$}
+  \zi \assert{\Comment $x \neq \const{Nil} \land \id{bst}(x)$}
+  \li \If $\attrib{x}{right} \neq \const{Nil}$
+  \li \Then \Return $\proc{Minimum}(\attrib{x}{right})$
+      \End
+  \li $y \gets \attrib{x}{up}$
+  \li \While $y \neq \const{Nil}$ and $x \isequal \attrib{y}{right}$
+  \li \Do $x \gets y$
+  \li   $y \gets \attrib{x}{up}$
+      \End
+  \li \Return $y$
+\end{codebox}
+
+Complexidade: $O(\alpha(\id{root}))$
+\pause
+
+Exercício: escrever o algoritmo que encontra o nó predecessor (se existir).
+
+\end{frame}
+
+%% TODO : EXERCICIOS SOBRE CONSULTA
+
+\section{Operações de mutação}
+
+\begin{frame}
+
+\frametitle{Inserção}
+\framesubtitle{Operações de mutação}
+
+\begin{codebox}
+  \Procname{$\proc{Insert}(A, k)$}
+  \zi \assert{\Comment $\id{bst}(\attrib{A}{root})$}
+  \li $\attrib{A}{root} \gets \proc{Insert-Aux}(k, \attrib{A}{root}, \const{Nil})$
+  \zi \assert{\Comment $\id{bst}(\attrib{A'}{root}) \land \id{values}(\attrib{A'}{root}) = \id{values}(\attrib{A}{root}) \cup \{ \{ k \} \}$}
+\end{codebox}
+
+\begin{codebox}
+  \Procname{$\proc{Insert-Aux}(k, x, p)$}
+  \zi \assert{\Comment $\id{bst}(x) \land $}
+  \zi \assert{\Comment $(x = Nil \lor \attrib{x}{up} = \const{Nil} \lor$}
+  \zi \assert{\Comment $\attrib{x}{up} = p \land (\attrib{p}{key} \le k \land \attrib{p}{right} = x \lor
+      \attrib{p}{key} \ge k \land \attrib{p}{left} = x )\,)$}
+  \li \If $x \isequal \const{Nil}$
+  \li \Then \Return $\proc{Make-Node}(k, \const{Nil}, \const{Nil}, \id{p})$
+  \li \Else
+  \li    \If $k < \attrib{x}{key}$
+  \li    \Then $\attrib{x}{left} \gets \proc{Insert-Aux}(p, \attrib{x}{left}, x)$
+  \li    \Else $\attrib{x}{right} \gets \proc{Insert-Aux}(p, \attrib{x}{right}, x)$
+         \End
+       \End
+\end{codebox}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Inserção}
+\framesubtitle{Operações de mutação}
+
+\begin{itemize}
+
+  \item $O(h)$ para encontrar a posição de inserção
+
+  \item $\Theta(1)$ para criar o nó
+
+  \item $O(h)$ para atualizar as referências para as sub-árvores
+
+\end{itemize}
+
+
+\end{frame}
+
+%% TODO: ilustrate remove scenarios
+
+\begin{frame}
+
+\frametitle{Remoção}
+\framesubtitle{Operações de mutação}
+
+\begin{itemize}
+
+  \item Objetivo: remover a chave $k$ da coleção representada
+
+  \item Preâmbulo: buscar o nó, digamos $z$, com a chave $k$
+
+  \item Remover o nó $z$. 
+
+\pause
+
+\only<2>{
+  \assert{$z$ é uma folha:}
+
+  \begin{itemize}
+        
+  \item eliminar $z$, e 
+            
+  \item modificar o nó $\attrib{z}{up}$ (se existir) para ter
+    $\const{Nil}$ como sub-árvore, ao invés de $z$;
+
+  \end{itemize}
+}
+
+\only<3>{
+  \assert{$z$ tem apenas uma sub-árvore:}
+
+  \begin{itemize}
+
+  \item eliminar $z$
+        
+  \item modificar o nó $\attrib{z}{up}$ (se existir) para
+    ter a sub-árvore de $z$ como sub-árvore, ao invés de $z$.
+
+  \end{itemize}
+}
+
+\only<4>{
+  \assert{$z$ tem duas sub-árvores:}
+
+  \begin{itemize}
+
+  \item procurar o nó $y$, elemento sucessor de $z$ na árvore
+
+    necessariamente existe $y$ (\alert{por quê}?)
+
+  \item copiar $\attrib{y}{key}$ em $\attrib{z}{key}$
+
+  \item eliminar o nó $y$.
+
+    necessariamente $y$ tem pelo menos uma sub-árvore vazia.
+    (\alert{por quê}?)
+  \end{itemize}
+}
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Remoção}
+\framesubtitle{Operações de mutação}
+
+\begin{footnotesize}
+\begin{codebox}
+  \Procname{$\proc{Remove-Node}(A, k)$}
+  \li $z \gets \proc{Search}(\attrib{A}{root}, k)$ \Comment $z$: nó com o valor a eliminar
+  \li \If $z \isequal \const{Nil}$
+  \li \Then \Return
+      \End
+  \li \If $\attrib{z}{left} \isequal \const{Nil}$
+  or $\attrib{z}{right} \isequal \const{Nil}$
+  \li \Then $y \gets z$
+  \li \Else $y \gets \proc{Successor}(z)$ \Comment $y$: nó a eliminar
+      \End
+  \li \If $\attrib{y}{left} \neq \const{Nil}$
+  \li \Then $x \gets \attrib{y}{left}$
+  \li \Else $x \gets \attrib{y}{right}$   \Comment $x$: sub-árvore não vazia de $y$ ou $\const{Nil}$
+      \End
+  \li \If $x \neq \const{Nil}$
+  \li \Then $\attrib{x}{up} \gets \attrib{y}{up}$
+       \End
+  \li \If $\attrib{y}{up} \isequal \const{Nil}$
+  \li \Then $\attrib{A}{root} \gets x$
+  \li \Else \If $y \isequal \attrib{\attrib{y}{up}}{left}$
+  \li   \Then $\attrib{\attrib{y}{up}}{left} \gets x$
+  \li   \Else $\attrib{\attrib{y}{up}}{right} \gets x$ \Comment $y$ foi desconectado da árvore
+        \End
+      \End
+  \li \If $y \neq z$
+  \li \Then $\attrib{z}{key} \gets \attrib{y}{key}$
+      \End
+  \li $\proc{Free-Node}(y)$
+\end{codebox}
+\end{footnotesize}
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Inserção}
+\framesubtitle{Operações de mutação}
+
+\begin{itemize}
+
+  \item $O(h)$ para encontrar o nó a remover
+
+  \item $O(h)$ para encontrar o nó sucessor
+
+  \item $Theta(1)$ para realizar as modificações nas referências
+
+\end{itemize}
+
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Exercícios}
+
+\begin{enumerate}
+
+  \item O algoritmo de inserção apresentado realiza $O(h)$
+    atualizações de sub-árvore.
+
+    Modificar o algoritmo para realizar $\Theta(1)$ atualizações
+    de sub-árvore
+
+  \item Projetar um algoritmo de inserção não recursivo.
+
+  \item Verdadeiro ou falso?
+
+    Remover a chave $k_1$, e então remover a chave $k_2$ deixa a árvore no
+    mesmo estado de que remover primeiro $k_2$ e então $k_1$.
+
+    Justifique.
+
+  \item Um algoritmo de ordenação de um arranjo consiste em 
+    \begin{enumerate}
+      \item inserir sucessivamente os valores do arranjo em uma árvore binária de busca
+      \item percorrer a árvore em ordem, inserindo os valores no arranjo.
+
+    \end{enumerate}
+
+    Qual a complexidade deste algoritmo?
+
+\end{enumerate}
+
+\end{frame}
+%% TODO : EXERCICIOS SOBRE MUTACAO
+
+\begin{frame}
+
+  \frametitle{Conclusões}
+
+  \begin{itemize}
+
+    \item Operações: $O(\alpha(\attrib{A}{root}))$
+
+    \item Em geral:
+
+      \begin{itemize}
+      \item $\alpha(\attrib{A}{root}) \in O( | \id{values}(\attrib{A}{root}) |)$
+
+      \item $\alpha(\attrib{A}{root}) \in \Omega( \lg | \id{values}(\attrib{A}{root}) |)$
+      \end{itemize}
+
+    \item Podemos fazer melhor?
+
+      \pause
+
+      \begin{itemize}
+
+        \item \alert{Sim!}
+
+          $\Longrightarrow \alpha(\attrib{A}{root}) \in \Theta( \lg | \id{values}(\attrib{A}{root}) |)$ 
+
+          \item Árvores AVL, árvores rubro-negras.
+
+      \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+\end{document}
+
+

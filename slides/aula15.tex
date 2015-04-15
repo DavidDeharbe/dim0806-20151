@@ -1,0 +1,1166 @@
+\documentclass{beamer}
+\setbeamertemplate{footline}[frame number]
+%\documentclass{beamer}
+
+\input{preamble}
+
+\title{Aula 15: Tabelas de espalhamento}
+\subtitle{Tabelas de dispersão, tabelas \textit{hash\/}}
+\author{David Déharbe \\
+  Programa de Pós-graduação em Sistemas e Computação \\
+  Universidade Federal do Rio Grande do Norte \\
+  Centro de Ciências Exatas e da Terra \\
+  Departamento de Informática e Matemática Aplicada}
+\date{13 de abril de 2015}
+
+
+\begin{document}
+\selectlanguage{brazil}
+\begin{frame}
+  \titlepage
+  Download me from \url{http://ufrn.academia.edu/DavidDeharbe}.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Plano da aula}
+  \tableofcontents
+
+  \alert{Referência}: Cormen et al. Capítulo 12.
+\end{frame}
+
+\section{Preâmbulo}
+
+\begin{frame}
+
+  \frametitle{Introdução}
+
+  \begin{itemize}
+
+    \item Coleção dinâmica de dados
+
+    \item Cada dado $x$ tem um atributo \alert{chave} $\attrib{x}{key}$
+      \alert{único}
+
+      $x \neq y \Rightarrow \attrib{x}{key} \neq \attrib{y}{key}$
+
+    \item Operações
+
+      \begin{itemize}
+
+        \item Inserção de um dado;
+
+        \item Remoção de um dado;
+
+        \item Busca na coleção de um dado com uma determinada chave
+
+          \begin{itemize}
+
+            \item pode ser bem sucedida ou mal sucedida
+
+          \end{itemize}
+
+        \item Custo $\Theta(1)$ em média, $\Theta(n)$ no pior caso.
+
+      \end{itemize}
+
+  \end{itemize}
+
+\end{frame}
+
+\section{Tabelas de indexação direta}
+
+\begin{frame}
+
+  \frametitle{Tabelas de indexação direta}
+
+  \begin{itemize}
+
+    \item $U$: conjunto das chaves possíveis
+
+    \item $U$ é \alert{pequeno}
+
+    \item Encontrar função bijetora $i$ de $U$ para $1 \twodots | U |$
+
+    \item Manter uma tabela $A$ de tamanho $| U |$, onde $A[ i(\attrib{x}{key}) ]$ 
+
+      \begin{itemize}
+
+        \item é $x$, ou uma referência para $x$, quando o dado $x$ está na
+          coleção;
+
+        \item é o valor especial $\const{Nil}$, caso contrário.
+
+      \end{itemize}
+
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Operações}
+  \framesubtitle{Tabelas de indexação direta}
+
+  \begin{codebox}
+    \Procname{$\proc{Buscar}(A, k)$}
+    \zi \Return $A[ i( k )]$
+  \end{codebox}
+
+  \begin{codebox}
+    \Procname{$\proc{Inserir}(A, x)$}
+    \zi $A[ i( \attrib{x}{key} )] \gets x$
+  \end{codebox}
+
+  \begin{codebox}
+    \Procname{$\proc{Remover}(A, x)$}
+    \zi $A[ i( \attrib{x}{key} )] \gets \const{Nil}$
+  \end{codebox}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Exercício}
+  \framesubtitle{Tabelas de indexação direta}
+
+  \begin{enumerate}
+    \item Assumindo 
+      \begin{itemize}
+      \item as mesmas hipóteses que para as tabelas de indexação
+        direta, e 
+      \item que não estamos interessados em representar $x$ na
+      coleção, mas apenas registrar a presença ou ausência dele, 
+      \end{itemize}
+      encontrar uma estrutura de dados mais econômica em memória que
+      a tabela.
+
+    \item Descrever um procedimento para encontrar o dado com maior chave
+      em uma tabela de indexação direta.
+
+      Qual o custo deste procedimento?
+  \end{enumerate}
+
+\end{frame}
+
+\section{Tabelas de espalhamento}
+
+\begin{frame}
+
+  \frametitle{Tabelas de espalhamento}
+
+  \begin{itemize}
+
+    \item O tamanho de uma tabela de indexação direta é $\Theta(| U |)$
+
+    \item Quando $U$ não é pequeno, tabelas de indexação direta não são
+      viáveis.
+
+      \begin{itemize}
+
+        \item Em um compilador, como representar a tabela dos símbolos?
+
+      \end{itemize}
+
+    \item Mesmo se $| U |$ pode ser representado em memória, se o tamanho de
+      $K$, o conjunto dos dados efetivamente presentes da coleção é muito menor
+      que $| U |$, há desperdício de memória.
+
+    \item Quando $| K |$ é muito menor que $| U |$, recomenda-se considerar
+      \alert{tabelas de espalhamento} ao invés de tabelas de indexação direta.
+
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Considerações sobre a complexidade}
+  \framesubtitle{Tabelas de espalhamento}
+
+  \begin{itemize}
+
+    \item O \alert{custo médio} das operações é $\Theta(1)$
+
+      \begin{itemize}
+
+        \item no caso de tabelas de indexação direta, é o custo no \alert{pior caso}
+
+      \end{itemize}
+   
+    \item A quantidade de memória necessária é $\Theta( | K | )$.
+
+      \begin{itemize}
+
+        \item O tamanho de uma tabela de indexação direta é $\Theta(| U |)$
+
+      \end{itemize}
+
+    \item A função de indexação $h$ de $U$ para $1 \twodots m$ ($m$ tamanho da tabela
+      de espalhamento) é \alert{sobrejetora}
+
+      \begin{itemize}
+
+        \item A função da tabela de indexação direta é sobrejetora.
+
+        \item A função $h$ é chamada \alert{função de espalhamento}
+
+          função de dispersão, função \textit{hash\/}
+
+      \end{itemize}
+
+  \end{itemize}
+      
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Colisões}
+  \framesubtitle{Tabelas de espalhamento}
+
+  \begin{itemize}
+
+    \item Problema: \alert{colisões}
+
+      \begin{itemize}
+
+      \item dados $x$ e $x'$, com chaves $k$ e $k'$ são tais que $h(k) = h(k')$,
+         são inseridos na tabela.
+
+      \end{itemize}
+
+    \item Como resolver as colisões?
+
+      \begin{itemize}
+
+        \item Encadeamento externo
+
+        \item Política de endereçamento aberto
+
+      \end{itemize}
+
+    \item Como reduzir a probabilidade de colisões?
+
+      \begin{itemize}
+
+      \item Funções de espalhamento
+
+      \item A função ideal mapearia cada chave para uma posição
+        diferente.
+
+      \item Como $| U | > m$, a função ideal não existe.
+
+      \end{itemize}
+
+  \end{itemize}
+      
+\end{frame}
+
+\subsection{Tratamento de colisões por encadeamento externo}
+
+\begin{frame}
+
+\frametitle{Tratamento de colisões por encadeamento externo}
+
+\begin{itemize}
+
+\item Cada posição contem uma referência para a primeira célula de uma lista
+  encadeada
+
+  A lista na posição $p$ armazena $\{ x \, | \, h(\attrib{x}{key}) = p \}$;
+
+\item ou $\const{Nil}$ se a coleção não contem dado $x$ tal que
+  $h(\attrib{x}{key}) = p$.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Operações}
+  \framesubtitle{Tabelas de espalhamento com encadeamento externo}
+
+  \begin{codebox}
+    \Procname{$\proc{Buscar}(A, k)$}
+    \zi \Comment buscar um dado com chave $k$ na lista $A[ h( k )]$
+  \end{codebox}
+
+  \begin{codebox}
+    \Procname{$\proc{Inserir}(A, x)$}
+    \zi \Comment inserir o dado na cabeça da lista $A[ h( \attrib{x}{key} )] $
+  \end{codebox}
+
+  \begin{codebox}
+    \Procname{$\proc{Remover}(A, x)$}
+    \zi \Comment remover o dado $x$ da lista $A[ h( \attrib{x}{key} )] $
+  \end{codebox}
+
+  \pause
+  \alert{não esquecer de atualizar $A[h(\attrib{x}{key})]$ na inserção e na remoção}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Custo das operações}
+  \framesubtitle{Tabelas de espalhamento com encadeamento externo}
+
+  \begin{description}
+
+    \item[Buscar] complexidade linear no tamanho da lista $A[ h( k )]$
+
+
+    \item[Inserir] $\Theta(1)$
+
+    \item[Remover] 
+
+      \begin{itemize}
+
+        \item $\Theta(1)$ se a lista for duplamente encadeada e o dado $x$ contem os atributos
+          $\id{next}$ e $\id{prev}$.
+
+        \item complexidade linearmente proporcional ao tamanho da lista $A[ h(\attrib{x}{key}) ]$
+          caso contrário.
+
+      \end{itemize}
+
+  \end{description}
+
+  \pause 
+
+  O que podemos dizer sobre o tamanho das listas?
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Análise de espalhamento com encadeamento externo}
+
+
+  \begin{center}
+    \begin{tabular}{rcl}
+      $n$ & : & número de elementos na tabela \\
+      $m$ & : & tamanho da tabela
+    \end{tabular}
+  \end{center}
+
+  \begin{itemize}
+
+  \item \alert{fator de carga}: $\alpha = n / m$.
+
+
+  \item pior caso: 
+
+    \begin{itemize}
+
+      \item todos os elementos estão na mesma posição $\Theta(n)$
+
+      \item lista encadeada
+
+      \item função de espalhamento \alert{não} espalha!
+
+    \end{itemize}
+
+
+  \item caso médio depende das propriedades da função de espalhamento
+
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Análise de espalhamento com encadeamento externo}
+  \framesubtitle{Caso médio}
+
+  Hipóteses:
+
+  \begin{enumerate}
+
+  \item \alert{espalhamento uniforme simples}: para qualquer chave $k$ a
+    probabilidade de $h(k) = i$ é $1/m$, para $1 \le i \le m$
+
+  \item o custo de calcular $h(k)$ é sempre $\Theta(1)$.
+
+  \item fator de carga $\alpha$
+
+  \item tratamento de colisões por encadeamento externo
+
+  \end{enumerate}
+
+  Cenários analizados:
+
+  \begin{itemize}
+
+    \item busca mal-sucedida
+
+    \item busca bem-sucedida
+
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Análise de espalhamento com encadeamento externo}
+  \framesubtitle{Caso médio de busca mal-sucedida}
+
+  Hipóteses:
+
+  \begin{theorem}
+
+    Sob as hipóteses enunciadas, o custo de uma busca mal-sucedida é $\Theta(1+\alpha)$.
+
+  \end{theorem}
+
+  \pause
+
+  \begin{proof}
+
+  O custo é
+  \begin{itemize}
+
+    \item o de uma busca mal-sucedida em uma lista: $\Theta(| \text{lista} |)$ ( $= \Theta( \alpha )$ em média).
+
+    \item acrescentado do cálculo de $h(k)$, e do acesso ao arranjo ($= \Theta(1)$).
+
+  \end{itemize}
+  ou seja $\Theta(1 + \alpha)$.
+
+  \end{proof}
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Análise de espalhamento com encadeamento externo}
+  \framesubtitle{Caso médio de busca bem-sucedida}
+
+  Hipóteses:
+
+  \begin{theorem}
+
+    Sob as hipóteses enunciadas, o custo de uma busca bem-sucedida é $\Theta(1+\alpha)$.
+
+  \end{theorem}
+
+  \pause
+
+  \begin{proof}
+
+  O custo médio é
+  \begin{itemize}
+
+    \item o de uma busca bem-sucedida em uma lista: $\Theta(| \text{lista} | /2)$ ( $= \Theta( \alpha / 2)$ em média).
+
+    \item acrescentado do cálculo de $h(k)$, e do acesso ao arranjo ($= \Theta(1)$).
+
+  \end{itemize}
+  ou seja $\Theta(1 + \alpha/2) = \Theta(1 + \alpha)$.
+
+  \end{proof}
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Análise de espalhamento com encadeamento externo}
+  \framesubtitle{Conclusão}
+
+  \begin{itemize}
+
+  \item Sob as hipóteses enunciadas, e
+
+  \item se $m$ é pelo menos proporcionalmente linear a $n$ ($m \in \Omega(n)$), 
+
+  \item então $n \in O(m)$ e $\alpha = n/m \in O(m)/m = O(1)$.
+
+  \item Logo o custo da busca é $O(1)$.
+
+  \item Para a inserção, o custo é $O(1)$.
+
+  \item Para a remoção, o custo é 
+
+    \begin{itemize}
+
+      \item $O(1)$ se a lista for duplamente encadeada e $x$ inclui os attributos de encadeamento;
+
+      \item $O(1+\alpha) = O(1)$ caso contrário (pelo mesmos motivos que a busca).
+
+    \end{itemize}
+
+  \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Exercícios}
+
+  \begin{enumerate}
+
+    \item Simule inserir sucessivamente os valores com chaves 5, 28, 19, 15, 20,
+      33, 12, 17, 10 em uma tabela de espalhamento inicialmente vazia, com 9
+      posições, e função de espalhamento $h = \lambda k . 1 + k \mod 9$.
+
+    \item Sob as hipóteses enunciadas, estime a complexidade média da operação de inserção caso a mesma
+      seja realizadda:
+      \begin{itemize}
+
+        \item sempre no final da lista
+
+        \item em uma lista ordenada, mantendo a propriedade de ordenação
+
+      \end{itemize}
+
+    \item Sob a hipótese de espalhamento uniforme simples, quantas colisões há
+      quando $n$ chaves distintas são inseridos em uma tabela de espalhamento de
+      tamanho $m$?
+
+  \end{enumerate}
+
+\end{frame}
+
+\section{Funções de espalhamento}
+
+\begin{frame}
+
+\frametitle{Funções de espalhamento: características desejadas}
+
+\begin{tabular}{rcl}
+  $m$ & : & tamanho da tabela de espalhamento \\
+  $h$ & : & função de espalhamento \\
+  $U$ & : & universo das chaves \\
+\end{tabular}
+
+\begin{itemize}
+
+  \item A função de espalhamento \alert{ideal} é uniforme:
+
+    \begin{itemize}
+
+    \item Todas as listas encadeadas tem o mesmo tamanho $n / m$.
+
+    \item A probabilidade de qualquer operação de inserção ocorrer na posição $j$ seja $1 / m$.
+
+    \item Seja $P(k)$ a probabilidade de um dado ter a chave $k \in U$.
+
+      $$\sum_{\{ k | h(k) = j \}} P(k) = 1/m$$
+
+    \end{itemize}
+
+  \item Exemplo: $U = \{ k \in \mathbb{R} \,|\, 0 \le k \le 1 \}$, $P$ é uniforme.
+
+    $h(k) = 1 + \lfloor k \cdot m \rfloor$
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Funções de espalhamento: características desejadas}
+
+\begin{itemize}
+
+  \item A distribuição das chaves \alert{geralmente} não é conhecida.
+
+  \item Existe heurísticas com resultado prático satisfatório.
+
+    \begin{itemize}
+
+      \item análise estatística do domínio de aplicação
+
+      \item análise qualitativa do domínio de aplicação
+
+      \item o resultado do espalhamento deve ser independente de qualquer padrão
+        que possa ocorrer nos dados
+
+        Exemmplo de chaves comum em tabela de símbolos:
+        \texttt{"i"}, \texttt{"j"}, \texttt{"pt"}, \texttt{"ptr"}, \texttt{"pt1"}
+
+    \end{itemize}
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Tratando chaves como números naturais}
+
+  \begin{itemize}
+
+    \item É comum funções de espalhamente considerar que as chaves são números naturais.
+
+    \item É simples satisfazer esta hipótese:
+
+      \begin{itemize}
+
+        \item qualquer chave tem uma representação binária
+
+        \item por interpretação como número na base 2, qualquer código binário é
+          mapeado  para um número natural.
+
+        \item Exemplo (codificação ASCII, base 128): 
+
+          \begin{itemize}
+
+            \item \texttt{"pt"} é interpretada como o par de naturais (112, 116), através da norma ASCII,
+              a qual tem 128 códigos diferentes.
+
+            \item Logo \texttt{"pt"} é mapeado para $112 \cdot 128^1 + 116 \cdot 128^0 = 14452$.
+
+          \end{itemize}
+
+          \item O mapeamento é uma função bijetora.
+      \end{itemize}
+
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Espalhamento pelo método da divisão}
+
+  \begin{tabular}{rcl}
+    $m$ & : & tamanho da tabela de espalhamento \\
+    $h$ & : & função de espalhamento \\
+  \end{tabular}
+  
+  \begin{itemize}
+    \item $h = \lambda k \cdot k \mod m$
+
+    \item Potências de 2 são valores a evitar para $m$
+
+      \begin{itemize}
+
+        \item Motivo: $h(k)$ só depende de $\log_2 m$ bits de $k$.
+
+      \end{itemize}
+
+    \item Potências de 10 são valores a evitar para $m$ se as chaves são números decimais
+
+    \item Receita para umm $m$ geralmente bom:
+
+      \begin{itemize}
+
+        \item número primo
+
+        \item não vizinho de uma potência de 2
+
+      \end{itemize}
+
+    \item Sempre verificar experimentalmente a escolha com dados representativos da aplicação.
+      
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Espalhamento por multiplicação}
+
+  \begin{tabular}{rcl}
+    $k$ & : & chave \\
+    $m$ & : & tamanho da tabela de espalhamento \\
+    $h$ & : & função de espalhamento \\
+  \end{tabular}
+  
+  \begin{itemize}
+    
+  \item Escolher uma constante $A \in \mathbb{R}$ tal que $0 < A < 1$
+
+  \item Seja $\varphi(k) = k \cdot A - \lfloor k \cdot A \rfloor \rfloor$ a parte
+    fracionária do produto da chave por $A$.
+
+  \item $h = \lambda k . 1 + \lfloor m \cdot \varphi(A) \rfloor$ é a função de espalhamento obtida.
+
+  \item O valor de $m$ não é crítico: pode ser uma potência de 2.
+
+  \item A escolha ótima do valor de $A$ depende da aplicação
+
+    \begin{itemize}
+
+    \item O valor $(\sqrt{5} - 1)/2 = 0.61803...$ foi sugerido por ter boa probabilidade de funcionar bem (Knuth).
+
+    \end{itemize}
+
+  \item $h = \lambda k . k \times \lfloor A \cdot 2^w \rfloor / 2^{w-p}$, onde $w$
+    é o tamanho da palavra do computador e $2^p = m$.
+
+  \end{itemize}
+
+\end{frame}
+
+%% incluir desenho figure 12.4 do Cormen
+
+\begin{frame}
+
+  \frametitle{Espalhamento universal}
+  \framesubtitle{Carter \& Wegman, 1979}
+  \begin{itemize}
+    
+  \item O usuário maliocoso pode escolher uma série de dados que vão todos 
+    ser ``espalhados'' para a mesma posição.
+
+  \item O desempenho da aplicação será afetado negativamente
+
+  \item Espalhamento universal é uma solução a este problema
+
+  \item Há uma coleção de funções de espalhamento.
+
+  \item Em tempo de execução uma das funções de espalhamento é escolhida aleatoriamente.
+
+  \item Reduz a probabilidade do desempenho ser ruim.
+
+  \item Uma coleção $H$ de funções de espalhamento é \alert{universal} quando, para
+    cada par de chaves distintas $x, y$, $h(x) = h(y)$ com probabilidade $|H|/m$. 
+
+    \begin{itemize}
+
+      \item Escolhendo uma função de espalhamento $h$ ao acaso em $H$, a 
+        chance de colisão entre $x$ e $y$ é $1/m$. 
+
+      \item Esta probabilidade é a mesma que se $h(x)$ e $h(y)$ ter sido
+        escolhidos aleatoriamente em $1 \twodots m$.
+
+    \end{itemize}
+
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Espalhamento universal}
+
+  \begin{theorem}
+
+    Se $h$ é escolhido de uma coleção universal de funções de espalhamento
+    para espalhar $n \le m$ chaves, o número esperado de colisões para
+    uma chave $x$ é menos que 1.
+
+  \end{theorem}
+
+  \begin{proof}
+
+    \begin{itemize}
+
+    \item Seja $x \neq y$ duas chaves quaisquer.
+
+    \item Por definição, a probabilidade de colisão é $1 / m$.
+
+    \item Se há $n$ chaves distintas $x_1, \ldots x_n$, 
+
+      \begin{itemize}
+
+        \item a probabilidade de colisão de 
+          $x_1$ com $x_2$ é $1 / m$, com $x_2$ é $1 / m$, etc.
+
+        \item a probabilidade global de colisão é $(n-1)/m$;
+
+        \item se $n \le m$, a probabilidade de colisão  $(n-1)/m < 1$.
+
+      \end{itemize}
+
+    \end{itemize}
+
+  \end{proof}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Projeto de classe universal de funções de espalhamento}
+
+\begin{itemize}
+
+\item $m$ é um número primo
+
+\item cada chave $k$ é considerada como uma sequência $\langle k_1, \ldots, k_r$
+  de $r$ cadeias de $t$ bits (condição $2^t < m$)
+
+\item Seja $a = \langle a_1, \ldots, a_r \rangle$ uma sequênciada formada $r$
+  elementos escolhidos do conjunto $1 \twodots m$
+
+\item A função de espalhamento $h_a = \lambda k . \sum_{i=1}^{r} a_i k_i$ 
+
+\item $H = \bigcup_a \{ h_{a} \}$ tem $m^r$ elementos.
+\end{itemize}
+
+\begin{theorem}
+
+A classe $H$ é universal.
+
+\end{theorem}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Projeto de classe universal de funções de espalhamento}
+
+\begin{proof}
+
+Seja $x \neq y$ e $h(x) = h(y)$. Assumimos que $x_1 \neq y_1$ (poderia ser qualquer sub-sequência).
+
+\begin{itemize}
+
+\item $h_{a}(x) = h_{a}(y) \Longrightarrow \sum_{i=1}^{r} a_i x_i \mod m = \sum_{i=1}^{r} a_i y_i \mod m$.
+
+\item Logo $\sum_{i=1}^{r} a_i (x_i - y_i) \mod m = 0$.
+
+\item Logo $a_1(x_1 - y_1) \equiv \sum_{i=1}^{r} a_i (x_i - y_i) \mod m = 0$.
+
+\item Teoria dos números: como $x_1 - y_1 \neq 0$, possui um inverso multiplicativo módulo $m$.
+
+\item Logo $a_1 = - \sum_{i=2}^r a_i (x_i - y_i) \cdot (x_1 - y_1)^{-1} \mod m$
+
+... e existe um único $a_0 \mod m$ tal que $h(x) = h(y)$.
+
+\item Tem $m^{r-1}$ valores de $a$ (uma para cada $\langle a_2, \ldots, a_r \rangle$) tais que $x$ e $y$ colidem.
+
+\item De $m^r$ combinações possíveis, há $m^{r-1}$ colisões. A probabilidade é
+  $m^{r-1}/m^r = 1/m$: $H$ é universal.
+
+\end{itemize}
+
+\end{proof}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Exercícios}
+
+\begin{enumerate}
+
+\item Aplicando o espalhamento por multiplicação com $A = (\sqrt{5} - 1)/2$ e $m
+  = 1000$, quais são as posições para as chaves 61, 62, 63, 64 e 65?
+
+\item Em uma aplicação onde comparar duas chaves é custoso, como adaptar as estruturas de dados
+  envolvidas em uma tabela de espalhamento para acelerar as operações?
+
+\end{enumerate}
+
+\end{frame}
+
+\section{Endereçamento aberto}
+
+\begin{frame}
+
+\frametitle{Resolução de colisões por endereçamento aberto}
+
+\begin{itemize}
+
+  \item Sem encadeamento externo
+
+  \item Se houver uma colisão, uma nova posição é calculada
+
+  \item Função de espalhamento: $h(k, i)$
+
+    \begin{itemize}
+
+      \item $k$ chave
+
+      \item $i$ \alert{tentativa}
+
+      até $m$ tentativas
+
+    \end{itemize}
+
+  \item capacidade limitada ($\neq$ encadeamento externo)
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Inserção}
+\framesubtitle{Resolução de colisões por endereçamento aberto}
+
+\begin{codebox}
+    \Procname{$\proc{Inserir}(T, x)$}
+    \li $i \gets 1$
+    \li \Repeat 
+    \li   $p \gets h(\attrib{x}{key}, i)$ 
+    \li   \If $T[p] \isequal \const{Nil}$
+    \li   \Then $T[p] \gets x$
+    \li     \Return $p$
+    \li   \Else $i \gets i+1$
+          \End
+    \li \Until $i \isequal m+1$
+    \li \Comment tratamento de tabela cheia
+\end{codebox}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Busca}
+\framesubtitle{Resolução de colisões por endereçamento aberto}
+
+\begin{codebox}
+    \Procname{$\proc{Buscar}(T, k)$}
+    \li $i \gets 1$
+    \li \Repeat 
+    \li   $p \gets h(k, i)$ 
+    \li   \If $\attrib{T[p]}{key} \isequal k$
+    \li   \Then \Return $p$
+          \End
+    \li   \If $T[p] \isequal \const{Nil}$
+    \li   \Then \Return $\const{Nil}$
+          \End
+    \li   $i \gets i+1$
+          \End
+    \li \Until $i \isequal m+1$
+    \li \Return $\const{Nil}$
+\end{codebox}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Remover}
+\framesubtitle{Resolução de colisões por endereçamento aberto}
+
+\begin{codebox}
+    \Procname{$\proc{Remover}(T, x)$}
+    \li $i \gets 1$
+    \li \Repeat 
+    \li   $p \gets h(\attrib{x}{key}, i)$ 
+    \li   \If $T[p] \isequal k$
+    \li   \Then $T[p] \gets \const{Nil}$
+                \Return
+          \End
+    \li   $i \gets i+1$
+          \End
+    \li \Until $i \isequal m+1$
+    \li \Comment tratar erro 
+\end{codebox}
+
+\pause
+
+\begin{itemize}
+
+\item Assumindo $m = 10$, $h = \lambda k, i \cdot 1 + ((k + i - 1) \mod m)$, $\attrib{x}{key} = x$,
+\item simular $\proc{Inserir}(5)$, $\proc{Inserir}(15)$, $\proc{Remover}(5)$, $\proc{Buscar}(15)$
+\pause
+\item \alert{...problema...} \pause solução: $\const{Deleted}$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Inserção}
+\framesubtitle{Resolução de colisões por endereçamento aberto}
+
+\begin{codebox}
+    \Procname{$\proc{Inserir}(A, x)$}
+    \li $i \gets 1$
+    \li \Repeat 
+    \li   $p \gets h(\attrib{x}{key}, i)$ 
+    \li   \If $T[p] \isequal \const{Nil}$ or $T[p] \isequal \const{Deleted}$
+    \li   \Then $T[p] \gets x$
+    \li     \Return $p$
+    \li   \Else $i \gets i+1$
+          \End
+    \li \Until $i \isequal m+1$
+    \li \Comment tratamento de tabela cheia
+\end{codebox}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Busca}
+\framesubtitle{Resolução de colisões por endereçamento aberto}
+
+\begin{codebox}
+    \Procname{$\proc{Buscar}(A, k)$}
+    \li $i \gets 1$
+    \li \Repeat 
+    \li   $p \gets h(k, i)$ 
+    \li   \If $\attrib{T[p]}{key} \isequal k$
+    \li   \Then \Return $p$
+          \End
+    \li   \If $T[p] \isequal \const{Nil}$
+    \li   \Then \Return $\const{Nil}$
+          \End
+    \li   $i \gets i+1$
+          \End
+    \li \Until $i \isequal m+1$
+    \li \Return $\const{Nil}$
+\end{codebox}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Remover}
+\framesubtitle{Resolução de colisões por endereçamento aberto}
+
+\begin{codebox}
+    \Procname{$\proc{Remover}(A, x)$}
+    \li $i \gets 1$
+    \li \Repeat 
+    \li   $p \gets h(\attrib{x}{key}, i)$ 
+    \li   \If $T[p] \isequal k$
+    \li   \Then $T[p] \gets \const{Deleted}$
+          \End
+    \li   $i \gets i+1$
+          \End
+    \li \Until $i \isequal m+1$
+    \li \Comment tratar erro 
+\end{codebox}
+
+\end{frame}
+
+\subsection{Tentativas lineares}
+
+\begin{frame}
+
+\frametitle{Tentativas lineares}
+
+\begin{tabular}{rcl}
+$h$ & : & função de espalhamento da chave \\
+$m$ & : & tamanho da tabela
+\end{tabular}
+
+$$h_L = \lambda k, i \cdot 1 + (h(k) + (i - 1) \mod m)$$
+
+\begin{itemize}
+
+\item tentativas são realizadas em posições sucessivas
+
+\item problema: \alert{agrupamentos primários}
+
+\begin{itemize}
+
+  \item quando há uma sub-faixa ocupada de tamanho $n < m$, 
+
+  \item a probabilidade de colisão é $n/m$, 
+
+  \item cria uma sub-faixa de tamanho $n' \ge n+1$
+
+  \item a probabilidade de colisão nesta sub-faixa torna-se $n'/m$.
+
+\end{itemize}
+
+\item não é uma boa sub-solução: desempenho degrada-se rapidamente.
+
+\end{itemize}
+
+\end{frame}
+
+\subsection{Tentativas quadráticas}
+
+\begin{frame}
+
+\frametitle{Tentativas quadráticas}
+
+\begin{tabular}{rcl}
+$h$ & : & função de espalhamento da chave \\
+$m$ & : & tamanho da tabela
+\end{tabular}
+
+$$h_Q = \lambda k, i \cdot 1 + (h(k) + c_1 \cdot (i-1) + c_2 \cdot(i-1)^2 \mod m)$$
+
+$c_1 \neq 0, c_2 \neq 0$ são constantes
+
+\begin{itemize}
+\item elimina o problema dos agrupamentos lineares
+\item para que todas as posições sejam visitadas em $m$ tentativas, os valores
+  de $m$, $c_1$ e $c_2$ não podem ser quaisquer
+\item note que se $h_Q(k_1, 1) = h_Q(k_2, 1)$ então $h_Q(k_1, i) = h_Q(k_2, i)$ para $i > 1$
+\item a mesma sequência de tentativas é calculada para chaves com o mesmo valor de espalhamento inicial
+\begin{itemize}
+\item aparecem \alert{agrupamentos secundários}
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\subsection{Espalhamento duplo}
+
+\begin{frame}
+
+\frametitle{Espalhamento duplo}
+
+\begin{tabular}{rcl}
+$h_1$, $h_2$ & : & função de espalhamento da chave \\
+$m$ & : & tamanho da tabela
+\end{tabular}
+
+$$h_D = \lambda k, i \cdot 1 + (h_1(k) + (i-1)\cdot h_2(k) \mod m)$$
+
+\begin{itemize}
+\item a sequência de tentativas depende de $k$ para a posição inicial, 
+
+\item o deslocamento para as próximas tentativas também depende de $k$.
+
+\item para $m$ tentativas visitem $m$ posiçõs diferentes,
+  o valor de $h_2(k)$ deve ser relativamente primo com relação a $m$.
+
+\begin{itemize}
+
+\item dica 1: $m = 2^p$ e $\forall k \cdot h_2(k)$ é ímpar.
+
+\item dica 2: $m$ primo, e $\forall k \cdot h_2(k) < m$ é ímpar
+
+  exemplo: $h_1 = \lambda k \cdot 1 + (k \mod m)$, $h_2 = \lambda k \cdot 1 + (k mod m')$,
+  com $m' = m - 1$.
+
+\end{itemize}
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Comparação das tentativas}
+
+\begin{itemize}
+
+\item tentativa linear: $m$ sequências de tentativas possíveis
+
+\item tentativa quadrática: $m$ sequências de tentativas possíveis
+
+\item espalhamento duplo: $m^2$ sequência de tentativas possíveis
+
+\item ideal: $m!$ sequências de tentativas possíveis
+
+\end{itemize}
+
+\alert{$\Longrightarrow$} espalhamento duplo é teoricamente bem superior
+
+\end{frame}
+
+%% TODO \subsection{Análise do endereçamento aberto} pp.237-239
+
+\begin{frame}
+
+\frametitle{Exercícios}
+
+\begin{enumerate}
+
+\item Seja uma tabela de dispersão de tamanho $m = 11$ com endereçamento
+  aberto. Os valores $10, 22, 31, 4, 15, 28, 17, 88, 59$ são inseridos, nesta
+  ordem.  Qual o resultado destas operações quando é usada a função de
+  espalhamento $h = \lambda k \cdot 1 + k \mod m$, e as colisões são tratadas
+  por:
+\begin{itemize}
+\item tentativas lineares
+\item tentativas quadráticas
+\item espalhamento duplo, e $h_2 = \lambda k \cdot 1 + (k \mod (m - 1))$,
+  $c_1 = 1$, $c_2 = 3$.
+\end{itemize}
+
+\end{enumerate}
+
+\end{frame}
+
+\end{document}
+

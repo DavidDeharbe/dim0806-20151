@@ -16,7 +16,6 @@ pdflatex $file
 ./splitPDF.py $file.pdf 1 2 3 4 5
 for i in 1 2 3 4 5; do mv $file.part$i.$i'_'$i.pdf "$file-$i.pdf"; done
 }
-
 function aula14 () {
 
 TEXFILES="singly-linked-list \
@@ -31,7 +30,9 @@ TEXFILES="singly-linked-list \
   singly-linked-list-insert-first \
   doubly-linked-list-insert-after\
   doubly-linked-list-sentinel-circular-remove\
-  doubly-linked-list-insert-before"
+  doubly-linked-list-insert-before \
+  doubly-linked-list-sentinel-circular \
+  doubly-linked-list-sentinel-circular-empty"
 
 for file in $TEXFILES; do
   pdflatex $file
@@ -70,4 +71,25 @@ pages="1 2 3 4"
 ./splitPDF.py $file.pdf $pages
 for i in $pages; do mv $file.part$i.$i'_'$i.pdf "$file-$i.pdf"; done
 
+}
+
+function aula16 () {
+
+TEXFILES="ab \
+  abb"
+
+for file in $TEXFILES; do
+  pdflatex $file
+done
+
+file=abb
+pages="1 2"
+./splitPDF.py $file.pdf $pages
+for i in $pages; do mv $file.part$i.$i'_'$i.pdf "$file-$i.pdf"; done
+
+}
+
+
+function clean () {
+	rm -f *.log *.aux *~ *.pdf
 }

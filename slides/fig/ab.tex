@@ -1,0 +1,37 @@
+\documentclass{article}
+\usepackage[pdftex,active,tightpage]{preview}
+\setlength\PreviewBorder{2mm}
+ 
+\usepackage{tikz}
+\usetikzlibrary{calc,shapes.multipart,chains,arrows}
+
+\begin{document}
+\begin{preview}
+\begin{tikzpicture}[
+        tree/.style={
+            very thick, rectangle split, 
+            rectangle split parts=4, draw, 
+            rectangle split horizontal, minimum size=18pt,
+            inner sep=4pt, text=black,
+            rectangle split part fill={red!20, blue!20, blue!20, blue!20}
+        }, 
+        ->, very thick
+      ]
+  \node[tree] (root)  {$v_1$
+  \nodepart{two}?
+  };
+  \node[tree, left=of root, below=of root] (left)  {$v_2$
+  \nodepart{three}?
+  \nodepart{four}?
+  };
+  \node[tree, right=of left] (right) {$v_3$
+  \nodepart{three}?
+  \nodepart{four}?
+  };
+  \draw[->] let \p1 = (left.two), \p2 = (left.center) in (\x1,\y2) -- (root);
+  \draw[->] let \p1 = (right.two), \p2 = (right.center) in (\x1,\y2) -- (root);
+  \draw[->] let \p1 = (root.three), \p2 = (root.center) in (\x1,\y2) -- (left);
+  \draw[->] let \p1 = (root.four), \p2 = (root.four) in (\x1,\y2) -- (right);
+\end{tikzpicture}
+\end{preview}
+\end{document}
