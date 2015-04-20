@@ -1,11 +1,17 @@
 # (PDF)LaTeX generated files #
 ##############################
+*.dvi
 *.aux
 *.toc
 *.snm
 *.nav
 *.out
 *.log
+
+# latexml generated files #
+###########################
+*.fls
+*.fdb_latexmk
 
 # Editor back-up #
 ##################

@@ -4,8 +4,7 @@
 
 \input{preamble}
 
-\title{Aula 15: Árvores binárias de busca}
-\subtitle{Tabelas de dispersão, tabelas \textit{hash\/}}
+\title{Aula 16: Árvores binárias de busca}
 \author{David Déharbe \\
   Programa de Pós-graduação em Sistemas e Computação \\
   Universidade Federal do Rio Grande do Norte \\
@@ -82,7 +81,7 @@
     Chaves armazenados em uma árvore enraizada em $x$:
     $
     \begin{array}[t]{rcl}
-      \id{values}(x) & = & \{ \{ \attrib{x}{key} \, | \, x \in \id{nodes}(\id{root}) \} \} \\
+      \id{values}(x) & = & \{ \{ \attrib{x}{key} \, | \, x \in \id{nodes}(x) \} \} \\
       \id{values}(\const{Nil}) & = & \emptyset
     \end{array}
     $
@@ -243,7 +242,7 @@ x = \const{Nil} \lor
       \end{center}
 }
 \only<2>{
-    \item Uma árvore binária de busca de altura 4
+    \item Uma árvore binária de busca de altura 5
       \begin{center}
         \includegraphics[width=.6\textwidth]{fig/abb-2.pdf}
       \end{center}
@@ -338,7 +337,7 @@ Exercício: escrever um algoritmo não recursivo.
   \zi \assert{\Comment $\id{bst}(x) \land x \neq \const{Nil}$}
   \li \If $\attrib{x}{left} \isequal \const{Nil}$
   \li \Then \Return $x$
-  \li \Else \Return $\proc{Minimum}(\attrib{x}{left}, x)$
+  \li \Else \Return $\proc{Minimum}(\attrib{x}{left})$
       \End
   \zi \assert{\Comment $\proc{Minimum}(x) = \min \id{values}(x)$}
 \end{codebox}
@@ -348,7 +347,7 @@ Exercício: escrever um algoritmo não recursivo.
   \zi \assert{\Comment $\id{bst}(x) \land x \neq \const{Nil}$}
   \li \If $\attrib{x}{right} \isequal \const{Nil}$
   \li \Then \Return $x$
-  \li \Else \Return $\proc{Maximum}(\attrib{x}{right}, x)$
+  \li \Else \Return $\proc{Maximum}(\attrib{x}{right})$
       \End
   \zi \assert{\Comment $\proc{Maximum}(x) = \max \id{values}(x)$}
 \end{codebox}

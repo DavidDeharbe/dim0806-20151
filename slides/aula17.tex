@@ -1,0 +1,1494 @@
+\documentclass{beamer}
+\setbeamertemplate{footline}[frame number]
+%\documentclass{beamer}
+
+\input{preamble}
+
+\title{Aula 17: Árvores AVL}
+\author{David Déharbe \\
+  Programa de Pós-graduação em Sistemas e Computação \\
+  Universidade Federal do Rio Grande do Norte \\
+  Centro de Ciências Exatas e da Terra \\
+  Departamento de Informática e Matemática Aplicada}
+\date{20 de abril de 2015}
+
+
+\begin{document}
+\selectlanguage{brazil}
+\begin{frame}
+  \titlepage
+  Download me from \url{http://ufrn.academia.edu/DavidDeharbe}.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Plano da aula}
+
+
+  \begin{center}
+    \includegraphics[width=.5\textwidth]{fig/avl.pdf}
+  \end{center}
+
+  \tableofcontents
+
+\end{frame}
+
+\section{Introdução}
+
+\begin{frame}
+
+  \frametitle{Árvores AVL}
+  \framesubtitle{Introdução}
+
+  
+  \begin{itemize}
+    
+  \item Em 1962, Adelson-Velskii e Landis inventaram essa estrutura de dados:
+    \begin{itemize}
+    \item busca em $O(\lg n)$, 
+    \item remoção em $\theta(\lg n)$ e
+    \item inserção em $\Theta(\lg n)$
+    \end{itemize}
+
+  \item uma \alert{árvore AVL} é uma árvore binária de busca 
+
+  +restrição estrutural: altura das sub-árvores
+
+  \item após inserção e remoção, a árvore pode se auto-balancear (caso médio:
+    $\Theta(1)$, pior caso: $\Theta(\lg n)$
+    
+  \item a altura da árvore é $\Theta(\lg \text{número de nós})$
+
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Árvores AVL}
+\framesubtitle{Especificação}
+
+\begin{eqnarray*}
+\id{avl}(x) & \equiv & \begin{array}[t]{l}
+\id{bst}(x) \land \\
+(\begin{array}[t]{l}
+x = \const{Nil} \lor \\
+(\begin{array}[t]{ll}
+  \left| \alpha(\attrib{x}{left} - \alpha(\attrib{x}{right}) \right| \le 1 & \land \\
+  \id{avl}{(\attrib{x}{left}}) \land \id{avl}({\attrib{x}{right}})\, )\, )
+\end{array}
+\end{array}
+\end{array}
+\end{eqnarray*}
+
+\begin{itemize}
+\item árvore binária de busca, e
+\item árvore vazia, ou
+\item para qualquer sub-árvore, a diferença de altura entre as duas sub-árvores
+  não ultrapassa um (1).
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Implementação}
+
+\begin{itemize}
+\item $\attrib{x}{bal} \in \{-1, 0, 1\}$: balanço da árvore enraizada em $x$
+\item $\attrib{x}{bal} = \alpha(\attrib{x}{right}) - \alpha(\attrib{x}{left})$
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Ilustração}
+
+  Coleção: $2, 3, 5, 5, 7, 8$
+
+  \begin{itemize}
+\only<1>{
+    \item Uma árvore AVL
+      \begin{center}
+        \includegraphics[width=.7\textwidth]{fig/abb-1.pdf}
+      \end{center}
+}
+\only<2>{
+    \item Uma árvore binária de busca que não é AVL
+      \begin{center}
+        \includegraphics[width=.6\textwidth]{fig/abb-2.pdf}
+      \end{center}
+}
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Exercício}
+
+\begin{enumerate}
+
+  \item Desenhar a estrutura de árvores AVL com o menor número de nós
+    possível com alturas de 0 até 5.
+
+  \item Como definir a relação entre a altura e o menor número de nós
+    possível? e o maior?
+
+\end{enumerate}
+
+\end{frame}
+
+\section{Propriedades}
+
+\begin{frame}
+
+\frametitle{Propriedade de altura}
+
+\only<1>{
+$$\phi = \frac{1 + \sqrt{5}}{2}$$ (número de ouro)
+
+\begin{theorem}
+  Uma árvore AVL, enraizada em $x$, e com $n$ nós tem a sua altura tal que
+  \begin{eqnarray*}
+  \alpha(x) & \le & \log_\phi (\sqrt{5} \cdot (n+2)) - 2 \approx 1,44 \ln (n+1) - 0,328
+  \end{eqnarray*}
+\end{theorem}
+}
+
+\only<2>{
+\begin{proof}(Esbouço)
+Seja $\min$ a função que a uma dada altura $a$ associa o número mínimo de nós em uma árvore AVL de altura $a$:
+
+$$\min 0 = 0, \min 1 = 1, \min n = 1 + \min (n-1) + \min (n-2)$$
+
+As propriedades da função $\min$ tem como consequência o teorema enunciado. Não
+entraremos mais em detalhes sobre este assunto.
+\end{proof}
+}
+
+\end{frame}
+
+\section{Operações}
+
+\begin{frame}
+
+\frametitle{Operação de busca}
+
+\begin{itemize}
+\item A busca não modifica a árvore.
+
+\item O algoritmo de busca em árvores AVL é o mesmo da busca em árvores binárias
+  de busca qualquer.
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Operação de inserção}
+
+\begin{enumerate}
+
+\item inserção em árvore binária de busca
+
+\item \alert{se necessário}, re-balanceamento
+
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Re-balanceamento}
+\framesubtitle{Inserção}
+
+aparece desequilibro quando:
+
+\begin{itemize}
+
+\item há pelo menos um nó entre a raiz e o nó criado tal $\left|\attrib{n}{bal}\right| > 1$ após a inserção
+
+\item seja $n$ o nó de maior nível (mais próximo do nó inserido) com
+desequilibro
+
+\item antes da inserção: $\attrib{n}{bal} = 1$ ou $\attrib{n}{bal} = -1$.
+
+\item $n$ possui pelo uma sub-árvore 
+
+  \begin{itemize}
+
+    \item com altura maior que a outra sub-árvore
+
+    \item logo não é vazia
+
+  \end{itemize}
+
+\item análise por caso: 
+
+  \begin{enumerate}
+
+  \item sub-árvore esquerda $E$, ou
+
+  \item sub-árvore direita $D$
+
+  \end{enumerate}
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Inserção em $E$}
+\framesubtitle{Re-balanceamento}
+
+$\alpha(E) = \alpha(D)+1$, $E \neq \const{Nil}$
+
+\begin{tabular}{rcl}
+$a$ & : & $\alpha(D)$ (e $\alpha(E) = a+1$), \\
+$n_e$ & : a raiz de $E$, \\
+$EE$ & a sub-árvore esquerda de $n_e$, \\ 
+$ED$ & a sub-árvore direita de $n_e$.
+\end{tabular}
+
+Logo, $a$ é a altura da sub-árvore mais alta entre $EE$ e $ED$.
+
+\begin{enumerate}
+
+\item inserção: em $EE$, ou
+
+\item inserção: em $ED$.
+
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Inserção em $EE$}
+\framesubtitle{Re-balanceamento}
+
+$\alpha(E) = \alpha(D)+1$, $E \neq \const{Nil}$
+
+\begin{tabular}{rcl}
+$a$ & : & $\alpha(D)$ (e $\alpha(E) = a+1$), \\
+$n_e$ & : a raiz de $E$, \\
+$EE$ & a sub-árvore esquerda de $n_e$, \\ 
+$ED$ & a sub-árvore direita de $n_e$.
+\end{tabular}
+
+inserção em $EE$
+
+\begin{itemize}
+
+\item altura de $EE$ antes: $a$
+
+\item altura de $EE$ depois: $a+1$
+
+\item altura de $ED$ antes: $a$ ou $a-1$
+
+\begin{itemize}
+
+\item se fosse $a-1$, $n_e$ estaria desbalanceado
+
+\item contradiz hipótese que $n$ é o nó desbalanceado de maior nível
+
+\item altura de $ED$ é $a$
+
+\end{itemize}
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Inserção em $EE$: ilustração}
+\framesubtitle{Re-balanceamento}
+
+\begin{center}
+\setlength{\unitlength}{0.55cm}
+\begin{picture}(13,8)(0,0)
+\put(1,3.00){\vector(0,1){2}}
+\put(1,2.50){\vector(0,-1){2}}
+\put(1,2.75){\makebox(0,0){$a+1$}}
+
+\put(2.5,5){\circle*{.2}}
+\put(2,5.7){\makebox(0,0)[b]{$n_{ee}$}}
+\put(1.5,1){\line(1,4){1}}
+\put(1.5,1){\line(1,0){2}}
+\put(3.5,1){\line(-1,4){1}}
+\put(2.5,3){\makebox(0,0){$EE'$}}
+
+\put(2.5,0.5){\vector(0,1){0.5}}
+\put(2.5,0.4){\makebox(0,0)[t]{$c$}}
+
+\put(5.5,5){\circle*{.2}}
+\put(4.5,1){\line(1,4){1}}
+\put(4.5,1){\line(1,0){2}}
+\put(6.5,1){\line(-1,4){1}}
+\put(5.5,3){\makebox(0,0){$ED$}}
+
+\put(7,3.25){\vector(0,1){1.75}}
+\put(7,2.75){\vector(0,-1){1.75}}
+\put(7,3){\makebox(0,0){$a$}}
+
+\put(10,6.5){\circle*{.2}}
+\put(9,2.5){\line(1,4){1}}
+\put(9,2.5){\line(1,0){2}}
+\put(11,2.5){\line(-1,4){1}}
+\put(10,4.5){\makebox(0,0){$D$}}
+
+\put(12,4.75){\vector(0,1){1.75}}
+\put(12,4.25){\vector(0,-1){1.75}}
+\put(12,4.5){\makebox(0,0){$a$}}
+
+\put(2.5,5){\line(1,1){1.5}}
+\put(5.5,5){\line(-1,1){1.5}}
+\put(4,6.5){\circle*{.2}}
+\put(4,6.7){\makebox(0,0)[b]{$n_e$}}
+\put(4,5.9){\makebox(0,0)[b]{$E$}}
+
+\put(4,6.5){\line(3,1){3}}
+\put(10,6.5){\line(-3,1){3}}
+\put(7,7.5){\circle*{.2}}
+\put(7,7.7){\makebox(0,0)[b]{$n$}}
+\put(7,6.9){\makebox(0,0)[b]{$S$}}
+
+\end{picture}
+\end{center}
+
+\alert{rotação simples a direita}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Inserção em $ED$}
+\framesubtitle{Re-balanceamento}
+
+$\alpha(E) = \alpha(D)+1$, $E \neq \const{Nil}$
+
+\begin{tabular}{rcl}
+$a$ & : & $\alpha(D)$ (e $\alpha(E) = a+1$), \\
+$n_e$ & : a raiz de $E$, \\
+$EE$ & a sub-árvore esquerda de $n_e$, \\ 
+$ED$ & a sub-árvore direita de $n_e$.
+\end{tabular}
+
+inserção em $ED$
+
+\begin{itemize}
+
+\item altura de $ED$ antes: $a$
+
+\item altura de $ED$ depois: $a+1$
+
+\item altura de $EE$ antes: $a$ ou $a-1$
+
+\begin{itemize}
+
+\item se fosse $a-1$, $n_e$ estaria desbalanceado
+
+\item contradiz hipótese que $n$ é o nó desbalanceado de maior nível
+
+\item altura de $EE$ é $a$
+
+\end{itemize}
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Inserção em $ED$}
+\framesubtitle{Re-balanceamento}
+
+\begin{center}
+\setlength{\unitlength}{0.61cm}
+\begin{picture}(13,8)(0,0)
+\put(1,3.25){\vector(0,1){1.75}}
+\put(1,2.75){\vector(0,-1){1.75}}
+\put(1,3){\makebox(0,0){$a$}}
+
+\put(2.5,5){\circle*{.2}}
+\put(1.5,1){\line(1,4){1}}
+\put(1.5,1){\line(1,0){2}}
+\put(3.5,1){\line(-1,4){1}}
+\put(2.5,3){\makebox(0,0){$EE$}}
+
+\put(5.5,5){\circle*{.2}}
+\put(5.5,5.2){\makebox(0,0)[b]{$n_{ed}$}}
+\put(4.5,1){\line(1,4){1}}
+\put(4.5,1){\line(1,0){2}}
+\put(6.5,1){\line(-1,4){1}}
+\put(5.5,3){\makebox(0,0){$ED'$}}
+
+\put(5.5,0.5){\vector(0,1){0.5}}
+\put(5.5,0.4){\makebox(0,0)[t]{$c$}}
+
+\put(7,3.00){\vector(0,1){2}}
+\put(7,2.50){\vector(0,-1){2}}
+\put(7,2.75){\makebox(0,0){$a+1$}}
+
+\put(10,6.5){\circle*{.2}}
+\put(9,2.5){\line(1,4){1}}
+\put(9,2.5){\line(1,0){2}}
+\put(11,2.5){\line(-1,4){1}}
+\put(10,4.5){\makebox(0,0){$D$}}
+
+\put(12,4.75){\vector(0,1){1.75}}
+\put(12,4.25){\vector(0,-1){1.75}}
+\put(12,4.5){\makebox(0,0){$a$}}
+
+\put(2.5,5){\line(1,1){1.5}}
+\put(5.5,5){\line(-1,1){1.5}}
+\put(4,6.5){\circle*{.2}}
+\put(4,6.7){\makebox(0,0)[b]{$n_e$}}
+\put(4,5.9){\makebox(0,0)[b]{$E$}}
+
+\put(4,6.5){\line(3,1){3}}
+\put(10,6.5){\line(-3,1){3}}
+\put(7,7.5){\circle*{.2}}
+\put(7,7.7){\makebox(0,0)[b]{$n$}}
+\put(7,6.9){\makebox(0,0)[b]{$S$}}
+
+\end{picture}
+\end{center}
+
+\alert{rotação dupla a direita}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Inserção em $D$}
+\framesubtitle{Re-balanceamento}
+
+\begin{itemize}
+
+\item A situação é simétrica à inserção em $E$.
+
+\item A análise é similar.
+
+\item O tratamento é simétrico, com 2 sub-casos ($DD$ e $DE$).
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Inserção em $DD$: ilustração}
+\framesubtitle{Re-balanceamento}
+
+\begin{center}
+\setlength{\unitlength}{0.55cm}
+\begin{picture}(13,8)(0,0)
+\put(12,2.50){\vector(0,-1){2.25}}
+\put(12,3.00){\vector(0,1){2.00}}
+\put(12,2.75){\makebox(0,0){$a+1$}}
+
+\put(10.5,5){\circle*{.2}}
+\put(11.5,1){\line(-1,4){1}}
+\put(11.5,1){\line(-1,0){2}}
+\put(9.5,1){\line(1,4){1}}
+\put(10.5,3){\makebox(0,0){$DD$}}
+
+\put(10.5,0.5){\vector(0,1){0.5}}
+\put(10.5,0.4){\makebox(0,0)[t]{$c$}}
+
+\put(7.5,5){\circle*{.2}}
+\put(7.5,5.2){\makebox(0,0)[b]{$n_{de}$}}
+\put(8.5,1){\line(-1,4){1}}
+\put(8.5,1){\line(-1,0){2}}
+\put(6.5,1){\line(1,4){1}}
+\put(7.5,3){\makebox(0,0){$DE$}}
+
+\put(6,3.25){\vector(0,1){1.75}}
+\put(6,2.75){\vector(0,-1){1.75}}
+\put(6,3){\makebox(0,0){$a$}}
+
+\put(3,6.5){\circle*{.2}}
+\put(4,2.5){\line(-1,4){1}}
+\put(4,2.5){\line(-1,0){2}}
+\put(2,2.5){\line(1,4){1}}
+\put(3,4.5){\makebox(0,0){$D$}}
+
+\put(1,4.75){\vector(0,1){1.75}}
+\put(1,4.25){\vector(0,-1){1.75}}
+\put(1,4.5){\makebox(0,0){$a$}}
+
+\put(10.5,5){\line(-1,1){1.5}}
+\put(7.5,5){\line(1,1){1.5}}
+\put(9,6.5){\circle*{.2}}
+\put(9,6.7){\makebox(0,0)[b]{$n_d$}}
+\put(9,5.9){\makebox(0,0)[b]{$D$}}
+
+\put(9,6.5){\line(-3,1){3}}
+\put(3,6.5){\line(3,1){3}}
+\put(6,7.5){\circle*{.2}}
+\put(6,7.7){\makebox(0,0)[b]{$n$}}
+\put(6,6.9){\makebox(0,0)[b]{$S$}}
+
+\end{picture}
+\end{center}
+
+\alert{rotação simples a esquerda}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Inserção em $DE$}
+\framesubtitle{Re-balanceamento}
+
+\begin{center}
+\setlength{\unitlength}{0.61cm}
+\begin{picture}(13,8)(0,0)
+\put(12,3.25){\vector(0,1){1.75}}
+\put(12,2.70){\vector(0,-1){2.20}}
+\put(12,3){\makebox(0,0){$a$}}
+
+\put(10.5,5){\circle*{.2}}
+\put(10.5,5.2){\makebox(0,0)[b]{$n_{dd}$}}
+\put(11.5,1){\line(-1,4){1}}
+\put(11.5,1){\line(-1,0){2}}
+\put(9.5,1){\line(1,4){1}}
+\put(10.5,3){\makebox(0,0){$DD$}}
+
+\put(7.5,5){\circle*{.2}}
+\put(8.5,1){\line(-1,4){1}}
+\put(8.5,1){\line(-1,0){2}}
+\put(6.5,1){\line(1,4){1}}
+\put(7.5,3){\makebox(0,0){$DE'$}}
+
+\put(7.5,0.5){\vector(0,1){0.5}}
+\put(7.5,0.4){\makebox(0,0)[t]{$c$}}
+
+\put(6,3.00){\vector(0,1){2}}
+\put(6,2.50){\vector(0,-1){2.25}}
+\put(6,2.75){\makebox(0,0){$a+1$}}
+
+\put(3,6.5){\circle*{.2}}
+\put(4,2.5){\line(-1,4){1}}
+\put(4,2.5){\line(-1,0){2}}
+\put(2,2.5){\line(1,4){1}}
+\put(3,4.5){\makebox(0,0){$E$}}
+
+\put(1,4.75){\vector(0,1){1.75}}
+\put(1,4.25){\vector(0,-1){1.75}}
+\put(1,4.5){\makebox(0,0){$a$}}
+
+\put(10.5,5){\line(-1,1){1.5}}
+\put(7.5,5){\line(1,1){1.5}}
+\put(9,6.5){\circle*{.2}}
+\put(9,6.7){\makebox(0,0)[b]{$n_d$}}
+\put(9,5.9){\makebox(0,0)[b]{$D$}}
+
+\put(9,6.5){\line(-3,1){3}}
+\put(3,6.5){\line(3,1){3}}
+\put(6,7.5){\circle*{.2}}
+\put(6,7.7){\makebox(0,0)[b]{$n$}}
+\put(6,6.9){\makebox(0,0)[b]{$S$}}
+\end{picture}
+\end{center}
+
+\alert{rotação dupla a esquerda}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Rotação simples a direita}
+\framesubtitle{Remanejamento}
+
+\begin{tabular}{cc}
+\setlength{\unitlength}{0.45cm}
+\begin{picture}(13,8)(0,0)
+\put(1,3.00){\vector(0,1){2}}
+\put(1,2.50){\vector(0,-1){2}}
+\put(1,2.75){\makebox(0,0){$a+1$}}
+
+\put(2.5,5){\circle*{.2}}
+\put(1.5,1){\line(1,4){1}}
+\put(1.5,1){\line(1,0){2}}
+\put(3.5,1){\line(-1,4){1}}
+\put(2.5,3){\makebox(0,0){$EE'$}}
+
+\put(2.5,0.5){\vector(0,1){0.5}}
+\put(2.5,0.4){\makebox(0,0)[t]{$c$}}
+
+\put(5.5,5){\circle*{.2}}
+\put(4.5,1){\line(1,4){1}}
+\put(4.5,1){\line(1,0){2}}
+\put(6.5,1){\line(-1,4){1}}
+\put(5.5,3){\makebox(0,0){$ED$}}
+
+\put(7,3.25){\vector(0,1){1.75}}
+\put(7,2.75){\vector(0,-1){1.75}}
+\put(7,3){\makebox(0,0){$a$}}
+
+\put(10,6.5){\circle*{.2}}
+\put(9,2.5){\line(1,4){1}}
+\put(9,2.5){\line(1,0){2}}
+\put(11,2.5){\line(-1,4){1}}
+\put(10,4.5){\makebox(0,0){$D$}}
+
+\put(12,4.75){\vector(0,1){1.75}}
+\put(12,4.25){\vector(0,-1){1.75}}
+\put(12,4.5){\makebox(0,0){$a$}}
+
+\put(2.5,5){\line(1,1){1.5}}
+\put(5.5,5){\line(-1,1){1.5}}
+\put(4,6.5){\circle*{.2}}
+\put(4,6.7){\makebox(0,0)[b]{$n_e$}}
+
+\put(4,6.5){\line(3,1){3}}
+\put(10,6.5){\line(-3,1){3}}
+\put(7,7.5){\circle*{.2}}
+\put(7,7.7){\makebox(0,0)[b]{$n$}}
+
+\end{picture}
+&
+\setlength{\unitlength}{0.45cm}
+\begin{picture}(13,8)(0,0)
+\put(0,2.00){\begin{picture}(13,6)(0,0)
+
+\put(1,3.00){\vector(0,1){2}}
+\put(1,2.50){\vector(0,-1){2}}
+\put(1,2.75){\makebox(0,0){$a+1$}}
+
+\put(2.5,5){\circle*{.2}}
+\put(1.5,1){\line(1,4){1}}
+\put(1.5,1){\line(1,0){2}}
+\put(3.5,1){\line(-1,4){1}}
+\put(2.5,3){\makebox(0,0){$EE'$}}
+
+\put(2.5,0.5){\vector(0,1){0.5}}
+\put(2.5,0.4){\makebox(0,0)[t]{$c$}}
+
+\put(4.5,2.75){\vector(0,1){1.75}}
+\put(4.5,2.25){\vector(0,-1){1.75}}
+\put(4.5,2.5){\makebox(0,0){$a$}}
+
+\put(6,4.5){\circle*{.2}}
+\put(5,0.5){\line(1,4){1}}
+\put(5,0.5){\line(1,0){2}}
+\put(7,0.5){\line(-1,4){1}}
+\put(6,2.5){\makebox(0,0){$ED$}}
+
+\put(9,4.5){\circle*{.2}}
+\put(8,0.5){\line(1,4){1}}
+\put(8,0.5){\line(1,0){2}}
+\put(10,0.5){\line(-1,4){1}}
+\put(9,2.5){\makebox(0,0){$D$}}
+
+\put(10.5,3.00){\vector(0,1){2}}
+\put(10.5,2.50){\vector(0,-1){2}}
+\put(10.5,2.75){\makebox(0,0){$a+1$}}
+
+\put(6,4.5){\line(3,1){1.5}}
+\put(9,4.5){\line(-3,1){1.5}}
+\put(7.5,5){\circle*{.2}}
+\put(7.5,5.2){\makebox(0,0)[b]{$n$}}
+
+\put(2.5,5){\line(5,1){2.5}}
+\put(7.5,5){\line(-5,1){2.5}}
+\put(5,5.5){\circle*{.2}}
+\put(5,5.7){\makebox(0,0)[b]{$n_e$}}
+
+\end{picture}}
+\end{picture} \\
+Antes & Depois
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Rotação simples a direita: algoritmo}
+\framesubtitle{Remanejamento}
+
+\begin{codebox}
+\Procname{$\proc{Rotate-Simple-Right}(n)$}
+\li $ne \gets \attrib{n}{left}$
+\li $\attrib{n}{left} \gets \attrib{ne}{right}$
+\li $\attrib{n}{right} \gets n$
+\li $\attrib{ne}{bal} \gets 0$
+\li $\attrib{n}{bal} \gets 0$
+\li \Return $ne$
+\end{codebox}
+
+\only<1>{
+\begin{itemize}
+\item o parâmetro é a raiz da sub-árvore a remanejar
+\item o resultado é a raiz da sub-árvore após o remanejamento
+\end{itemize}
+$\Theta(1)$ operações.
+}
+
+\only<2>{
+Exercício:
+\begin{enumerate}
+\item termine o algoritmo com cálculo de $\attrib{}{up}$.
+\item argumente que a árvore resultante é uma árvore binária de busca
+\end{enumerate}
+}
+
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Rotação dupla a direita}
+\framesubtitle{Remanejamento}
+
+\begin{tabular}{c}
+\setlength{\unitlength}{0.45cm}
+\begin{picture}(15,8)(0,0)
+
+\put(1,3.75){\vector(0,1){1.75}}
+\put(1,3.25){\vector(0,-1){1.75}}
+\put(1,3.50){\makebox(0,0){\footnotesize $a$}}
+
+\put(2.5,5.5){\circle*{.2}}
+\put(1.5,1.5){\line(1,4){1}}
+\put(1.5,1.5){\line(1,0){2}}
+\put(3.5,1.5){\line(-1,4){1}}
+\put(2.5,3.5){\makebox(0,0){\footnotesize $EE$}}
+
+\put(4.5,2.75){\vector(0,1){2.25}}
+\put(4.5,2.25){\vector(0,-1){2.25}}
+\put(4.5,2.50){\makebox(0,0){\footnotesize $a$}}
+
+\put(6,5){\circle*{.2}}
+\put(5,1){\line(1,4){1}}
+\put(5,1){\line(1,0){2}}
+\put(7,1){\line(-1,4){1}}
+\put(6,3){\makebox(0,0){\footnotesize $EDE'$}}
+
+\put(6,0.5){\vector(0,1){0.5}}
+\put(6,0.4){\makebox(0,0)[t]{\footnotesize $c$}}
+
+\put(9,5){\circle*{.2}}
+\put(8,1){\line(1,4){1}}
+\put(8,1){\line(1,0){2}}
+\put(10,1){\line(-1,4){1}}
+\put(9,3){\makebox(0,0){\footnotesize $EDD'$}}
+
+\put(10.5,3.25){\vector(0,1){1.75}}
+\put(10.5,2.75){\vector(0,-1){1.75}}
+\put(10.5,3.00){\makebox(0,0){\footnotesize $a-1$}}
+
+\put(13,6){\circle*{.2}}
+\put(12,2){\line(1,4){1}}
+\put(12,2){\line(1,0){2}}
+\put(14,2){\line(-1,4){1}}
+\put(13,4){\makebox(0,0){\footnotesize $D$}}
+
+\put(14.5,4.25){\vector(0,1){1.75}}
+\put(14.5,3.75){\vector(0,-1){1.75}}
+\put(14.5,4.00){\makebox(0,0){\footnotesize $a$}}
+
+\put(6,5){\line(3,1){1.5}}
+\put(9,5){\line(-3,1){1.5}}
+\put(7.5,5.5){\circle*{.2}}
+\put(7.5,5.7){\makebox(0,0)[b]{\footnotesize $n_{ed}$}}
+
+\put(2.5,5.5){\line(5,1){2.5}}
+\put(7.5,5.5){\line(-5,1){2.5}}
+\put(5.0,6.0){\circle*{.2}}
+\put(5.0,6.2){\makebox(0,0)[b]{\footnotesize $n_e$}}
+
+\put(5,6){\line(4,1){4}}
+\put(13,6){\line(-4,1){4}}
+\put(9,7){\circle*{.2}}
+\put(9,7.2){\makebox(0,0)[b]{\footnotesize $n$}}
+
+\end{picture}
+\\
+antes \\
+\setlength{\unitlength}{0.45cm}
+\begin{picture}(12,6)(0,0)
+
+\put(1,2.25){\vector(0,1){1.75}}
+\put(1,1.75){\vector(0,-1){1.75}}
+\put(1,2.00){\makebox(0,0){\footnotesize $a$}}
+
+\put(2.5,4){\circle*{.2}}
+\put(1.5,0){\line(1,4){1}}
+\put(1.5,0){\line(1,0){2}}
+\put(3.5,0){\line(-1,4){1}}
+\put(2.5,2){\makebox(0,0){\footnotesize $EE$}}
+
+\put(4,2.25){\vector(0,1){1.75}}
+\put(4,1.75){\vector(0,-1){1.75}}
+\put(4,2.00){\makebox(0,0){\footnotesize $a$}}
+
+\put(5.5,4){\circle*{.2}}
+\put(4.5,0){\line(1,4){1}}
+\put(4.5,0){\line(1,0){2}}
+\put(6.5,0){\line(-1,4){1}}
+\put(5.5,2){\makebox(0,0){\footnotesize $EDE'$}}
+
+\put(2.5,4.0){\line(3,1){1.5}}
+\put(5.5,4.0){\line(-3,1){1.5}}
+\put(4.0,4.5){\circle*{.2}}
+\put(4.0,4.7){\makebox(0,0)[b]{\footnotesize $n_e$}}
+
+\put(7,2.25){\vector(0,1){1.75}}
+\put(7,1.75){\vector(0,-1){1.75}}
+\put(7,2.00){\makebox(0,0){\footnotesize $a-1$}}
+
+\put(8.5,4){\circle*{.2}}
+\put(7.5,0){\line(1,4){1}}
+\put(7.5,0){\line(1,0){2}}
+\put(9.5,0){\line(-1,4){1}}
+\put(8.5,2){\makebox(0,0){\footnotesize $EDD'$}}
+
+\put(10,2.25){\vector(0,1){1.75}}
+\put(10,1.75){\vector(0,-1){1.75}}
+\put(10,2.00){\makebox(0,0){\footnotesize $a$}}
+
+\put(11.5,4){\circle*{.2}}
+\put(10.5,0){\line(1,4){1}}
+\put(10.5,0){\line(1,0){2}}
+\put(12.5,0){\line(-1,4){1}}
+\put(11.5,2){\makebox(0,0){\footnotesize $D$}}
+
+\put(8.5,4.0){\line(3,1){1.5}}
+\put(11.5,4.0){\line(-3,1){1.5}}
+\put(10.0,4.5){\circle*{.2}}
+\put(10.0,4.7){\makebox(0,0)[b]{\footnotesize $n$}}
+
+\put(04.0,4.5){\line(3,1){3}}
+\put(10.0,4.5){\line(-3,1){3}}
+\put(07.0,5.5){\circle*{.2}}
+\put(07.0,5.7){\makebox(0,0)[b]{\footnotesize $n_{ed}$}}
+
+\end{picture} \\
+depois
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Rotação dupla a direita: algoritmo}
+\framesubtitle{Remanejamento}
+
+\begin{tabular}{cc}
+\begin{minipage}[t]{.5\textwidth}
+\begin{codebox}
+\Procname{$\proc{Rotate-Double-Right}(n)$}
+\zi $ne \gets \attrib{n}{left}$
+\zi $ned \gets \attrib{ne}{right}$
+\zi $\attrib{n}{left} \gets \attrib{ned}{right}$
+\zi $\attrib{ne}{right} \gets \attrib{ned}{left}$
+\zi $\attrib{ned}{left} \gets ne$
+\zi $\attrib{ned}{right} \gets n$
+\end{codebox}
+\end{minipage}
+&\begin{minipage}[t]{.45\textwidth}
+\begin{codebox}
+\zi \If $\attrib{ned}{bal} \isequal 1$
+\zi \Then $\attrib{n}{bal} \gets 0$
+\zi   $\attrib{ne}{bal} \gets -1$
+\zi \Else \If $\attrib{ned}{bal} \isequal 0$
+\zi \Then $\attrib{n}{bal} \gets 0$
+\zi   $\attrib{ne}{bal} \gets 0$
+\zi \Else
+\zi   $\attrib{n}{bal} \gets 1$
+\zi   $\attrib{ne}{bal} \gets 0$
+\zi $\attrib{ned}{bal} \gets 0$
+\zi \Return $ned$
+\end{codebox}
+\end{minipage}
+\end{tabular}
+
+\only<1>{
+\begin{itemize}
+\item o parâmetro é a raiz da sub-árvore a remanejar
+\item o resultado é a raiz da sub-árvore após o remanejamento
+\end{itemize}
+$\Theta(1)$ operações.
+}
+
+\only<2>{
+Exercício:
+\begin{enumerate}
+\item termine o algoritmo com cálculo de $\attrib{}{up}$.
+\item argumente que a árvore resultante é uma árvore binária de busca
+\end{enumerate}
+}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Inserção: algoritmo}
+
+\begin{codebox}
+\Procname{$\proc{Insert}(n, v)$}
+\only<1>{\li \If $n \isequal \const{Nil}$
+\li \Then $n \gets \proc{Make-Avl-Node}(v, \const{Nil}, \const{Nil}, 0)$
+\li   \Return $\const{True}$
+    \End
+\li \If $\attrib{n}{val} \isequal v$
+\li \Then \Return $\const{False}$
+    \End
+\li \If $v < \attrib{n}{val}$
+\li \Then  $\id{inc} \gets \proc{Insert}(\attrib{n}{left}, v)$
+\li   \If $\id{inc}$
+\zi      \alert{$\cdots$}
+      \End
+\li \Else $\cdots$
+    \End
+}
+\only<2>{
+\zi   $\cdots$
+\li   \If $\id{inc}$
+\li   \Then \If $\attrib{n}{bal} \isequal 0$
+\li     \Then \Return $\const{False}$
+\li     \ElseIf $\attrib{n}{bal} \isequal -1$
+\li     \Then \Return $\const{True}$
+\li     \Else
+\li       \If $\attrib{\attrib{n}{left}}{bal} \isequal -1$
+\li       \Then $n \gets \proc{Rotate-Simple-Right}(n)$
+\li       \Else $n \gets \proc{Rotate-Double-Right}(n)$
+          \End
+\li       \Return $\const{False}$
+        \End
+      \End
+\li \Else $\cdots$
+    \End
+}
+\end{codebox}
+
+\only<3>{Exercícios:
+\begin{enumerate}
+\item escrever o tratamento correspondente a $v > \attrib{n}{val}$.
+\item verifique que, quando há remanejamento, a altura da árvore após a inserção
+  é a mesma da altura antes da inserção.
+\end{enumerate}
+}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Remoção}
+\framesubtitle{Introdução}
+\begin{itemize}
+
+\item remove valor como em árvore binária de busca
+
+\item reequilibrar a árvore para reestabelecer a propriedade AVL
+
+\item mais de uma rotação pode ser necessária
+
+  $O(\lg n)$ no pior caso
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Remoção}
+\framesubtitle{Exemplo}
+
+\begin{center}
+\begin{tabular}{ccc}
+\setlength{\unitlength}{0.3cm}
+\begin{picture}(13,12)(0,0)
+
+\put(6,11.2){\makebox(0,0)[b]{$47^{(1)}$}}
+\put(6,11){\circle*{.2}}
+\put(6,11){\line(-4,-1){4}}
+\put(6,11){\line(4,-1){4}}
+
+\put(2,10.2){\makebox(0,0)[b]{$32^{(-1)}$}}
+\put(2,10){\circle*{.2}}
+\put(2,10){\line(-1,-1){2}}
+\put(2,10){\line(1,-1){2}}
+
+\put(10,10.2){\makebox(0,0)[b]{$68^{(-1)}$}}
+\put(10,10){\circle*{.2}}
+\put(10,10){\line(-1,-1){2}}
+\put(10,10){\line(1,-1){2}}
+
+\put(0,8.2){\makebox(0,0)[b]{$5^{(1)}$}}
+\put(0,8){\circle*{.2}}
+\put(0,8){\line(1,-4){1}}
+
+\put(4,8.2){\makebox(0,0)[b]{$40^{(0)}$}}
+\put(4,8){\circle*{.2}}
+
+\put(8,8.2){\makebox(0,0)[b]{$60^{(-1)}$}}
+\put(8,8){\circle*{.2}}
+\put(8,8){\line(-1,-4){1}}
+\put(8,8){\line(1,-4){1}}
+
+\put(12,8.2){\makebox(0,0)[b]{$88^{(1)}$}}
+\put(12,8){\circle*{.2}}
+\put(12,8){\line(1,-4){1}}
+
+\put(1,4.2){\makebox(0,0)[b]{$15^{(0)}$}}
+\put(1,4){\circle*{.2}}
+
+\put(7,4.2){\makebox(0,0)[b]{$54^{(-1)}$}}
+\put(7,4){\circle*{.2}}
+\put(7,4){\line(-1,-4){1}}
+
+\put(9,4.2){\makebox(0,0)[b]{$61^{(0)}$}}
+\put(9,4){\circle*{.2}}
+
+\put(13,4.2){\makebox(0,0)[b]{$90^{(0)}$}}
+\put(13,4){\circle*{.2}}
+
+\put(6,0.2){\makebox(0,0)[b]{$50^{(0)}$}}
+\put(6,0){\circle*{.2}}
+\end{picture}
+
+& 
+\hspace{1cm}
+
+&
+\setlength{\unitlength}{0.4cm}
+\begin{picture}(13,12)(0,0)
+
+\put(6,11.2){\makebox(0,0)[b]{$40^{(1)}$}}
+\put(6,11){\circle*{.2}}
+\put(6,11){\line(-4,-1){4}}
+\put(6,11){\line(4,-1){4}}
+
+\put(2,10.2){\makebox(0,0)[b]{\alert{$32^{(-2)}$}}}
+\put(2,10){\alert{\circle*{.2}}}
+\put(2,10){\line(-1,-1){2}}
+
+\put(10,10.2){\makebox(0,0)[b]{$68^{(-1)}$}}
+\put(10,10){\circle*{.2}}
+\put(10,10){\line(-1,-1){2}}
+\put(10,10){\line(1,-1){2}}
+
+\put(0,8.2){\makebox(0,0)[b]{$5^{(1)}$}}
+\put(0,8){\circle*{.2}}
+\put(0,8){\line(1,-4){1}}
+
+\put(8,8.2){\makebox(0,0)[b]{$60^{(-1)}$}}
+\put(8,8){\circle*{.2}}
+\put(8,8){\line(-1,-4){1}}
+\put(8,8){\line(1,-4){1}}
+
+\put(12,8.2){\makebox(0,0)[b]{$88^{(1)}$}}
+\put(12,8){\circle*{.2}}
+\put(12,8){\line(1,-4){1}}
+
+\put(1,4.2){\makebox(0,0)[b]{$15^{(0)}$}}
+\put(1,4){\circle*{.2}}
+
+\put(7,4.2){\makebox(0,0)[b]{$54^{(-1)}$}}
+\put(7,4){\circle*{.2}}
+\put(7,4){\line(-1,-4){1}}
+
+\put(9,4.2){\makebox(0,0)[b]{$61^{(0)}$}}
+\put(9,4){\circle*{.2}}
+
+\put(13,4.2){\makebox(0,0)[b]{$90^{(0)}$}}
+\put(13,4){\circle*{.2}}
+
+\put(6,0.2){\makebox(0,0)[b]{$50^{(0)}$}}
+\put(6,0){\circle*{.2}}
+\end{picture} \\
+
+& & \\
+
+(1) árvore inicial & & (2) após remoção de 47
+
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Remoção}
+\framesubtitle{Exemplo}
+
+\begin{center}
+\begin{tabular}{ccc}
+\setlength{\unitlength}{0.3cm}
+\begin{picture}(13,12)(0,0)
+
+\put(6,11.2){\makebox(0,0)[b]{$40^{(1)}$}}
+\put(6,11){\circle*{.2}}
+\put(6,11){\line(-4,-1){4}}
+\put(6,11){\line(4,-1){4}}
+
+\put(2,10.2){\makebox(0,0)[b]{$32^{(-2)}$}}
+\put(2,10){\circle*{.2}}
+\put(2,10){\line(-1,-1){2}}
+
+\put(10,10.2){\makebox(0,0)[b]{$68^{(-1)}$}}
+\put(10,10){\circle*{.2}}
+\put(10,10){\line(-1,-1){2}}
+\put(10,10){\line(1,-1){2}}
+
+\put(0,8.2){\makebox(0,0)[b]{$5^{(1)}$}}
+\put(0,8){\circle*{.2}}
+\put(0,8){\line(1,-4){1}}
+
+\put(8,8.2){\makebox(0,0)[b]{$60^{(-1)}$}}
+\put(8,8){\circle*{.2}}
+\put(8,8){\line(-1,-4){1}}
+\put(8,8){\line(1,-4){1}}
+
+\put(12,8.2){\makebox(0,0)[b]{$88^{(1)}$}}
+\put(12,8){\circle*{.2}}
+\put(12,8){\line(1,-4){1}}
+
+\put(1,4.2){\makebox(0,0)[b]{$15^{(0)}$}}
+\put(1,4){\circle*{.2}}
+
+\put(7,4.2){\makebox(0,0)[b]{$54^{(-1)}$}}
+\put(7,4){\circle*{.2}}
+\put(7,4){\line(-1,-4){1}}
+
+\put(9,4.2){\makebox(0,0)[b]{$61^{(0)}$}}
+\put(9,4){\circle*{.2}}
+
+\put(13,4.2){\makebox(0,0)[b]{$90^{(0)}$}}
+\put(13,4){\circle*{.2}}
+
+\put(6,0.2){\makebox(0,0)[b]{$50^{(0)}$}}
+\put(6,0){\circle*{.2}}
+\end{picture} 
+& &
+\setlength{\unitlength}{0.3cm}
+\begin{picture}(13,12)(0,0)
+
+\put(6,11.2){\makebox(0,0)[b]{\alert{$40^{(2)}$}}}
+\put(6,11){\alert{\circle*{.2}}}
+\put(6,11){\line(-4,-1){4}}
+\put(6,11){\line(4,-1){4}}
+
+\put(2,10.2){\makebox(0,0)[b]{$15^{(0)}$}}
+\put(2,10){\circle*{.2}}
+\put(2,10){\line(-1,-1){2}}
+\put(2,10){\line(1,-1){2}}
+
+\put(10,10.2){\makebox(0,0)[b]{$68^{(-1)}$}}
+\put(10,10){\circle*{.2}}
+\put(10,10){\line(-1,-1){2}}
+\put(10,10){\line(1,-1){2}}
+
+\put(0,8.2){\makebox(0,0)[b]{$5^{(0)}$}}
+\put(0,8){\circle*{.2}}
+
+\put(4,8.2){\makebox(0,0)[b]{$32^{(0)}$}}
+\put(4,8){\circle*{.2}}
+
+\put(8,8.2){\makebox(0,0)[b]{$60^{(-1)}$}}
+\put(8,8){\circle*{.2}}
+\put(8,8){\line(-1,-4){1}}
+\put(8,8){\line(1,-4){1}}
+
+\put(12,8.2){\makebox(0,0)[b]{$88^{(1)}$}}
+\put(12,8){\circle*{.2}}
+\put(12,8){\line(1,-4){1}}
+
+\put(7,4.2){\makebox(0,0)[b]{$54^{(-1)}$}}
+\put(7,4){\circle*{.2}}
+\put(7,4){\line(-1,-4){1}}
+
+\put(9,4.2){\makebox(0,0)[b]{$61^{(0)}$}}
+\put(9,4){\circle*{.2}}
+
+\put(13,4.2){\makebox(0,0)[b]{$90^{(0)}$}}
+\put(13,4){\circle*{.2}}
+
+\put(6,0.2){\makebox(0,0)[b]{$50^{(0)}$}}
+\put(6,0){\circle*{.2}}
+\end{picture}
+\\
+
+& & \\
+
+após remoção de 47 
+& & 
+após rotação dupla a direita de 32
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Remoção}
+\framesubtitle{Exemplo}
+
+\begin{center}
+\begin{tabular}{cc}
+\setlength{\unitlength}{0.3cm}
+\begin{picture}(13,12)(0,0)
+
+\put(6,11.2){\makebox(0,0)[b]{\footnotesize $40^{(2)}$}}
+\put(6,11){\circle*{.2}}
+\put(6,11){\line(-4,-1){4}}
+\put(6,11){\line(4,-1){4}}
+
+\put(2,10.2){\makebox(0,0)[b]{\footnotesize $15^{(0)}$}}
+\put(2,10){\circle*{.2}}
+\put(2,10){\line(-1,-1){2}}
+\put(2,10){\line(1,-1){2}}
+
+\put(10,10.2){\makebox(0,0)[b]{\footnotesize $68^{(-1)}$}}
+\put(10,10){\circle*{.2}}
+\put(10,10){\line(-1,-1){2}}
+\put(10,10){\line(1,-1){2}}
+
+\put(0,8.2){\makebox(0,0)[b]{\footnotesize $5^{(0)}$}}
+\put(0,8){\circle*{.2}}
+
+\put(4,8.2){\makebox(0,0)[b]{\footnotesize $32^{(0)}$}}
+\put(4,8){\circle*{.2}}
+
+\put(8,8.2){\makebox(0,0)[b]{\footnotesize $60^{(-1)}$}}
+\put(8,8){\circle*{.2}}
+\put(8,8){\line(-1,-4){1}}
+\put(8,8){\line(1,-4){1}}
+
+\put(12,8.2){\makebox(0,0)[b]{\footnotesize $88^{(1)}$}}
+\put(12,8){\circle*{.2}}
+\put(12,8){\line(1,-4){1}}
+
+\put(7,4.2){\makebox(0,0)[b]{\footnotesize $54^{(-1)}$}}
+\put(7,4){\circle*{.2}}
+\put(7,4){\line(-1,-4){1}}
+
+\put(9,4.2){\makebox(0,0)[b]{\footnotesize $61^{(0)}$}}
+\put(9,4){\circle*{.2}}
+
+\put(13,4.2){\makebox(0,0)[b]{\footnotesize $90^{(0)}$}}
+\put(13,4){\circle*{.2}}
+
+\put(6,0.2){\makebox(0,0)[b]{\footnotesize $50^{(0)}$}}
+\put(6,0){\circle*{.2}}
+\end{picture}
+
+&
+
+\setlength{\unitlength}{0.3cm}
+\begin{picture}(13,12)(0,0)
+
+\put(0,0.2){\makebox(0,0)[b]{\footnotesize $5^{(0)}$}}
+\put(0,0){\circle*{.2}}
+
+\put(2,0.2){\makebox(0,0)[b]{\footnotesize $32^{(0)}$}}
+\put(2,0){\circle*{.2}}
+
+\put(4,0.2){\makebox(0,0)[b]{\footnotesize $50^{(0)}$}}
+\put(4,0){\circle*{.2}}
+
+\put(14,0.2){\makebox(0,0)[b]{\footnotesize $90^{(0)}$}}
+\put(14,0){\circle*{.2}}
+
+\put(1,4.2){\makebox(0,0)[b]{\footnotesize $15^{(0)}$}}
+\put(1,4){\circle*{.2}}
+\put(1,4){\line(-1,-4){1}}
+\put(1,4){\line(1,-4){1}}
+
+\put(5,4.2){\makebox(0,0)[b]{\footnotesize $54^{(-1)}$}}
+\put(5,4){\circle*{.2}}
+\put(5,4){\line(-1,-4){1}}
+
+\put(9,4.2){\makebox(0,0)[b]{\footnotesize $61^{(0)}$}}
+\put(9,4){\circle*{.2}}
+
+\put(13,4.2){\makebox(0,0)[b]{\footnotesize $88^{(1)}$}}
+\put(13,4){\circle*{.2}}
+\put(13,4){\line(1,-4){1}}
+
+\put(3,6.2){\makebox(0,0)[b]{\footnotesize $40^{(0)}$}}
+\put(3,6){\circle*{.2}}
+\put(3,6){\line(-1,-1){2}}
+\put(3,6){\line(1,-1){2}}
+
+\put(11,6.2){\makebox(0,0)[b]{\footnotesize $68^{(1)}$}}
+\put(11,6){\circle*{.2}}
+\put(11,6){\line(-1,-1){2}}
+\put(11,6){\line(1,-1){2}}
+
+\put(7,7.2){\makebox(0,0)[b]{\footnotesize $60^{(0)}$}}
+\put(7,7){\circle*{.2}}
+\put(7,7){\line(-4,-1){4}}
+\put(7,7){\line(4,-1){4}}
+
+\end{picture}
+
+\\
+
+& 
+
+\\
+
+rotação dupla a direita de 32
+
+&
+
+rotação dupla a esquerda de 40
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Algoritmo de remoção}
+\framesubtitle{Principais etapas}
+
+Entradas: a raiz $n$ de uma árvore AVL, um valor $v$
+
+\begin{enumerate}
+\item encontrar o valor $v$ em $n$
+\item se a busca for mal sucedida: término
+\item remover o nó $m$ com o valor $v$
+\begin{itemize}
+\item nó folha: remover nó $m$
+\item nó interno com uma sub-árvore vazia: remover nó $m$
+\item nó interno sem sub-árvore vazia: remover nó com valor mínimo $v'$ da sub-árvore direita, substituir $v$ por $v'$ em $m$.
+\end{itemize}
+\item possivelmente reequilibrar a árvore
+\end{enumerate}
+\pause
+algoritmos auxiliares:
+\begin{itemize}
+\item $\proc{Remove-Min}$
+\item $\proc{Balance-Right}$, $\proc{Balance-Left}$: rebalanceamento da sub-árvore direita, esquerda
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Remoção}
+
+\begin{small}
+\only<1>{
+\begin{tabular}{rcl}
+$n$ & : & raiz da sub-árvore cujo valor mínimo deve ser removido (ref) \\
+$v$ & : & valor a remover (ref) \\
+& $\rightarrow$ & Booleano indicando se a altura diminuiu
+\end{tabular}
+}
+\only<2>{
+\begin{codebox}
+\Procname{$\proc{Remove}(n, v)$}
+\li \If $n \isequal \const{Nil}$
+\li \Then \Return $\const{False}$
+    \End
+\li \If $v < \attrib{n}{val}$
+\li \Then
+      \Return $\proc{Balance-Left}(n, \proc{Remove}(\attrib{n}{left}))$
+    \End
+\li \If $v > \attrib{n}{val}$
+\li \Then
+      \Return $\proc{Balance-Right}(n, \proc{Remove}(\attrib{n}{right}))$
+    \End
+\li \If $\attrib{n}{left} \isequal \const{Nil}$
+\li \Then
+      $\id{tmp} \gets n$
+\li   $n \gets \attrib{n}{right}$
+\li   $\proc{Free-AVL-Node}(\id{tmp})$
+\li   \Return $\const{True}$
+    \End
+\li \If $\attrib{n}{right} \isequal \const{Nil}$
+\li \Then
+      $\id{tmp} \gets n$
+\li   $n \gets \attrib{n}{left}$
+\li   $\proc{Free-AVL-Node}(tmp)$
+\li   \Return $\const{True}$
+    \End
+\li  \Return $\proc{Balance-Right}(\proc{Remove-Min}(\attrib{n}{right}, \attrib{n}{val}))$
+\end{codebox}
+}
+\end{small}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Remoção do nó com valor mínimo}
+
+\begin{tabular}{rcl}
+$n$ & : & raiz da sub-árvore cujo valor mínimo deve ser removido (ref) \\
+$v$ & : & variável onde o valor mínimo será armazenado (ref) \\
+& $\rightarrow$ & Booleano indicando se a altura diminuiu
+\end{tabular}
+
+\begin{codebox}
+\Procname{$\proc{Remove-Min}(n, v)$}
+\li \If $\attrib{n}{left} \isequal \const{Nil}$
+\li \Then
+      $v \gets \attrib{n}{val}$
+\li   $\id{tmp} \gets n$
+\li   $n \gets \attrib{n}{right}$
+\li   $\proc{Free-AVL-Node}(tmp)$
+\li   \Return $\const{True}$
+\li \Else
+\li   \Return $\proc{Balance-Left}(\proc{Remove-Min}(\attrib{n}{left}, v), n)$
+    \End  
+\end{codebox}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Rebalanceamento da sub-árvore direita}
+
+\begin{small}
+\begin{tabular}{rcl}
+$n$ & : & a sub-árvore direita de $n$ sofreu remoção (ref) \\
+$dec$ & : & Booleano indicando se a altura diminuiu na remoção na sub-árvore \\
+& $\rightarrow$ & Booleano indicando se a altura diminuiu na remoção
+\end{tabular}
+
+\begin{codebox}
+\Procname{$\proc{Balance-Right}(n, \id{dec})$}
+\li \If not $\id{dec}$
+\li \Then \Return $\const{False}$
+    \End
+\li \If $\attrib{n}{bal} \isequal -1$ \> \> \> \> \> \Comment desequilibro em $n$
+\li \Then
+      \If $\attrib{\attrib{n}{left}}{bal} \isequal -1$ or
+          $\attrib{\attrib{n}{left}}{bal} \isequal 0$
+\li   \Then
+        $\proc{Rotate-Simple-Right}(n)$
+\li   \ElseNoIf 
+        $\proc{Rotate-Double-Right}(n)$
+      \End
+\li   \Return $\const{True}$
+\li \ElseIf $\attrib{n}{bal} \isequal 0$
+\li \Then
+      $\attrib{n}{bal} \gets -1$
+\li   \Return $\const{False}$
+\li \ElseNoIf
+      $\attrib{n}{bal} \gets 0$
+\li   \Return $\const{True}$
+    \End
+\end{codebox}
+\end{small}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Exercícios}
+
+\begin{enumerate}
+\item Escrever o algoritmo $\proc{Balance-Left}$
+\item Aplicar repetidamente o algoritmo de remoção à árvore inicial do exemplo
+  até ter removido todos os valores da árvore:
+  \begin{itemize}
+    \item em ordem decrescente de valor
+    \item em ordem crescente de valor
+    \item escolhendo sempre o valor mediano da coleção representada
+  \end{itemize}
+\end{enumerate}
+\end{frame}
+\end{document}
+
+
+
