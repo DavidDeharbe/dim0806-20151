@@ -45,7 +45,7 @@
   \item Em 1962, Adelson-Velskii e Landis inventaram essa estrutura de dados:
     \begin{itemize}
     \item busca em $O(\lg n)$, 
-    \item remoção em $\theta(\lg n)$ e
+    \item remoção em $\Theta(\lg n)$ e
     \item inserção em $\Theta(\lg n)$
     \end{itemize}
 
@@ -53,10 +53,11 @@
 
   +restrição estrutural: altura das sub-árvores
 
-  \item após inserção e remoção, a árvore pode se auto-balancear (caso médio:
-    $\Theta(1)$, pior caso: $\Theta(\lg n)$
+  \item após inserção e remoção, a árvore pode se auto-balancear 
+
+    caso médio: $\Theta(1)$, pior caso: $\Theta(\lg n)$
     
-  \item a altura da árvore é $\Theta(\lg \text{número de nós})$
+  \item a altura da árvore é $\Theta(\lg \langle \text{número de nós} \rangle)$
 
   \end{itemize}
 
@@ -73,7 +74,7 @@
 (\begin{array}[t]{l}
 x = \const{Nil} \lor \\
 (\begin{array}[t]{ll}
-  \left| \alpha(\attrib{x}{left} - \alpha(\attrib{x}{right}) \right| \le 1 & \land \\
+  \left| \alpha(\attrib{x}{left}) - \alpha(\attrib{x}{right}) \right| \le 1 & \land \\
   \id{avl}{(\attrib{x}{left}}) \land \id{avl}({\attrib{x}{right}})\, )\, )
 \end{array}
 \end{array}
@@ -247,9 +248,9 @@ $\alpha(E) = \alpha(D)+1$, $E \neq \const{Nil}$
 
 \begin{tabular}{rcl}
 $a$ & : & $\alpha(D)$ (e $\alpha(E) = a+1$), \\
-$n_e$ & : a raiz de $E$, \\
-$EE$ & a sub-árvore esquerda de $n_e$, \\ 
-$ED$ & a sub-árvore direita de $n_e$.
+$n_e$ & : & a raiz de $E$, \\
+$EE$ & : & a sub-árvore esquerda de $n_e$, \\ 
+$ED$ & : & a sub-árvore direita de $n_e$.
 \end{tabular}
 
 Logo, $a$ é a altura da sub-árvore mais alta entre $EE$ e $ED$.
@@ -273,9 +274,9 @@ $\alpha(E) = \alpha(D)+1$, $E \neq \const{Nil}$
 
 \begin{tabular}{rcl}
 $a$ & : & $\alpha(D)$ (e $\alpha(E) = a+1$), \\
-$n_e$ & : a raiz de $E$, \\
-$EE$ & a sub-árvore esquerda de $n_e$, \\ 
-$ED$ & a sub-árvore direita de $n_e$.
+$n_e$ & : & a raiz de $E$, \\
+$EE$ & : & a sub-árvore esquerda de $n_e$, \\ 
+$ED$ & : & a sub-árvore direita de $n_e$.
 \end{tabular}
 
 inserção em $EE$
@@ -360,243 +361,6 @@ inserção em $EE$
 \end{center}
 
 \alert{rotação simples a direita}
-
-\end{frame}
-
-\begin{frame}
-
-\frametitle{Inserção em $ED$}
-\framesubtitle{Re-balanceamento}
-
-$\alpha(E) = \alpha(D)+1$, $E \neq \const{Nil}$
-
-\begin{tabular}{rcl}
-$a$ & : & $\alpha(D)$ (e $\alpha(E) = a+1$), \\
-$n_e$ & : a raiz de $E$, \\
-$EE$ & a sub-árvore esquerda de $n_e$, \\ 
-$ED$ & a sub-árvore direita de $n_e$.
-\end{tabular}
-
-inserção em $ED$
-
-\begin{itemize}
-
-\item altura de $ED$ antes: $a$
-
-\item altura de $ED$ depois: $a+1$
-
-\item altura de $EE$ antes: $a$ ou $a-1$
-
-\begin{itemize}
-
-\item se fosse $a-1$, $n_e$ estaria desbalanceado
-
-\item contradiz hipótese que $n$ é o nó desbalanceado de maior nível
-
-\item altura de $EE$ é $a$
-
-\end{itemize}
-
-\end{itemize}
-
-\end{frame}
-
-\begin{frame}
-
-\frametitle{Inserção em $ED$}
-\framesubtitle{Re-balanceamento}
-
-\begin{center}
-\setlength{\unitlength}{0.61cm}
-\begin{picture}(13,8)(0,0)
-\put(1,3.25){\vector(0,1){1.75}}
-\put(1,2.75){\vector(0,-1){1.75}}
-\put(1,3){\makebox(0,0){$a$}}
-
-\put(2.5,5){\circle*{.2}}
-\put(1.5,1){\line(1,4){1}}
-\put(1.5,1){\line(1,0){2}}
-\put(3.5,1){\line(-1,4){1}}
-\put(2.5,3){\makebox(0,0){$EE$}}
-
-\put(5.5,5){\circle*{.2}}
-\put(5.5,5.2){\makebox(0,0)[b]{$n_{ed}$}}
-\put(4.5,1){\line(1,4){1}}
-\put(4.5,1){\line(1,0){2}}
-\put(6.5,1){\line(-1,4){1}}
-\put(5.5,3){\makebox(0,0){$ED'$}}
-
-\put(5.5,0.5){\vector(0,1){0.5}}
-\put(5.5,0.4){\makebox(0,0)[t]{$c$}}
-
-\put(7,3.00){\vector(0,1){2}}
-\put(7,2.50){\vector(0,-1){2}}
-\put(7,2.75){\makebox(0,0){$a+1$}}
-
-\put(10,6.5){\circle*{.2}}
-\put(9,2.5){\line(1,4){1}}
-\put(9,2.5){\line(1,0){2}}
-\put(11,2.5){\line(-1,4){1}}
-\put(10,4.5){\makebox(0,0){$D$}}
-
-\put(12,4.75){\vector(0,1){1.75}}
-\put(12,4.25){\vector(0,-1){1.75}}
-\put(12,4.5){\makebox(0,0){$a$}}
-
-\put(2.5,5){\line(1,1){1.5}}
-\put(5.5,5){\line(-1,1){1.5}}
-\put(4,6.5){\circle*{.2}}
-\put(4,6.7){\makebox(0,0)[b]{$n_e$}}
-\put(4,5.9){\makebox(0,0)[b]{$E$}}
-
-\put(4,6.5){\line(3,1){3}}
-\put(10,6.5){\line(-3,1){3}}
-\put(7,7.5){\circle*{.2}}
-\put(7,7.7){\makebox(0,0)[b]{$n$}}
-\put(7,6.9){\makebox(0,0)[b]{$S$}}
-
-\end{picture}
-\end{center}
-
-\alert{rotação dupla a direita}
-
-\end{frame}
-
-\begin{frame}
-
-\frametitle{Inserção em $D$}
-\framesubtitle{Re-balanceamento}
-
-\begin{itemize}
-
-\item A situação é simétrica à inserção em $E$.
-
-\item A análise é similar.
-
-\item O tratamento é simétrico, com 2 sub-casos ($DD$ e $DE$).
-
-\end{itemize}
-
-\end{frame}
-
-\begin{frame}
-
-\frametitle{Inserção em $DD$: ilustração}
-\framesubtitle{Re-balanceamento}
-
-\begin{center}
-\setlength{\unitlength}{0.55cm}
-\begin{picture}(13,8)(0,0)
-\put(12,2.50){\vector(0,-1){2.25}}
-\put(12,3.00){\vector(0,1){2.00}}
-\put(12,2.75){\makebox(0,0){$a+1$}}
-
-\put(10.5,5){\circle*{.2}}
-\put(11.5,1){\line(-1,4){1}}
-\put(11.5,1){\line(-1,0){2}}
-\put(9.5,1){\line(1,4){1}}
-\put(10.5,3){\makebox(0,0){$DD$}}
-
-\put(10.5,0.5){\vector(0,1){0.5}}
-\put(10.5,0.4){\makebox(0,0)[t]{$c$}}
-
-\put(7.5,5){\circle*{.2}}
-\put(7.5,5.2){\makebox(0,0)[b]{$n_{de}$}}
-\put(8.5,1){\line(-1,4){1}}
-\put(8.5,1){\line(-1,0){2}}
-\put(6.5,1){\line(1,4){1}}
-\put(7.5,3){\makebox(0,0){$DE$}}
-
-\put(6,3.25){\vector(0,1){1.75}}
-\put(6,2.75){\vector(0,-1){1.75}}
-\put(6,3){\makebox(0,0){$a$}}
-
-\put(3,6.5){\circle*{.2}}
-\put(4,2.5){\line(-1,4){1}}
-\put(4,2.5){\line(-1,0){2}}
-\put(2,2.5){\line(1,4){1}}
-\put(3,4.5){\makebox(0,0){$D$}}
-
-\put(1,4.75){\vector(0,1){1.75}}
-\put(1,4.25){\vector(0,-1){1.75}}
-\put(1,4.5){\makebox(0,0){$a$}}
-
-\put(10.5,5){\line(-1,1){1.5}}
-\put(7.5,5){\line(1,1){1.5}}
-\put(9,6.5){\circle*{.2}}
-\put(9,6.7){\makebox(0,0)[b]{$n_d$}}
-\put(9,5.9){\makebox(0,0)[b]{$D$}}
-
-\put(9,6.5){\line(-3,1){3}}
-\put(3,6.5){\line(3,1){3}}
-\put(6,7.5){\circle*{.2}}
-\put(6,7.7){\makebox(0,0)[b]{$n$}}
-\put(6,6.9){\makebox(0,0)[b]{$S$}}
-
-\end{picture}
-\end{center}
-
-\alert{rotação simples a esquerda}
-
-\end{frame}
-
-\begin{frame}
-
-\frametitle{Inserção em $DE$}
-\framesubtitle{Re-balanceamento}
-
-\begin{center}
-\setlength{\unitlength}{0.61cm}
-\begin{picture}(13,8)(0,0)
-\put(12,3.25){\vector(0,1){1.75}}
-\put(12,2.70){\vector(0,-1){2.20}}
-\put(12,3){\makebox(0,0){$a$}}
-
-\put(10.5,5){\circle*{.2}}
-\put(10.5,5.2){\makebox(0,0)[b]{$n_{dd}$}}
-\put(11.5,1){\line(-1,4){1}}
-\put(11.5,1){\line(-1,0){2}}
-\put(9.5,1){\line(1,4){1}}
-\put(10.5,3){\makebox(0,0){$DD$}}
-
-\put(7.5,5){\circle*{.2}}
-\put(8.5,1){\line(-1,4){1}}
-\put(8.5,1){\line(-1,0){2}}
-\put(6.5,1){\line(1,4){1}}
-\put(7.5,3){\makebox(0,0){$DE'$}}
-
-\put(7.5,0.5){\vector(0,1){0.5}}
-\put(7.5,0.4){\makebox(0,0)[t]{$c$}}
-
-\put(6,3.00){\vector(0,1){2}}
-\put(6,2.50){\vector(0,-1){2.25}}
-\put(6,2.75){\makebox(0,0){$a+1$}}
-
-\put(3,6.5){\circle*{.2}}
-\put(4,2.5){\line(-1,4){1}}
-\put(4,2.5){\line(-1,0){2}}
-\put(2,2.5){\line(1,4){1}}
-\put(3,4.5){\makebox(0,0){$E$}}
-
-\put(1,4.75){\vector(0,1){1.75}}
-\put(1,4.25){\vector(0,-1){1.75}}
-\put(1,4.5){\makebox(0,0){$a$}}
-
-\put(10.5,5){\line(-1,1){1.5}}
-\put(7.5,5){\line(1,1){1.5}}
-\put(9,6.5){\circle*{.2}}
-\put(9,6.7){\makebox(0,0)[b]{$n_d$}}
-\put(9,5.9){\makebox(0,0)[b]{$D$}}
-
-\put(9,6.5){\line(-3,1){3}}
-\put(3,6.5){\line(3,1){3}}
-\put(6,7.5){\circle*{.2}}
-\put(6,7.7){\makebox(0,0)[b]{$n$}}
-\put(6,6.9){\makebox(0,0)[b]{$S$}}
-\end{picture}
-\end{center}
-
-\alert{rotação dupla a esquerda}
 
 \end{frame}
 
@@ -715,7 +479,7 @@ Antes & Depois
 \Procname{$\proc{Rotate-Simple-Right}(n)$}
 \li $ne \gets \attrib{n}{left}$
 \li $\attrib{n}{left} \gets \attrib{ne}{right}$
-\li $\attrib{n}{right} \gets n$
+\li $\attrib{ne}{right} \gets n$
 \li $\attrib{ne}{bal} \gets 0$
 \li $\attrib{n}{bal} \gets 0$
 \li \Return $ne$
@@ -737,6 +501,105 @@ Exercício:
 \end{enumerate}
 }
 
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Inserção em $ED$}
+\framesubtitle{Re-balanceamento}
+
+$\alpha(E) = \alpha(D)+1$, $E \neq \const{Nil}$
+
+\begin{tabular}{rcl}
+$a$ & : & $\alpha(D)$ (e $\alpha(E) = a+1$), \\
+$n_e$ & : a raiz de $E$, \\
+$EE$ & a sub-árvore esquerda de $n_e$, \\ 
+$ED$ & a sub-árvore direita de $n_e$.
+\end{tabular}
+
+inserção em $ED$
+
+\begin{itemize}
+
+\item altura de $ED$ antes: $a$
+
+\item altura de $ED$ depois: $a+1$
+
+\item altura de $EE$ antes: $a$ ou $a-1$
+
+\begin{itemize}
+
+\item se fosse $a-1$, $n_e$ estaria desbalanceado
+
+\item contradiz hipótese que $n$ é o nó desbalanceado de maior nível
+
+\item altura de $EE$ é $a$
+
+\end{itemize}
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Inserção em $ED$}
+\framesubtitle{Re-balanceamento}
+
+\begin{center}
+\setlength{\unitlength}{0.61cm}
+\begin{picture}(13,8)(0,0)
+\put(1,3.25){\vector(0,1){1.75}}
+\put(1,2.75){\vector(0,-1){1.75}}
+\put(1,3){\makebox(0,0){$a$}}
+
+\put(2.5,5){\circle*{.2}}
+\put(1.5,1){\line(1,4){1}}
+\put(1.5,1){\line(1,0){2}}
+\put(3.5,1){\line(-1,4){1}}
+\put(2.5,3){\makebox(0,0){$EE$}}
+
+\put(5.5,5){\circle*{.2}}
+\put(5.5,5.2){\makebox(0,0)[b]{$n_{ed}$}}
+\put(4.5,1){\line(1,4){1}}
+\put(4.5,1){\line(1,0){2}}
+\put(6.5,1){\line(-1,4){1}}
+\put(5.5,3){\makebox(0,0){$ED'$}}
+
+\put(5.5,0.5){\vector(0,1){0.5}}
+\put(5.5,0.4){\makebox(0,0)[t]{$c$}}
+
+\put(7,3.00){\vector(0,1){2}}
+\put(7,2.50){\vector(0,-1){2}}
+\put(7,2.75){\makebox(0,0){$a+1$}}
+
+\put(10,6.5){\circle*{.2}}
+\put(9,2.5){\line(1,4){1}}
+\put(9,2.5){\line(1,0){2}}
+\put(11,2.5){\line(-1,4){1}}
+\put(10,4.5){\makebox(0,0){$D$}}
+
+\put(12,4.75){\vector(0,1){1.75}}
+\put(12,4.25){\vector(0,-1){1.75}}
+\put(12,4.5){\makebox(0,0){$a$}}
+
+\put(2.5,5){\line(1,1){1.5}}
+\put(5.5,5){\line(-1,1){1.5}}
+\put(4,6.5){\circle*{.2}}
+\put(4,6.7){\makebox(0,0)[b]{$n_e$}}
+\put(4,5.9){\makebox(0,0)[b]{$E$}}
+
+\put(4,6.5){\line(3,1){3}}
+\put(10,6.5){\line(-3,1){3}}
+\put(7,7.5){\circle*{.2}}
+\put(7,7.7){\makebox(0,0)[b]{$n$}}
+\put(7,6.9){\makebox(0,0)[b]{$S$}}
+
+\end{picture}
+\end{center}
+
+\alert{rotação dupla a direita}
 
 \end{frame}
 
@@ -927,11 +790,156 @@ Exercício:
 
 \begin{frame}
 
+\frametitle{Inserção em $D$}
+\framesubtitle{Re-balanceamento}
+
+\begin{itemize}
+
+\item A situação é simétrica à inserção em $E$.
+
+\item A análise é similar.
+
+\item O tratamento é simétrico, com 2 sub-casos ($DD$ e $DE$).
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Inserção em $DD$: ilustração}
+\framesubtitle{Re-balanceamento}
+
+\begin{center}
+\setlength{\unitlength}{0.55cm}
+\begin{picture}(13,8)(0,0)
+\put(12,2.50){\vector(0,-1){2.25}}
+\put(12,3.00){\vector(0,1){2.00}}
+\put(12,2.75){\makebox(0,0){$a+1$}}
+
+\put(10.5,5){\circle*{.2}}
+\put(11.5,1){\line(-1,4){1}}
+\put(11.5,1){\line(-1,0){2}}
+\put(9.5,1){\line(1,4){1}}
+\put(10.5,3){\makebox(0,0){$DD$}}
+
+\put(10.5,0.5){\vector(0,1){0.5}}
+\put(10.5,0.4){\makebox(0,0)[t]{$c$}}
+
+\put(7.5,5){\circle*{.2}}
+\put(7.5,5.2){\makebox(0,0)[b]{$n_{de}$}}
+\put(8.5,1){\line(-1,4){1}}
+\put(8.5,1){\line(-1,0){2}}
+\put(6.5,1){\line(1,4){1}}
+\put(7.5,3){\makebox(0,0){$DE$}}
+
+\put(6,3.25){\vector(0,1){1.75}}
+\put(6,2.75){\vector(0,-1){1.75}}
+\put(6,3){\makebox(0,0){$a$}}
+
+\put(3,6.5){\circle*{.2}}
+\put(4,2.5){\line(-1,4){1}}
+\put(4,2.5){\line(-1,0){2}}
+\put(2,2.5){\line(1,4){1}}
+\put(3,4.5){\makebox(0,0){$D$}}
+
+\put(1,4.75){\vector(0,1){1.75}}
+\put(1,4.25){\vector(0,-1){1.75}}
+\put(1,4.5){\makebox(0,0){$a$}}
+
+\put(10.5,5){\line(-1,1){1.5}}
+\put(7.5,5){\line(1,1){1.5}}
+\put(9,6.5){\circle*{.2}}
+\put(9,6.7){\makebox(0,0)[b]{$n_d$}}
+\put(9,5.9){\makebox(0,0)[b]{$D$}}
+
+\put(9,6.5){\line(-3,1){3}}
+\put(3,6.5){\line(3,1){3}}
+\put(6,7.5){\circle*{.2}}
+\put(6,7.7){\makebox(0,0)[b]{$n$}}
+\put(6,6.9){\makebox(0,0)[b]{$S$}}
+
+\end{picture}
+\end{center}
+
+\alert{rotação simples a esquerda}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Inserção em $DE$}
+\framesubtitle{Re-balanceamento}
+
+\begin{center}
+\setlength{\unitlength}{0.61cm}
+\begin{picture}(13,8)(0,0)
+\put(12,3.25){\vector(0,1){1.75}}
+\put(12,2.70){\vector(0,-1){2.20}}
+\put(12,3){\makebox(0,0){$a$}}
+
+\put(10.5,5){\circle*{.2}}
+\put(10.5,5.2){\makebox(0,0)[b]{$n_{dd}$}}
+\put(11.5,1){\line(-1,4){1}}
+\put(11.5,1){\line(-1,0){2}}
+\put(9.5,1){\line(1,4){1}}
+\put(10.5,3){\makebox(0,0){$DD$}}
+
+\put(7.5,5){\circle*{.2}}
+\put(8.5,1){\line(-1,4){1}}
+\put(8.5,1){\line(-1,0){2}}
+\put(6.5,1){\line(1,4){1}}
+\put(7.5,3){\makebox(0,0){$DE'$}}
+
+\put(7.5,0.5){\vector(0,1){0.5}}
+\put(7.5,0.4){\makebox(0,0)[t]{$c$}}
+
+\put(6,3.00){\vector(0,1){2}}
+\put(6,2.50){\vector(0,-1){2.25}}
+\put(6,2.75){\makebox(0,0){$a+1$}}
+
+\put(3,6.5){\circle*{.2}}
+\put(4,2.5){\line(-1,4){1}}
+\put(4,2.5){\line(-1,0){2}}
+\put(2,2.5){\line(1,4){1}}
+\put(3,4.5){\makebox(0,0){$E$}}
+
+\put(1,4.75){\vector(0,1){1.75}}
+\put(1,4.25){\vector(0,-1){1.75}}
+\put(1,4.5){\makebox(0,0){$a$}}
+
+\put(10.5,5){\line(-1,1){1.5}}
+\put(7.5,5){\line(1,1){1.5}}
+\put(9,6.5){\circle*{.2}}
+\put(9,6.7){\makebox(0,0)[b]{$n_d$}}
+\put(9,5.9){\makebox(0,0)[b]{$D$}}
+
+\put(9,6.5){\line(-3,1){3}}
+\put(3,6.5){\line(3,1){3}}
+\put(6,7.5){\circle*{.2}}
+\put(6,7.7){\makebox(0,0)[b]{$n$}}
+\put(6,6.9){\makebox(0,0)[b]{$S$}}
+\end{picture}
+\end{center}
+
+\alert{rotação dupla a esquerda}
+
+\end{frame}
+
+\begin{frame}
+
 \frametitle{Inserção: algoritmo}
 
+\begin{tabular}{rcl}
+$n$ & : & raiz da sub-árvore onde a inserção ocorrerá (\alert{ref}) \\
+$v$ & : & valor a inserir \\
+& $\rightarrow$ & Booleano indicando se a altura aumentou
+\end{tabular}
+
 \begin{codebox}
+\only<1>{
 \Procname{$\proc{Insert}(n, v)$}
-\only<1>{\li \If $n \isequal \const{Nil}$
+\li \If $n \isequal \const{Nil}$
 \li \Then $n \gets \proc{Make-Avl-Node}(v, \const{Nil}, \const{Nil}, 0)$
 \li   \Return $\const{True}$
     \End
@@ -941,18 +949,21 @@ Exercício:
 \li \If $v < \attrib{n}{val}$
 \li \Then  $\id{inc} \gets \proc{Insert}(\attrib{n}{left}, v)$
 \li   \If $\id{inc}$
-\zi      \alert{$\cdots$}
+\zi      \alert{$\langle \text{tratamento de incremento de altura na sub-árvore } \rangle$}
       \End
 \li \Else $\cdots$
     \End
 }
 \only<2>{
-\zi   $\cdots$
 \li   \If $\id{inc}$
 \li   \Then \If $\attrib{n}{bal} \isequal 0$
-\li     \Then \Return $\const{False}$
-\li     \ElseIf $\attrib{n}{bal} \isequal -1$
-\li     \Then \Return $\const{True}$
+\li     \Then
+          $\attrib{n}{bal} \gets -1$
+\li       \Return $\const{True}$
+\li     \ElseIf $\attrib{n}{bal} \isequal 11$
+\li     \Then
+          $\attrib{n}{bal} \gets 0$
+\li       \Return $\const{False}$
 \li     \Else
 \li       \If $\attrib{\attrib{n}{left}}{bal} \isequal -1$
 \li       \Then $n \gets \proc{Rotate-Simple-Right}(n)$
@@ -961,7 +972,7 @@ Exercício:
 \li       \Return $\const{False}$
         \End
       \End
-\li \Else $\cdots$
+\li \Else \alert{$\langle \text{Inserção na sub-árvore direita} \rangle$}
     \End
 }
 \end{codebox}
@@ -1371,8 +1382,8 @@ algoritmos auxiliares:
 \begin{small}
 \only<1>{
 \begin{tabular}{rcl}
-$n$ & : & raiz da sub-árvore cujo valor mínimo deve ser removido (ref) \\
-$v$ & : & valor a remover (ref) \\
+$n$ & : & raiz da sub-árvore cujo valor mínimo deve ser removido (\alert{ref}) \\
+$v$ & : & valor a remover \\
 & $\rightarrow$ & Booleano indicando se a altura diminuiu
 \end{tabular}
 }
@@ -1404,7 +1415,7 @@ $v$ & : & valor a remover (ref) \\
 \li   $\proc{Free-AVL-Node}(tmp)$
 \li   \Return $\const{True}$
     \End
-\li  \Return $\proc{Balance-Right}(\proc{Remove-Min}(\attrib{n}{right}, \attrib{n}{val}))$
+\li  \Return $\proc{Balance-Right}(n, \proc{Remove-Min}(\attrib{n}{right}, \attrib{n}{val}))$
 \end{codebox}
 }
 \end{small}
@@ -1430,7 +1441,7 @@ $v$ & : & variável onde o valor mínimo será armazenado (ref) \\
 \li   $\proc{Free-AVL-Node}(tmp)$
 \li   \Return $\const{True}$
 \li \Else
-\li   \Return $\proc{Balance-Left}(\proc{Remove-Min}(\attrib{n}{left}, v), n)$
+\li   \Return $\proc{Balance-Left}(n, \proc{Remove-Min}(\attrib{n}{left}, v), n)$
     \End  
 \end{codebox}
 
@@ -1442,8 +1453,8 @@ $v$ & : & variável onde o valor mínimo será armazenado (ref) \\
 \begin{small}
 \begin{tabular}{rcl}
 $n$ & : & a sub-árvore direita de $n$ sofreu remoção (ref) \\
-$dec$ & : & Booleano indicando se a altura diminuiu na remoção na sub-árvore \\
-& $\rightarrow$ & Booleano indicando se a altura diminuiu na remoção
+$dec$ & : & indica se a altura diminuiu na remoção na sub-árvore \\
+& $\rightarrow$ & indica se a altura diminuiu na remoção em $n$
 \end{tabular}
 
 \begin{codebox}
@@ -1456,9 +1467,9 @@ $dec$ & : & Booleano indicando se a altura diminuiu na remoção na sub-árvore 
       \If $\attrib{\attrib{n}{left}}{bal} \isequal -1$ or
           $\attrib{\attrib{n}{left}}{bal} \isequal 0$
 \li   \Then
-        $\proc{Rotate-Simple-Right}(n)$
+        $n \gets \proc{Rotate-Simple-Right}(n)$
 \li   \ElseNoIf 
-        $\proc{Rotate-Double-Right}(n)$
+        $n \gets \proc{Rotate-Double-Right}(n)$
       \End
 \li   \Return $\const{True}$
 \li \ElseIf $\attrib{n}{bal} \isequal 0$
