@@ -1,0 +1,1386 @@
+\documentclass{beamer}
+\setbeamertemplate{footline}[frame number]
+%\documentclass{beamer}
+
+\input{preamble}
+
+\title{Aula 17: Árvores rubro-negras}
+\author{David Déharbe \\
+  Programa de Pós-graduação em Sistemas e Computação \\
+  Universidade Federal do Rio Grande do Norte \\
+  Centro de Ciências Exatas e da Terra \\
+  Departamento de Informática e Matemática Aplicada}
+\date{22 de abril de 2015}
+
+\newcommand{\negro}[1]{\colorbox{black}{\textcolor{white}{\textbf{#1}}}}
+\newcommand{\rubro}[1]{\colorbox{red}{\textcolor{white}{\textbf{#1}}}}
+\newcommand{\bh}[0]{\ensuremath{\id{bh}}}
+
+
+\begin{document}
+\selectlanguage{brazil}
+\begin{frame}
+  \titlepage
+  Download me from \url{http://ufrn.academia.edu/DavidDeharbe}.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Plano da aula}
+
+
+\begin{center}
+\setlength{\unitlength}{0.4cm}
+\begin{picture}(13,12.5)(0,0)
+
+\put(6,11.2){\makebox(0,0)[b]{\negro{47}}}
+\put(6,11){\circle*{.2}}
+\put(6,11){\line(-4,-1){4}}
+\put(6,11){\line(4,-1){4}}
+
+\put(2,10.2){\makebox(0,0)[b]{\negro{32}}}
+\put(2,10){\circle*{.2}}
+\put(2,10){\line(-1,-1){2}}
+\put(2,10){\line(1,-1){2}}
+
+\put(10,10.2){\makebox(0,0)[b]{\rubro{68}}}
+\put(10,10){\circle*{.2}}
+\put(10,10){\line(-1,-1){2}}
+\put(10,10){\line(1,-1){2}}
+
+\put(0,8.2){\makebox(0,0)[b]{\negro{5}}}
+\put(0,8){\circle*{.2}}
+\put(0,8){\line(1,-4){1}}
+
+\put(4,8.2){\makebox(0,0)[b]{\negro{40}}}
+\put(4,8){\circle*{.2}}
+
+\put(8,8.2){\makebox(0,0)[b]{\negro{60}}}
+\put(8,8){\circle*{.2}}
+\put(8,8){\line(-1,-4){1}}
+\put(8,8){\line(1,-4){1}}
+
+\put(12,8.2){\makebox(0,0)[b]{\negro{88}}}
+\put(12,8){\circle*{.2}}
+\put(12,8){\line(1,-4){1}}
+\put(12,8){\line(-1,-4){1}}
+
+\put(1,4.2){\makebox(0,0)[b]{\rubro{15}}}
+\put(1,4){\circle*{.2}}
+
+\put(7,4.2){\makebox(0,0)[b]{\negro{54}}}
+\put(7,4){\circle*{.2}}
+\put(7,4){\line(-1,-4){1}}
+
+\put(9,4.2){\makebox(0,0)[b]{\negro{61}}}
+\put(9,4){\circle*{.2}}
+
+\put(11,4.2){\makebox(0,0)[b]{\negro{75}}}
+\put(11,4){\circle*{.2}}
+
+\put(13,4.2){\makebox(0,0)[b]{\negro{90}}}
+\put(13,4){\circle*{.2}}
+
+\put(6,0.2){\makebox(0,0)[b]{\rubro{50}}}
+\put(6,0){\circle*{.2}}
+\end{picture}
+\end{center}
+
+  \tableofcontents
+
+\end{frame}
+
+\section{Introdução}
+
+\begin{frame}
+
+  \frametitle{Árvores rubro-negra}
+  \framesubtitle{Introdução}
+
+  
+  \begin{itemize}
+    
+  \item Em 1972, Rudolf Bayer projetou a estrutura de dados árvores B binárias
+    simétricas.
+
+  \item Popularizada sob o nome árvores rubro-negras (Guibas \& Sedgewick 1978)
+
+  \item Complexidade
+    \begin{itemize}
+    \item busca em $O(\lg n)$, 
+    \item remoção em $\Theta(\lg n)$ e
+    \item inserção em $\Theta(\lg n)$
+    \end{itemize}
+
+  \item Menos restritivas que árvores AVL, com alturas tendendo a ser maiores
+
+    \begin{itemize}
+
+      \item busca: menos eficiente
+
+      \item inserção e remoção: mais eficiente
+
+    \end{itemize}
+
+  \item bastante usadas na prática (Linux, STL)
+
+  \end{itemize}
+
+\end{frame}
+
+\section{Propriedades}
+
+\begin{frame}
+
+\frametitle{Árvores rubro-negra}
+\framesubtitle{Especificação}
+
+\begin{enumerate}
+
+\item árvore binária de busca
+
+\item os nós tem um atributo $\id{color} \in \{ \const{Red}, \const{Black} \}$.
+
+Convenção: $\attrib{\const{Nil}}{color} = \const{Black}$
+
+\item A raiz é negra $\attrib{root}{color} = \const{Black}$
+
+\item Qualquer caminho da raiz até uma sub-árvore vazia tem o mesmo número de
+  nós negros.
+  \begin{eqnarray*}
+    \id{bh}(\const{Nil}) & = & 0 \\
+    \id{bh}(x) & = & 1 + \id{bh}(\attrib{x}{left}) \text{ se } \attrib{\attrib{x}{left}}{color} = \const{Black} \\
+    \id{bh}(x) & = & \id{bh}(\attrib{x}{left}) \text{ se } \attrib{\attrib{x}{left}}{color} = \const{Red}
+  \end{eqnarray*}
+
+\item Os descendentes de um nó rubro são negros: 
+$\attrib{x}{color} = \const{Red} \Rightarrow \attrib{\attrib{x}{left}}{color} = \const{Black} \land \attrib{\attrib{x}{right}}{color} = \const{Black}$.
+
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Ilustração}
+
+\begin{center}
+\begin{tabular}{ccc}
+\setlength{\unitlength}{0.35cm}
+\begin{picture}(13,12.5)(0,0)
+
+\put(6,11.2){\makebox(0,0)[b]{\negro{47}}}
+\put(6,11){\circle*{.2}}
+\put(6,11){\line(-4,-1){4}}
+\put(6,11){\line(4,-1){4}}
+
+\put(2,10.2){\makebox(0,0)[b]{\negro{32}}}
+\put(2,10){\circle*{.2}}
+\put(2,10){\line(-1,-1){2}}
+\put(2,10){\line(1,-1){2}}
+
+\put(10,10.2){\makebox(0,0)[b]{\rubro{68}}}
+\put(10,10){\circle*{.2}}
+\put(10,10){\line(-1,-1){2}}
+\put(10,10){\line(1,-1){2}}
+
+\put(0,8.2){\makebox(0,0)[b]{\negro{5}}}
+\put(0,8){\circle*{.2}}
+\put(0,8){\line(1,-4){1}}
+
+\put(4,8.2){\makebox(0,0)[b]{\negro{40}}}
+\put(4,8){\circle*{.2}}
+
+\put(8,8.2){\makebox(0,0)[b]{\negro{60}}}
+\put(8,8){\circle*{.2}}
+\put(8,8){\line(-1,-4){1}}
+\put(8,8){\line(1,-4){1}}
+
+\put(12,8.2){\makebox(0,0)[b]{\negro{88}}}
+\put(12,8){\circle*{.2}}
+\put(12,8){\line(1,-4){1}}
+\put(12,8){\line(-1,-4){1}}
+
+\put(1,4.2){\makebox(0,0)[b]{\rubro{15}}}
+\put(1,4){\circle*{.2}}
+
+\put(7,4.2){\makebox(0,0)[b]{\negro{54}}}
+\put(7,4){\circle*{.2}}
+\put(7,4){\line(-1,-4){1}}
+
+\put(9,4.2){\makebox(0,0)[b]{\negro{61}}}
+\put(9,4){\circle*{.2}}
+
+\put(11,4.2){\makebox(0,0)[b]{\negro{75}}}
+\put(11,4){\circle*{.2}}
+
+\put(13,4.2){\makebox(0,0)[b]{\negro{90}}}
+\put(13,4){\circle*{.2}}
+
+\put(6,0.2){\makebox(0,0)[b]{\rubro{50}}}
+\put(6,0){\circle*{.2}}
+\end{picture}
+
+& \hspace{.2cm} &
+
+\setlength{\unitlength}{0.35cm}
+\begin{picture}(13,12.5)(0,0)
+
+\put(6,11.2){\makebox(0,0)[b]{\negro{47}}}
+\put(6,11){\circle*{.2}}
+\put(6,11){\line(-4,-1){4}}
+\put(6,11){\line(4,-1){4}}
+
+\put(2,10.2){\makebox(0,0)[b]{\negro{32}}}
+\put(2,10){\circle*{.2}}
+\put(2,10){\line(-1,-1){2}}
+\put(2,10){\line(1,-1){2}}
+
+\put(10,10.2){\makebox(0,0)[b]{\rubro{68}}}
+\put(10,10){\circle*{.2}}
+\put(10,10){\line(-1,-1){2}}
+\put(10,10){\line(1,-1){2}}
+
+\put(0,8.2){\makebox(0,0)[b]{\negro{5}}}
+\put(0,8){\circle*{.2}}
+\put(0,8){\line(1,-4){1}}
+
+\put(4,8.2){\makebox(0,0)[b]{\negro{40}}}
+\put(4,8){\circle*{.2}}
+
+\put(8,8.2){\makebox(0,0)[b]{\negro{60}}}
+\put(8,8){\circle*{.2}}
+\put(8,8){\line(-1,-4){1}}
+\put(8,8){\line(1,-4){1}}
+
+\put(12,8.2){\makebox(0,0)[b]{\negro{88}}}
+\put(12,8){\circle*{.2}}
+\put(12,8){\line(1,-4){1}}
+
+\put(1,4.2){\makebox(0,0)[b]{\rubro{15}}}
+\put(1,4){\circle*{.2}}
+
+\put(7,4.2){\makebox(0,0)[b]{\negro{54}}}
+\put(7,4){\circle*{.2}}
+\put(7,4){\line(-1,-4){1}}
+
+\put(9,4.2){\makebox(0,0)[b]{\negro{61}}}
+\put(9,4){\circle*{.2}}
+
+\put(13,4.2){\makebox(0,0)[b]{\negro{90}}}
+\put(13,4){\circle*{.2}}
+
+\put(6,0.2){\makebox(0,0)[b]{\rubro{50}}}
+\put(6,0){\circle*{.2}}
+\end{picture} \\
+rubro-negra & & não rubro-negra
+
+\end{tabular}
+\end{center}
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Exercício}
+
+Existe outras maneiras de colorir os nós da seguinte árvore de tal forma que
+respeite as propriedades de árvores rubro-negras?
+
+\begin{center}
+\setlength{\unitlength}{0.35cm}
+\begin{picture}(13,12.5)(0,0)
+
+\put(6,11.2){\makebox(0,0)[b]{\negro{47}}}
+\put(6,11){\circle*{.2}}
+\put(6,11){\line(-4,-1){4}}
+\put(6,11){\line(4,-1){4}}
+
+\put(2,10.2){\makebox(0,0)[b]{\negro{32}}}
+\put(2,10){\circle*{.2}}
+\put(2,10){\line(-1,-1){2}}
+\put(2,10){\line(1,-1){2}}
+
+\put(10,10.2){\makebox(0,0)[b]{\rubro{68}}}
+\put(10,10){\circle*{.2}}
+\put(10,10){\line(-1,-1){2}}
+\put(10,10){\line(1,-1){2}}
+
+\put(0,8.2){\makebox(0,0)[b]{\negro{5}}}
+\put(0,8){\circle*{.2}}
+\put(0,8){\line(1,-4){1}}
+
+\put(4,8.2){\makebox(0,0)[b]{\negro{40}}}
+\put(4,8){\circle*{.2}}
+
+\put(8,8.2){\makebox(0,0)[b]{\negro{60}}}
+\put(8,8){\circle*{.2}}
+\put(8,8){\line(-1,-4){1}}
+\put(8,8){\line(1,-4){1}}
+
+\put(12,8.2){\makebox(0,0)[b]{\negro{88}}}
+\put(12,8){\circle*{.2}}
+\put(12,8){\line(1,-4){1}}
+\put(12,8){\line(-1,-4){1}}
+
+\put(1,4.2){\makebox(0,0)[b]{\rubro{15}}}
+\put(1,4){\circle*{.2}}
+
+\put(7,4.2){\makebox(0,0)[b]{\negro{54}}}
+\put(7,4){\circle*{.2}}
+\put(7,4){\line(-1,-4){1}}
+
+\put(9,4.2){\makebox(0,0)[b]{\negro{61}}}
+\put(9,4){\circle*{.2}}
+
+\put(11,4.2){\makebox(0,0)[b]{\negro{75}}}
+\put(11,4){\circle*{.2}}
+
+\put(13,4.2){\makebox(0,0)[b]{\negro{90}}}
+\put(13,4){\circle*{.2}}
+
+\put(6,0.2){\makebox(0,0)[b]{\rubro{50}}}
+\put(6,0){\circle*{.2}}
+\end{picture}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Altura de árvores rubro-negras}
+
+\begin{theorem}
+Seja $T$ uma árvore rubro-negra, com $n$ nós, então $\alpha(\attrib{T}{root}) \in \Theta(\lg n)$.
+\end{theorem}
+
+\begin{proof}
+\begin{itemize}
+\item seja $p = \bh(T)$ (a altura negra de $T$)
+\item há $2^p - 1$ nós negros, logo $n \ge 2^p - 1$
+\item a altura máxima $\alpha_m$ de $T$ é $2p$ (alternando nós rubros e negros)
+\item $\alpha_m \le 2p$ e $n \ge 2^p - 1$, logo $\alpha_m \le 2 \log_2 (n+1)$.
+\item em uma árvore binária $\alpha_m \in \Omega(\log n)$
+\item logo $\alpha_m \in \Theta(\log n)$.
+\end{itemize}
+\end{proof}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Implementação}
+
+\begin{itemize}
+\item $\attrib{x}{color} \in \{\const{Red}, \const{Black} \}$
+\end{itemize}
+
+\end{frame}
+
+\section{Operações}
+
+\begin{frame}
+
+\frametitle{Operação de busca}
+
+\begin{itemize}
+\item A busca não modifica a árvore.
+
+\item O algoritmo de busca em árvores rubro-negra é o mesmo da busca em árvores
+  binárias de busca qualquer.
+
+\item a complexidade é $O(\log n)$
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Operação de inserção}
+
+\begin{enumerate}
+
+\item inserção em árvore binária de busca
+
+\item \alert{se necessário}, re-balanceamento
+
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Re-balanceamento}
+\framesubtitle{Inserção}
+
+Propriedade 2: qual cor escolher para o novo nó?
+
+\begin{itemize}
+
+\item se for negro, e a árvore inicialmente não vazia, quebra a propriedade 4
+
+\item se for rubro, e a árvore inicialmente vazia, quebra a propriedade 3
+
+\end{itemize}
+
+\pause
+\alert{solução}
+
+\begin{itemize}
+
+\item é criado um nó, $1$
+
+\item a cor defaut é rubro: $\attrib{q}{col} \gets \const{Red}$
+
+\item após a inserção, a raiz é atribuída a cor negro
+$\attrib{root}{col} \gets \const{Black}$
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Re-balanceamento}
+\framesubtitle{Inserção}
+
+Propriedade 5: nó rubro não pode ter descendente direto rubro
+
+\begin{itemize}
+
+\item seja $v$ o nó ascendente de $q$
+
+\item se $v$ for negro, não ha desequilibro
+
+\item se $v$ for rubro, a propriedade 5 é violada
+
+\end{itemize}
+
+\pause
+
+\alert{solução}
+
+\begin{itemize}
+
+\item como $v$ é rubro, tem um nó ascendente, $w$, tal que $\attrib{w}{col} \isequal \const{Black}$
+
+\item seja $t$ a outra sub-árvore de $w$
+
+\begin{enumerate}
+
+\item $\attrib{t}{col} \isequal \const{Red}$
+
+\item $\attrib{t}{col} \isequal \const{Black}$
+
+\end{enumerate}
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{O caso $\attrib{t}{col} \isequal \const{Red}$}
+
+$\attrib{t}{col} \isequal \const{Red}$
+
+\begin{itemize}
+
+\item logo $t \neq \const{Nil}$
+
+\item inversão das cores de $v$, $w$ e $t$.
+\end{itemize}
+
+\begin{center}
+\begin{tabular}{ccc}
+(Antes) & & (Depois) \\
+\\
+\setlength{\unitlength}{0.35cm}
+\begin{picture}(14,9)(0,0)
+
+\put(7,8.2){\makebox(0,0)[b]{\negro{$w$}}}
+\put(7,8){\circle*{.2}}
+\put(7,8){\line(-4,-1){4}}
+\put(7,8){\line(4,-1){4}}
+
+\put(3,7.2){\makebox(0,0)[b]{\rubro{$v$}}}
+\put(3,7){\circle*{.2}}
+\put(3,7){\line(-1,-1){2}}
+\put(3,7){\line(1,-1){2}}
+
+\put(11,7.2){\makebox(0,0)[b]{\rubro{$t$}}}
+\put(11,7){\circle*{.2}}
+\put(11,7){\line(-1,-1){2}}
+\put(11,7){\line(1,-1){2}}
+
+\put(1,5.2){\makebox(0,0)[b]{\rubro{$q$}}}
+\put(1,5){\circle*{.2}}
+\put(1,5){\line(1,-4){1}}
+\put(1,5){\line(-1,-4){1}}
+
+\put(5,4.8){\makebox(0,0)[t]{\negro{$\gamma$}}}
+\put(5,5){\circle*{.2}}
+
+\put(9,4.8){\makebox(0,0)[t]{\negro{$\delta$}}}
+\put(9,5){\circle*{.2}}
+
+\put(13,4.8){\makebox(0,0)[t]{\negro{$\eta$}}}
+\put(13,5){\circle*{.2}}
+
+\put(2,0.8){\makebox(0,0)[t]{\negro{$\beta$}}}
+\put(2,1){\circle*{.2}}
+
+\put(0,0.8){\makebox(0,0)[t]{\negro{$\alpha$}}}
+\put(0,1){\circle*{.2}}
+
+\end{picture}
+& & 
+\setlength{\unitlength}{0.35cm}
+\begin{picture}(14,9)(0,0)
+
+\put(7,8.2){\makebox(0,0)[b]{\rubro{$w$}}}
+\put(7,8){\circle*{.2}}
+\put(7,8){\line(-4,-1){4}}
+\put(7,8){\line(4,-1){4}}
+
+\put(3,7.2){\makebox(0,0)[b]{\negro{$v$}}}
+\put(3,7){\circle*{.2}}
+\put(3,7){\line(-1,-1){2}}
+\put(3,7){\line(1,-1){2}}
+
+\put(11,7.2){\makebox(0,0)[b]{\negro{$t$}}}
+\put(11,7){\circle*{.2}}
+\put(11,7){\line(-1,-1){2}}
+\put(11,7){\line(1,-1){2}}
+
+\put(1,5.2){\makebox(0,0)[b]{\rubro{$q$}}}
+\put(1,5){\circle*{.2}}
+\put(1,5){\line(1,-4){1}}
+\put(1,5){\line(-1,-4){1}}
+
+\put(5,4.8){\makebox(0,0)[t]{\negro{$\gamma$}}}
+\put(5,5){\circle*{.2}}
+
+\put(9,4.8){\makebox(0,0)[t]{\negro{$\delta$}}}
+\put(9,5){\circle*{.2}}
+
+\put(13,4.8){\makebox(0,0)[t]{\negro{$\eta$}}}
+\put(13,5){\circle*{.2}}
+
+\put(2,0.8){\makebox(0,0)[t]{\negro{$\beta$}}}
+\put(2,1){\circle*{.2}}
+
+\put(0,0.8){\makebox(0,0)[t]{\negro{$\alpha$}}}
+\put(0,1){\circle*{.2}}
+
+\end{picture}
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{O caso $\attrib{t}{col} \isequal \const{Red}$}
+
+$\attrib{t}{col} \isequal \const{Red}$
+
+\begin{center}
+\begin{tabular}{ccc}
+(Antes) & & (Depois) \\
+\\
+\setlength{\unitlength}{0.32cm}
+\begin{picture}(14,9)(0,0)
+
+\put(7,8.2){\makebox(0,0)[b]{\negro{$w$}}}
+\put(7,8){\circle*{.2}}
+\put(7,8){\line(-4,-1){4}}
+\put(7,8){\line(4,-1){4}}
+
+\put(3,7.2){\makebox(0,0)[b]{\rubro{$v$}}}
+\put(3,7){\circle*{.2}}
+\put(3,7){\line(-1,-1){2}}
+\put(3,7){\line(1,-1){2}}
+
+\put(11,7.2){\makebox(0,0)[b]{\rubro{$t$}}}
+\put(11,7){\circle*{.2}}
+\put(11,7){\line(-1,-1){2}}
+\put(11,7){\line(1,-1){2}}
+
+\put(1,5.2){\makebox(0,0)[b]{\rubro{$q$}}}
+\put(1,5){\circle*{.2}}
+\put(1,5){\line(1,-4){1}}
+\put(1,5){\line(-1,-4){1}}
+
+\put(5,4.8){\makebox(0,0)[t]{\negro{$\gamma$}}}
+\put(5,5){\circle*{.2}}
+
+\put(9,4.8){\makebox(0,0)[t]{\negro{$\delta$}}}
+\put(9,5){\circle*{.2}}
+
+\put(13,4.8){\makebox(0,0)[t]{\negro{$\eta$}}}
+\put(13,5){\circle*{.2}}
+
+\put(2,0.8){\makebox(0,0)[t]{\negro{$\beta$}}}
+\put(2,1){\circle*{.2}}
+
+\put(0,0.8){\makebox(0,0)[t]{\negro{$\alpha$}}}
+\put(0,1){\circle*{.2}}
+
+\end{picture}
+& & 
+\setlength{\unitlength}{0.32cm}
+\begin{picture}(14,9)(0,0)
+
+\put(7,8.2){\makebox(0,0)[b]{\rubro{$w$}}}
+\put(7,8){\circle*{.2}}
+\put(7,8){\line(-4,-1){4}}
+\put(7,8){\line(4,-1){4}}
+
+\put(3,7.2){\makebox(0,0)[b]{\negro{$v$}}}
+\put(3,7){\circle*{.2}}
+\put(3,7){\line(-1,-1){2}}
+\put(3,7){\line(1,-1){2}}
+
+\put(11,7.2){\makebox(0,0)[b]{\negro{$t$}}}
+\put(11,7){\circle*{.2}}
+\put(11,7){\line(-1,-1){2}}
+\put(11,7){\line(1,-1){2}}
+
+\put(1,5.2){\makebox(0,0)[b]{\rubro{$q$}}}
+\put(1,5){\circle*{.2}}
+\put(1,5){\line(1,-4){1}}
+\put(1,5){\line(-1,-4){1}}
+
+\put(5,4.8){\makebox(0,0)[t]{\negro{$\gamma$}}}
+\put(5,5){\circle*{.2}}
+
+\put(9,4.8){\makebox(0,0)[t]{\negro{$\delta$}}}
+\put(9,5){\circle*{.2}}
+
+\put(13,4.8){\makebox(0,0)[t]{\negro{$\eta$}}}
+\put(13,5){\circle*{.2}}
+
+\put(2,0.8){\makebox(0,0)[t]{\negro{$\beta$}}}
+\put(2,1){\circle*{.2}}
+
+\put(0,0.8){\makebox(0,0)[t]{\negro{$\alpha$}}}
+\put(0,1){\circle*{.2}}
+
+\end{picture}
+\end{tabular}
+\end{center}
+
+\begin{enumerate}
+\item se $w$ era a raiz, é atribuído a cor negro
+\item se $w$ não era a raiz, opera-se eventual rebalanceamento em nível superior
+\item a operação não alterou $\id{bh}(w)$
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+
+\frametitle{O caso $\attrib{t}{col} \isequal \const{Black}$}
+
+$\attrib{t}{col} \isequal \const{Black}$
+
+\begin{enumerate}
+\item $\attrib{w}{left} \isequal v$ e $\attrib{v}{left} \isequal q$
+\item $\attrib{w}{left} \isequal v$ e $\attrib{v}{right} \isequal q$
+\item $\attrib{w}{right} \isequal v$ e $\attrib{v}{right} \isequal q$ (simétrico de 1)
+\item $\attrib{w}{right} \isequal v$ e $\attrib{v}{left} \isequal q$ (simétrico de 2)
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{O caso $\attrib{t}{col} \isequal \const{Black}$ e $\attrib{w}{left} \isequal v$ e $\attrib{v}{left} \isequal q$}
+
+$\attrib{t}{col} \isequal \const{Black}$ e $\attrib{w}{left} \isequal v$ e $\attrib{v}{left} \isequal q$
+
+\begin{center}
+\begin{tabular}{ccc}
+(Antes) & & (Depois) \\
+\\
+\setlength{\unitlength}{0.35cm}
+\begin{picture}(14,9)(0,0)
+\put(7,8.2){\makebox(0,0)[b]{\negro{$w$}}}
+\put(7,8){\circle*{.2}}
+\put(7,8){\line(-4,-1){4}}
+\put(7,8){\line(4,-1){4}}
+
+\put(3,7.2){\makebox(0,0)[b]{\rubro{$v$}}}
+\put(3,7){\circle*{.2}}
+\put(3,7){\line(-1,-1){2}}
+\put(3,7){\line(1,-1){2}}
+
+\put(11,6.8){\makebox(0,0)[t]{\negro{$\delta$}}}
+\put(11,7){\circle*{.2}}
+
+\put(1,5.2){\makebox(0,0)[b]{\rubro{$q$}}}
+\put(1,5){\circle*{.2}}
+\put(1,5){\line(1,-4){1}}
+\put(1,5){\line(-1,-4){1}}
+
+\put(5,4.8){\makebox(0,0)[t]{\negro{$\gamma$}}}
+\put(5,5){\circle*{.2}}
+
+\put(2,0.8){\makebox(0,0)[t]{\negro{$\beta$}}}
+\put(2,1){\circle*{.2}}
+
+\put(0,0.8){\makebox(0,0)[t]{\negro{$\alpha$}}}
+\put(0,1){\circle*{.2}}
+
+\end{picture}
+& & 
+\setlength{\unitlength}{0.35cm}
+\begin{picture}(14,9)(0,0)
+
+\put(7,8.2){\makebox(0,0)[b]{\negro{$v$}}}
+\put(7,8){\circle*{.2}}
+\put(7,8){\line(-4,-1){4}}
+\put(7,8){\line(4,-1){4}}
+
+\put(3,7.2){\makebox(0,0)[b]{\rubro{$q$}}}
+\put(3,7){\circle*{.2}}
+\put(3,7){\line(-1,-1){2}}
+\put(3,7){\line(1,-1){2}}
+
+\put(11,7.2){\makebox(0,0)[b]{\rubro{$w$}}}
+\put(11,7){\circle*{.2}}
+\put(11,7){\line(-1,-1){2}}
+\put(11,7){\line(1,-1){2}}
+
+\put(1,4.8){\makebox(0,0)[t]{\negro{$\alpha$}}}
+\put(1,5){\circle*{.2}}
+
+\put(5,4.8){\makebox(0,0)[t]{\negro{$\beta$}}}
+\put(5,5){\circle*{.2}}
+
+\put(9,4.8){\makebox(0,0)[t]{\negro{$\gamma$}}}
+\put(9,5){\circle*{.2}}
+
+\put(13,4.8){\makebox(0,0)[t]{\negro{$\delta$}}}
+\put(13,5){\circle*{.2}}
+
+\end{picture}
+\end{tabular}
+\end{center}
+
+rotação simples a direita + inversão cores de $v$ e $w$
+
+\only<2>{O resultado é uma árvore rubro-negra? Justifique.}
+\end{frame}
+
+\begin{frame}
+
+\frametitle{O caso $\attrib{t}{col} \isequal \const{Black}$ e $\attrib{w}{left} \isequal v$ e $\attrib{v}{right} \isequal q$}
+
+$\attrib{t}{col} \isequal \const{Black}$ e $\attrib{w}{left} \isequal v$ e $\attrib{v}{right} \isequal q$
+
+\begin{center}
+\begin{tabular}{ccc}
+(Antes) & & (Depois) \\
+\\
+\setlength{\unitlength}{0.35cm}
+\begin{picture}(14,9)(0,0)
+
+\put(7,8.2){\makebox(0,0)[b]{\negro{$w$}}}
+\put(7,8){\circle*{.2}}
+\put(7,8){\line(-4,-1){4}}
+\put(7,8){\line(4,-1){4}}
+
+\put(3,7.2){\makebox(0,0)[b]{\rubro{$v$}}}
+\put(3,7){\circle*{.2}}
+\put(3,7){\line(-1,-1){2}}
+\put(3,7){\line(1,-1){2}}
+
+\put(11,6.8){\makebox(0,0)[t]{\negro{$\delta$}}}
+\put(11,7){\circle*{.2}}
+
+\put(1,4.8){\makebox(0,0)[t]{\negro{$\alpha$}}}
+\put(1,5){\circle*{.2}}
+
+\put(5,5.2){\makebox(0,0)[b]{\rubro{$q$}}}
+\put(5,5){\circle*{.2}}
+\put(5,5){\line(-1,-1){2}}
+\put(5,5){\line(1,-1){2}}
+
+\put(3,2.8){\makebox(0,0)[t]{\negro{$\beta$}}}
+\put(3,3){\circle*{.2}}
+
+\put(7,2.8){\makebox(0,0)[t]{\negro{$\gamma$}}}
+\put(7,3){\circle*{.2}}
+
+\end{picture}
+& & 
+\setlength{\unitlength}{0.35cm}
+\begin{picture}(14,9)(0,0)
+
+\put(7,8.2){\makebox(0,0)[b]{\negro{$q$}}}
+\put(7,8){\circle*{.2}}
+\put(7,8){\line(-4,-1){4}}
+\put(7,8){\line(4,-1){4}}
+
+\put(3,7.2){\makebox(0,0)[b]{\rubro{$v$}}}
+\put(3,7){\circle*{.2}}
+\put(3,7){\line(-1,-1){2}}
+\put(3,7){\line(1,-1){2}}
+
+\put(11,7.2){\makebox(0,0)[b]{\rubro{$w$}}}
+\put(11,7){\circle*{.2}}
+\put(11,7){\line(-1,-1){2}}
+\put(11,7){\line(1,-1){2}}
+
+\put(1,4.8){\makebox(0,0)[t]{\negro{$\alpha$}}}
+\put(1,5){\circle*{.2}}
+
+\put(5,4.8){\makebox(0,0)[t]{\negro{$\beta$}}}
+\put(5,5){\circle*{.2}}
+
+\put(9,4.8){\makebox(0,0)[t]{\negro{$\gamma$}}}
+\put(9,5){\circle*{.2}}
+
+\put(13,4.8){\makebox(0,0)[t]{\negro{$\delta$}}}
+\put(13,5){\circle*{.2}}
+
+\end{picture}
+\end{tabular}
+\end{center}
+
+rotação dupla a direita + inversão cores de $q$ e $w$
+
+\only<2>{O resultado é uma árvore rubro-negra? Justifique.}
+\end{frame}
+
+\begin{frame}
+\frametitle{A operação de remoção}
+
+\begin{enumerate}
+
+\item remoção em árvore binária de busca
+
+\item \alert{se necessário}, re-balanceamento
+
+\item o nó removido tem pelo menos uma sub-árvore vazia
+
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Análise da remoção}
+
+O que fazer quando o nó a remover ter a cor
+\begin{description}
+\item[rubro] ? \only<2->{Nada, pois nenhuma propriedade pode ser quebrada.}
+
+\only<3>{Exercício: remover os nós com valores 15 e 50 na árvore seguinte:}
+
+\begin{center}
+\setlength{\unitlength}{0.4cm}
+\begin{picture}(13,12.5)(0,0)
+
+\put(6,11.2){\makebox(0,0)[b]{\negro{47}}}
+\put(6,11){\circle*{.2}}
+\put(6,11){\line(-4,-1){4}}
+\put(6,11){\line(4,-1){4}}
+
+\put(2,10.2){\makebox(0,0)[b]{\negro{32}}}
+\put(2,10){\circle*{.2}}
+\put(2,10){\line(-1,-1){2}}
+\put(2,10){\line(1,-1){2}}
+
+\put(10,10.2){\makebox(0,0)[b]{\rubro{68}}}
+\put(10,10){\circle*{.2}}
+\put(10,10){\line(-1,-1){2}}
+\put(10,10){\line(1,-1){2}}
+
+\put(0,8.2){\makebox(0,0)[b]{\negro{5}}}
+\put(0,8){\circle*{.2}}
+\put(0,8){\line(1,-4){1}}
+
+\put(4,8.2){\makebox(0,0)[b]{\negro{40}}}
+\put(4,8){\circle*{.2}}
+
+\put(8,8.2){\makebox(0,0)[b]{\negro{60}}}
+\put(8,8){\circle*{.2}}
+\put(8,8){\line(-1,-4){1}}
+\put(8,8){\line(1,-4){1}}
+
+\put(12,8.2){\makebox(0,0)[b]{\negro{88}}}
+\put(12,8){\circle*{.2}}
+\put(12,8){\line(1,-4){1}}
+\put(12,8){\line(-1,-4){1}}
+
+\put(1,4.2){\makebox(0,0)[b]{\rubro{15}}}
+\put(1,4){\circle*{.2}}
+
+\put(7,4.2){\makebox(0,0)[b]{\negro{54}}}
+\put(7,4){\circle*{.2}}
+\put(7,4){\line(-1,-4){1}}
+
+\put(9,4.2){\makebox(0,0)[b]{\negro{61}}}
+\put(9,4){\circle*{.2}}
+
+\put(11,4.2){\makebox(0,0)[b]{\negro{75}}}
+\put(11,4){\circle*{.2}}
+
+\put(13,4.2){\makebox(0,0)[b]{\negro{90}}}
+\put(13,4){\circle*{.2}}
+
+\put(6,0.2){\makebox(0,0)[b]{\rubro{50}}}
+\put(6,0){\circle*{.2}}
+\end{picture}
+\end{center}
+
+\item[negro] ? \only<4>{\alert{Rebalancear}}
+\end{description}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Remoção de um nó negro}
+
+Seja $y$ o nó a remover.
+\begin{itemize}
+\item todos os caminhos da raiz até uma folha passando por $y$ tem um nó negro a
+  menos
+\item seja $x$ a sub-árvore após a remoção de $y$ 
+  \begin{itemize}
+    \item $x$ é a sub-árvore vazia, ou
+    \item $x$ era a sub-árvore não vazia de $y$
+  \end{itemize}
+\item solução: incrementar a altura negra de $x$.
+  \begin{itemize}
+  \item se a raiz de $x$ era de cor rubro, passa a ser de cor negro
+  \item se a raiz de $x$ era de cor negra, a cor é duplamente negro
+  \end{itemize}
+\item se $x$ é a raiz da árvore (global): atribuir negro à cor de $x$
+\item se $x$ não é a raiz da árvore:
+  \begin{itemize}
+  \item seja $v : \attrib{x}{up}$, o ascendente direto de $x$
+  \item seja $w$ a outra sub-árvore de $v$
+
+    $w$ não pode ser a árvore vazia \pause explique o motivo.
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Os diferentes casos}
+\framesubtitle{$x \neq \id{root}, \attrib{x}{col} \isequal \const{Black}, \attrib{x}{up} \isequal v, \attrib{w}{up} \isequal v, w \neq x$}
+
+\begin{enumerate}
+\item $\attrib{w}{col} \isequal \const{Red}$
+\item $\attrib{w}{col} \isequal \const{Black}$, as sub-árvores de $w$ são de cor negro.
+\item $\attrib{w}{col} \isequal \const{Black}$, 
+$\attrib{\attrib{w}{left}}{col} \isequal \const{Red}$, 
+$\attrib{\attrib{w}{right}}{col} \isequal \const{Black}$.
+\item $\attrib{w}{col} \isequal \const{Black}$, 
+$\attrib{\attrib{w}{right}}{col} \isequal \const{Red}$.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Caso 1}
+\framesubtitle{$x \neq \id{root}, \attrib{x}{col} \isequal \const{Black}, \attrib{x}{up} \isequal v, \attrib{w}{up} \isequal v, w \neq x, \attrib{w}{col} \isequal \const{Red}$}
+
+\begin{center}
+\begin{tabular}[t]{ccc}
+(Antes) & & (Depois) \\
+\setlength{\unitlength}{0.35cm}
+\begin{picture}(14,6)(0,0)
+
+\put(7,5.2){\makebox(0,0)[b]{\negro{$v$}}}
+\put(7,5){\circle*{.2}}
+\put(7,5){\line(-4,-1){4}}
+\put(7,5){\line(4,-1){4}}
+
+\put(3,4.2){\makebox(0,0)[b]{\negro{$x$}$\bullet$}}
+\put(3,4){\circle*{.2}}
+\put(3,4){\line(-1,-1){2}}
+\put(3,4){\line(1,-1){2}}
+
+\put(11,4.2){\makebox(0,0)[b]{\rubro{$w$}}}
+\put(11,4){\circle*{.2}}
+\put(11,4){\line(-1,-1){2}}
+\put(11,4){\line(1,-1){2}}
+
+\put(1,1.8){\makebox(0,0)[b]{$\alpha$}}
+\put(1,2){\circle*{.2}}
+
+\put(5,1.8){\makebox(0,0)[t]{$\beta$}}
+\put(5,2){\circle*{.2}}
+
+\put(9,0.8){\makebox(0,0)[b]{\negro{$\gamma$}}}
+\put(9,2){\circle*{.2}}
+
+\put(13,0.8){\makebox(0,0)[b]{\negro{$\delta$}}}
+\put(13,2){\circle*{.2}}
+
+\end{picture}
+& & 
+\setlength{\unitlength}{0.35cm}
+\begin{picture}(14,7)(0,0)
+\put(7,6.2){\makebox(0,0)[b]{\negro{$w$}}}
+\put(7,6){\circle*{.2}}
+\put(7,6){\line(-4,-1){4}}
+\put(7,6){\line(4,-1){4}}
+
+\put(3,5.2){\makebox(0,0)[b]{\rubro{$v$}}}
+\put(3,5){\circle*{.2}}
+\put(3,5){\line(-1,-1){2}}
+\put(3,5){\line(1,-1){2}}
+
+\put(11,4.2){\makebox(0,0)[b]{\negro{$\delta$}}}
+\put(11,5){\circle*{.2}}
+
+\put(1,2.8){\makebox(0,0)[b]{\negro{$x$}$\bullet$}}
+\put(1,3){\circle*{.2}}
+\put(1,3){\line(-1,-4){.5}}
+\put(1,3){\line(1,-4){.5}}
+
+\put(0.5,0.8){\makebox(0,0)[t]{$\alpha$}}
+\put(0.5,1){\circle*{.2}}
+
+\put(1.5,0.8){\makebox(0,0)[t]{$\beta$}}
+\put(1.5,1){\circle*{.2}}
+
+\put(5,1.8){\makebox(0,0)[b]{\negro{$\gamma$}}}
+\put(5,3){\circle*{.2}}
+
+\end{picture}
+\end{tabular}
+\end{center}
+
+O nó irmão de $x$ tem a cor negra: caso 2, 3 ou 4.
+\end{frame}
+
+\begin{frame}
+\frametitle{Caso 2}
+\framesubtitle{$x \neq \id{root}, \attrib{x}{col} \isequal \const{Black}, \attrib{x}{up} \isequal v, \attrib{w}{up} \isequal v, w \neq x, \attrib{w}{col} \isequal \const{Black}, \attrib{\attrib{w}{left}}{col} \isequal \const{Black}, \attrib{\attrib{w}{right}}{col} \isequal \const{Black}$}
+
+\begin{center}
+\begin{tabular}{ccc}
+(Antes) & & (Depois) \\
+\setlength{\unitlength}{0.35cm}
+\begin{picture}(14,6)(0,0)
+
+\put(7,5.2){\makebox(0,0)[b]{$v_c$}}
+\put(7,5){\circle*{.2}}
+\put(7,5){\line(-4,-1){4}}
+\put(7,5){\line(4,-1){4}}
+
+\put(3,4.2){\makebox(0,0)[b]{\negro{$x$}$\bullet$}}
+\put(3,4){\circle*{.2}}
+\put(3,4){\line(-1,-1){2}}
+\put(3,4){\line(1,-1){2}}
+
+\put(11,4.2){\makebox(0,0)[b]{\negro{$w$}}}
+\put(11,4){\circle*{.2}}
+\put(11,4){\line(-1,-1){2}}
+\put(11,4){\line(1,-1){2}}
+
+\put(1,1.8){\makebox(0,0)[b]{$\alpha$}}
+\put(1,2){\circle*{.2}}
+
+\put(5,1.8){\makebox(0,0)[t]{$\beta$}}
+\put(5,2){\circle*{.2}}
+
+\put(9,0.8){\makebox(0,0)[b]{\negro{$\gamma$}}}
+\put(9,2){\circle*{.2}}
+
+\put(13,0.8){\makebox(0,0)[b]{\negro{$\delta$}}}
+\put(13,2){\circle*{.2}}
+
+\end{picture}
+& & 
+\setlength{\unitlength}{0.35cm}
+\begin{picture}(14,6)(0,0)
+
+\put(7,5.2){\makebox(0,0)[b]{$v_c \bullet$}}
+\put(7,5){\circle*{.2}}
+\put(7,5){\line(-4,-1){4}}
+\put(7,5){\line(4,-1){4}}
+
+\put(3,4.2){\makebox(0,0)[b]{\negro{$x$}}}
+\put(3,4){\circle*{.2}}
+\put(3,4){\line(-1,-1){2}}
+\put(3,4){\line(1,-1){2}}
+
+\put(11,4.2){\makebox(0,0)[b]{\rubro{$w$}}}
+\put(11,4){\circle*{.2}}
+\put(11,4){\line(-1,-1){2}}
+\put(11,4){\line(1,-1){2}}
+
+\put(1,1.8){\makebox(0,0)[b]{$\alpha$}}
+\put(1,2){\circle*{.2}}
+
+\put(5,1.8){\makebox(0,0)[t]{$\beta$}}
+\put(5,2){\circle*{.2}}
+
+\put(9,0.8){\makebox(0,0)[b]{\negro{$\gamma$}}}
+\put(9,2){\circle*{.2}}
+
+\put(13,0.8){\makebox(0,0)[b]{\negro{$\delta$}}}
+\put(13,2){\circle*{.2}}
+
+\end{picture}
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Caso 3}
+\framesubtitle{$x \neq \id{root}, \attrib{x}{col} \isequal \const{Black}, \attrib{x}{up} \isequal v, \attrib{w}{up} \isequal v, w \neq x, \attrib{w}{col} \isequal \const{Black}, \attrib{\attrib{w}{left}}{col} \isequal \const{Red}, \attrib{\attrib{w}{right}}{col} \isequal \const{Black}$}
+
+\begin{center}
+\begin{tabular}{ccc}
+(Antes) & & (Depois) \\
+\\
+\setlength{\unitlength}{0.35cm}
+\begin{picture}(14,11)(0,0)
+
+\put(7,10.2){\makebox(0,0)[b]{$v_c$}}
+\put(7,10){\circle*{.2}}
+\put(7,10){\line(-4,-1){4}}
+\put(7,10){\line(4,-1){4}}
+
+\put(3,9.2){\makebox(0,0)[b]{\negro{$x$}$\bullet$}}
+\put(3,9){\circle*{.2}}
+\put(3,9){\line(-1,-1){2}}
+\put(3,9){\line(1,-1){2}}
+
+\put(11,9.2){\makebox(0,0)[b]{\negro{$w$}}}
+\put(11,9){\circle*{.2}}
+\put(11,9){\line(-1,-1){2}}
+\put(11,9){\line(1,-1){2}}
+
+\put(1,6.8){\makebox(0,0)[b]{$\alpha$}}
+\put(1,7){\circle*{.2}}
+
+\put(5,6.8){\makebox(0,0)[t]{$\beta$}}
+\put(5,7){\circle*{.2}}
+
+\put(9,7.2){\makebox(0,0)[b]{\rubro{$z$}}}
+\put(9,7){\circle*{.2}}
+\put(9,7){\line(1,-4){1}}
+\put(9,7){\line(-1,-4){1}}
+
+\put(13,5.8){\makebox(0,0)[b]{\negro{$\eta$}}}
+\put(13,7){\circle*{.2}}
+
+\put(8,2.8){\makebox(0,0)[t]{\negro{$\gamma$}}}
+\put(8,3){\circle*{.2}}
+
+\put(10,2.8){\makebox(0,0)[t]{\negro{$\delta$}}}
+\put(10,3){\circle*{.2}}
+
+\end{picture}
+& & 
+\setlength{\unitlength}{0.35cm}
+\begin{picture}(14,11)(0,0)
+
+\put(7,10.2){\makebox(0,0)[b]{$v_c$}}
+\put(7,10){\circle*{.2}}
+\put(7,10){\line(-4,-1){4}}
+\put(7,10){\line(4,-1){4}}
+
+\put(3,9.2){\makebox(0,0)[b]{\negro{$x$}$\bullet$}}
+\put(3,9){\circle*{.2}}
+\put(3,9){\line(-1,-1){2}}
+\put(3,9){\line(1,-1){2}}
+
+\put(11,9.2){\makebox(0,0)[b]{\negro{$w$}}}
+\put(11,9){\circle*{.2}}
+\put(11,9){\line(-1,-1){2}}
+\put(11,9){\line(1,-1){2}}
+
+\put(1,6.8){\makebox(0,0)[b]{$\alpha$}}
+\put(1,7){\circle*{.2}}
+
+\put(5,6.8){\makebox(0,0)[t]{$\beta$}}
+\put(5,7){\circle*{.2}}
+
+\put(9,6.8){\makebox(0,0)[b]{\negro{$\gamma$}}}
+
+\put(13,7.2){\makebox(0,0)[b]{\rubro{$z$}}}
+\put(13,7){\circle*{.2}}
+\put(13,7){\line(1,-4){1}}
+\put(13,7){\line(-1,-4){1}}
+
+\put(12,2.8){\makebox(0,0)[t]{\negro{$\delta$}}}
+\put(12,3){\circle*{.2}}
+
+\put(14,2.8){\makebox(0,0)[t]{\negro{$\eta$}}}
+\put(14,3){\circle*{.2}}
+
+\end{picture}
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Caso 4}
+\framesubtitle{$x \neq \id{root}, \attrib{x}{col} \isequal \const{Black}, \attrib{x}{up} \isequal v, \attrib{w}{up} \isequal v, w \neq x, \attrib{w}{col} \isequal \const{Black}, \attrib{\attrib{w}{right}}{col} \isequal \const{Red}$}.
+
+\begin{center}
+\begin{tabular}{ccc}
+(Antes) & & (Depois) \\
+\\
+\setlength{\unitlength}{0.35cm}
+\begin{picture}(14,9)(0,0)
+
+\put(7,8.2){\makebox(0,0)[b]{$v_c$}}
+\put(7,8){\circle*{.2}}
+\put(7,8){\line(-4,-1){4}}
+\put(7,8){\line(4,-1){4}}
+
+\put(3,7.2){\makebox(0,0)[b]{\negro{$x$}$\bullet$}}
+\put(3,7){\circle*{.2}}
+\put(3,7){\line(-1,-1){2}}
+\put(3,7){\line(1,-1){2}}
+
+\put(11,7.2){\makebox(0,0)[b]{\negro{$w$}}}
+\put(11,7){\circle*{.2}}
+\put(11,7){\line(-1,-1){2}}
+\put(11,7){\line(1,-1){2}}
+
+\put(1,4.8){\makebox(0,0)[b]{$\alpha$}}
+\put(1,5){\circle*{.2}}
+
+\put(5,4.8){\makebox(0,0)[t]{$\beta$}}
+\put(5,5){\circle*{.2}}
+
+\put(9,4.8){\makebox(0,0)[t]{$\gamma$}}
+\put(9,5){\circle*{.2}}
+
+\put(13,5.2){\makebox(0,0)[b]{\rubro{$z$}}}
+\put(13,5){\circle*{.2}}
+\put(13,5){\line(1,-4){1}}
+\put(13,5){\line(-1,-4){1}}
+
+\put(12,0.8){\makebox(0,0)[t]{\negro{$\delta$}}}
+\put(12,1){\circle*{.2}}
+
+\put(14,0.8){\makebox(0,0)[t]{\negro{$\eta$}}}
+\put(14,1){\circle*{.2}}
+
+\end{picture}
+& & 
+\setlength{\unitlength}{0.35cm}
+\begin{picture}(14,9)(0,0)
+
+\put(7,8.2){\makebox(0,0)[b]{$w_c$}}
+\put(7,8){\circle*{.2}}
+\put(7,8){\line(-4,-1){4}}
+\put(7,8){\line(4,-1){4}}
+
+\put(3,7.2){\makebox(0,0)[b]{\negro{$v$}}}
+\put(3,7){\circle*{.2}}
+\put(3,7){\line(-1,-1){2}}
+\put(3,7){\line(1,-1){2}}
+
+\put(11,7.2){\makebox(0,0)[b]{\negro{$z$}}}
+\put(11,7){\circle*{.2}}
+\put(11,7){\line(-1,-1){2}}
+\put(11,7){\line(1,-1){2}}
+
+\put(1,5.2){\makebox(0,0)[b]{\negro{$x$}}}
+\put(1,5){\circle*{.2}}
+\put(1,5){\line(-1,-4){1}}
+\put(1,5){\line(1,-4){1}}
+
+\put(0,0.8){\makebox(0,0)[t]{$\alpha$}}
+\put(0,1){\circle*{.2}}
+
+\put(2,0.8){\makebox(0,0)[t]{$\beta$}}
+\put(2,1){\circle*{.2}}
+
+\put(5,4.8){\makebox(0,0)[t]{$\gamma$}}
+\put(5,5){\circle*{.2}}
+
+\put(9,4.8){\makebox(0,0)[t]{\negro{$\delta$}}}
+\put(9,5){\circle*{.2}}
+
+\put(13,4.8){\makebox(0,0)[t]{\negro{$\eta$}}}
+\put(13,5){\circle*{.2}}
+
+\end{picture}
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Exercícios}
+
+\begin{center}
+\setlength{\unitlength}{0.4cm}
+\begin{picture}(13,12.5)(0,0)
+
+\put(6,11.2){\makebox(0,0)[b]{\negro{47}}}
+\put(6,11){\circle*{.2}}
+\put(6,11){\line(-4,-1){4}}
+\put(6,11){\line(4,-1){4}}
+
+\put(2,10.2){\makebox(0,0)[b]{\negro{32}}}
+\put(2,10){\circle*{.2}}
+\put(2,10){\line(-1,-1){2}}
+\put(2,10){\line(1,-1){2}}
+
+\put(10,10.2){\makebox(0,0)[b]{\rubro{68}}}
+\put(10,10){\circle*{.2}}
+\put(10,10){\line(-1,-1){2}}
+\put(10,10){\line(1,-1){2}}
+
+\put(0,8.2){\makebox(0,0)[b]{\negro{5}}}
+\put(0,8){\circle*{.2}}
+\put(0,8){\line(1,-4){1}}
+
+\put(4,8.2){\makebox(0,0)[b]{\negro{40}}}
+\put(4,8){\circle*{.2}}
+
+\put(8,8.2){\makebox(0,0)[b]{\negro{60}}}
+\put(8,8){\circle*{.2}}
+\put(8,8){\line(-1,-4){1}}
+\put(8,8){\line(1,-4){1}}
+
+\put(12,8.2){\makebox(0,0)[b]{\negro{88}}}
+\put(12,8){\circle*{.2}}
+\put(12,8){\line(1,-4){1}}
+\put(12,8){\line(-1,-4){1}}
+
+\put(1,4.2){\makebox(0,0)[b]{\rubro{15}}}
+\put(1,4){\circle*{.2}}
+
+\put(7,4.2){\makebox(0,0)[b]{\negro{54}}}
+\put(7,4){\circle*{.2}}
+\put(7,4){\line(-1,-4){1}}
+
+\put(9,4.2){\makebox(0,0)[b]{\negro{61}}}
+\put(9,4){\circle*{.2}}
+
+\put(11,4.2){\makebox(0,0)[b]{\negro{75}}}
+\put(11,4){\circle*{.2}}
+
+\put(13,4.2){\makebox(0,0)[b]{\negro{90}}}
+\put(13,4){\circle*{.2}}
+
+\put(6,0.2){\makebox(0,0)[b]{\rubro{50}}}
+\put(6,0){\circle*{.2}}
+\end{picture}
+\end{center}
+
+\begin{enumerate}
+\item Repetidamente remove o valor na raiz até a árvore se tornar vazia
+\item Repetidamente remove o menor valor até a árvore se tornar vazia
+\item Repetidamente remove o maior valor até a árvore se tornar vazia
+\end{enumerate}
+
+\end{frame}
+
+\end{document}
+
