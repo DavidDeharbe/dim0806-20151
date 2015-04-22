@@ -99,8 +99,8 @@
   
   \begin{itemize}
     
-  \item Em 1972, Rudolf Bayer projetou a estrutura de dados árvores B binárias
-    simétricas.
+  \item Em 1972, Rudolf Bayer projetou a estrutura de dados
+    \alert{árvores B binárias simétricas}.
 
   \item Popularizada sob o nome árvores rubro-negras (Guibas \& Sedgewick 1978)
 
@@ -121,7 +121,7 @@
 
     \end{itemize}
 
-  \item bastante usadas na prática (Linux, STL)
+  \item bastante usadas na prática (escalonador Linux, STL)
 
   \end{itemize}
 
@@ -354,7 +354,7 @@ Seja $T$ uma árvore rubro-negra, com $n$ nós, então $\alpha(\attrib{T}{root})
 \begin{proof}
 \begin{itemize}
 \item seja $p = \bh(T)$ (a altura negra de $T$)
-\item há $2^p - 1$ nós negros, logo $n \ge 2^p - 1$
+\item há pelo menos $2^p - 1$ nós negros, logo $n \ge 2^p - 1$
 \item a altura máxima $\alpha_m$ de $T$ é $2p$ (alternando nós rubros e negros)
 \item $\alpha_m \le 2p$ e $n \ge 2^p - 1$, logo $\alpha_m \le 2 \log_2 (n+1)$.
 \item em uma árvore binária $\alpha_m \in \Omega(\log n)$
@@ -425,12 +425,12 @@ Propriedade 2: qual cor escolher para o novo nó?
 
 \begin{itemize}
 
-\item é criado um nó, $1$
+\item é criado um nó, $q$
 
-\item a cor defaut é rubro: $\attrib{q}{col} \gets \const{Red}$
+\item a cor defaut é rubro: $\attrib{q}{color} \gets \const{Red}$
 
 \item após a inserção, a raiz é atribuída a cor negro
-$\attrib{root}{col} \gets \const{Black}$
+$\attrib{root}{color} \gets \const{Black}$
 
 \end{itemize}
 
@@ -459,15 +459,15 @@ Propriedade 5: nó rubro não pode ter descendente direto rubro
 
 \begin{itemize}
 
-\item como $v$ é rubro, tem um nó ascendente, $w$, tal que $\attrib{w}{col} \isequal \const{Black}$
+\item como $v$ é rubro, tem um nó ascendente, $w$, tal que $\attrib{w}{color} \isequal \const{Black}$
 
 \item seja $t$ a outra sub-árvore de $w$
 
 \begin{enumerate}
 
-\item $\attrib{t}{col} \isequal \const{Red}$
+\item $\attrib{t}{color} \isequal \const{Red}$
 
-\item $\attrib{t}{col} \isequal \const{Black}$
+\item $\attrib{t}{color} \isequal \const{Black}$
 
 \end{enumerate}
 
@@ -477,9 +477,26 @@ Propriedade 5: nó rubro não pode ter descendente direto rubro
 
 \begin{frame}
 
-\frametitle{O caso $\attrib{t}{col} \isequal \const{Red}$}
+\begin{codebox}
+\Procname{$\proc{Insert}(T, k)$}
+\li \If $\attrib{T}{root} \isequal \const{Nil}$
+\li \Then $\attrib{T}{root} \gets \proc{Make-Node}(k)$
+\li \Else 
+      $v \gets \const{Nil}$
+\li   $w \gets \const{Nil}$
+\li   $\proc{Insert-Aux}(\attrib{T}{root}, v, w, k)$
+    \End
+\li $\attrib{\attrib{T}{root}}{color} \gets \const{Black}$
+\end{codebox}
 
-$\attrib{t}{col} \isequal \const{Red}$
+\end{frame}
+
+
+\begin{frame}
+
+\frametitle{O caso $\attrib{t}{color} \isequal \const{Red}$}
+
+$\attrib{t}{color} \isequal \const{Red}$
 
 \begin{itemize}
 
@@ -578,9 +595,9 @@ $\attrib{t}{col} \isequal \const{Red}$
 
 \begin{frame}
 
-\frametitle{O caso $\attrib{t}{col} \isequal \const{Red}$}
+\frametitle{O caso $\attrib{t}{color} \isequal \const{Red}$}
 
-$\attrib{t}{col} \isequal \const{Red}$
+$\attrib{t}{color} \isequal \const{Red}$
 
 \begin{center}
 \begin{tabular}{ccc}
@@ -677,9 +694,9 @@ $\attrib{t}{col} \isequal \const{Red}$
 
 \begin{frame}
 
-\frametitle{O caso $\attrib{t}{col} \isequal \const{Black}$}
+\frametitle{O caso $\attrib{t}{color} \isequal \const{Black}$}
 
-$\attrib{t}{col} \isequal \const{Black}$
+$\attrib{t}{color} \isequal \const{Black}$
 
 \begin{enumerate}
 \item $\attrib{w}{left} \isequal v$ e $\attrib{v}{left} \isequal q$
@@ -692,9 +709,9 @@ $\attrib{t}{col} \isequal \const{Black}$
 
 \begin{frame}
 
-\frametitle{O caso $\attrib{t}{col} \isequal \const{Black}$ e $\attrib{w}{left} \isequal v$ e $\attrib{v}{left} \isequal q$}
+\frametitle{O caso $\attrib{t}{color} \isequal \const{Black}$ e $\attrib{w}{left} \isequal v$ e $\attrib{v}{left} \isequal q$}
 
-$\attrib{t}{col} \isequal \const{Black}$ e $\attrib{w}{left} \isequal v$ e $\attrib{v}{left} \isequal q$
+$\attrib{t}{color} \isequal \const{Black}$ e $\attrib{w}{left} \isequal v$ e $\attrib{v}{left} \isequal q$
 
 \begin{center}
 \begin{tabular}{ccc}
@@ -772,9 +789,9 @@ rotação simples a direita + inversão cores de $v$ e $w$
 
 \begin{frame}
 
-\frametitle{O caso $\attrib{t}{col} \isequal \const{Black}$ e $\attrib{w}{left} \isequal v$ e $\attrib{v}{right} \isequal q$}
+\frametitle{O caso $\attrib{t}{color} \isequal \const{Black}$ e $\attrib{w}{left} \isequal v$ e $\attrib{v}{right} \isequal q$}
 
-$\attrib{t}{col} \isequal \const{Black}$ e $\attrib{w}{left} \isequal v$ e $\attrib{v}{right} \isequal q$
+$\attrib{t}{color} \isequal \const{Black}$ e $\attrib{w}{left} \isequal v$ e $\attrib{v}{right} \isequal q$
 
 \begin{center}
 \begin{tabular}{ccc}
@@ -852,6 +869,62 @@ rotação dupla a direita + inversão cores de $q$ e $w$
 \end{frame}
 
 \begin{frame}
+\frametitle{Algoritmo de inserção}
+\begin{codebox}
+\Procname{$\proc{Insert-Aux}(k, q, v, w)$}
+\li \If $q \isequal \const{Nil}$
+\li \Then 
+      $q \gets \proc{Make-Node}(k)$
+\li \ElseIf $k < \attrib{q}{key}$
+\li \Then
+      $\proc{Insert-Aux}(l, \attrib{q}{left}, q, v)$
+\li   \If $\attrib{q}{color} \isequal \const{Red}$ and $\attrib{\attrib{q}{left}}{color} \isequal \const{Red}$
+\li   \Then
+        $\proc{Balance}(\attrib{q}{left}, q, v)$
+      \End
+\li \ElseIf $k > \attrib{q}{key}$
+\li \Then
+      $\cdots$
+    \End    
+\end{codebox}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Algoritmo de inserção}
+\begin{small}
+\begin{codebox}
+\Procname{$\proc{Balance}(q, v, w)$}
+\li \If $v \isequal \attrib{w}{esq}$
+\li \Then 
+      $t \gets \attrib{w}{right}$
+\li \Else
+      $t \gets \attrib{w}{left}$
+    \End
+\li \If $\attrib{t}{color} \isequal \const{Red}$
+\li \Then
+      $\attrib{t}{color} \gets \attrib{v}{color} \gets \const{Black}$
+\li   $\attrib{w}{color} \gets \const{Red}$
+\li \Else
+      \If $q \isequal \attrib{v}{left}$ and $v \isequal \attrib{w}{left}$
+\li   \Then
+        $\attrib{v}{color} \gets \const{Black}$, $\attrib{w}{color} \gets \const{Red}$
+\li     $\proc{Rotate-Simple-Right}(w)$
+\li   \ElseIf $q \isequal \attrib{v}{right}$ and $v \isequal \attrib{w}{left}$
+\li     \Then
+          $\attrib{q}{color} \gets \const{Black}$, $\attrib{w}{color} \gets \const{Red}$
+\li     $\proc{Rotate-Double-Right}(w)$
+\li   \ElseIf $q \isequal \attrib{v}{right}$ and $v \isequal \attrib{w}{right}$
+\li     $\cdots$
+\li   \ElseNoIf
+\li     $\cdots$
+      \End
+    \End
+\end{codebox}
+\end{small}
+\end{frame}
+
+\begin{frame}
 \frametitle{A operação de remoção}
 
 \begin{enumerate}
@@ -870,7 +943,7 @@ rotação dupla a direita + inversão cores de $q$ e $w$
 
 \frametitle{Análise da remoção}
 
-O que fazer quando o nó a remover ter a cor
+O que fazer quando o nó a remover tem a cor
 \begin{description}
 \item[rubro] ? \only<2->{Nada, pois nenhuma propriedade pode ser quebrada.}
 
@@ -947,7 +1020,7 @@ Seja $y$ o nó a remover.
   menos
 \item seja $x$ a sub-árvore após a remoção de $y$ 
   \begin{itemize}
-    \item $x$ é a sub-árvore vazia, ou
+    \item $x$ é a sub-árvore vazia ($y$ era uma folha), ou
     \item $x$ era a sub-árvore não vazia de $y$
   \end{itemize}
 \item solução: incrementar a altura negra de $x$.
@@ -968,22 +1041,22 @@ Seja $y$ o nó a remover.
 
 \begin{frame}
 \frametitle{Os diferentes casos}
-\framesubtitle{$x \neq \id{root}, \attrib{x}{col} \isequal \const{Black}, \attrib{x}{up} \isequal v, \attrib{w}{up} \isequal v, w \neq x$}
+\framesubtitle{$x \neq \id{root}, \attrib{x}{color} \isequal \const{Black}, \attrib{x}{up} \isequal v, \attrib{w}{up} \isequal v, w \neq x$}
 
 \begin{enumerate}
-\item $\attrib{w}{col} \isequal \const{Red}$
-\item $\attrib{w}{col} \isequal \const{Black}$, as sub-árvores de $w$ são de cor negro.
-\item $\attrib{w}{col} \isequal \const{Black}$, 
-$\attrib{\attrib{w}{left}}{col} \isequal \const{Red}$, 
-$\attrib{\attrib{w}{right}}{col} \isequal \const{Black}$.
-\item $\attrib{w}{col} \isequal \const{Black}$, 
-$\attrib{\attrib{w}{right}}{col} \isequal \const{Red}$.
+\item $\attrib{w}{color} \isequal \const{Red}$
+\item $\attrib{w}{color} \isequal \const{Black}$, as sub-árvores de $w$ são de cor negro.
+\item $\attrib{w}{color} \isequal \const{Black}$, 
+$\attrib{\attrib{w}{left}}{color} \isequal \const{Red}$, 
+$\attrib{\attrib{w}{right}}{color} \isequal \const{Black}$.
+\item $\attrib{w}{color} \isequal \const{Black}$, 
+$\attrib{\attrib{w}{right}}{color} \isequal \const{Red}$.
 \end{enumerate}
 \end{frame}
 
 \begin{frame}
 \frametitle{Caso 1}
-\framesubtitle{$x \neq \id{root}, \attrib{x}{col} \isequal \const{Black}, \attrib{x}{up} \isequal v, \attrib{w}{up} \isequal v, w \neq x, \attrib{w}{col} \isequal \const{Red}$}
+\framesubtitle{$x \neq \id{root}, \attrib{x}{color} \isequal \const{Black}, \attrib{x}{up} \isequal v, \attrib{w}{up} \isequal v, w \neq x, \attrib{w}{color} \isequal \const{Red}$}
 
 \begin{center}
 \begin{tabular}[t]{ccc}
@@ -1058,7 +1131,7 @@ O nó irmão de $x$ tem a cor negra: caso 2, 3 ou 4.
 
 \begin{frame}
 \frametitle{Caso 2}
-\framesubtitle{$x \neq \id{root}, \attrib{x}{col} \isequal \const{Black}, \attrib{x}{up} \isequal v, \attrib{w}{up} \isequal v, w \neq x, \attrib{w}{col} \isequal \const{Black}, \attrib{\attrib{w}{left}}{col} \isequal \const{Black}, \attrib{\attrib{w}{right}}{col} \isequal \const{Black}$}
+\framesubtitle{$x \neq \id{root}, \attrib{x}{color} \isequal \const{Black}, \attrib{x}{up} \isequal v, \attrib{w}{up} \isequal v, w \neq x, \attrib{w}{color} \isequal \const{Black}, \attrib{\attrib{w}{left}}{color} \isequal \const{Black}, \attrib{\attrib{w}{right}}{color} \isequal \const{Black}$}
 
 \begin{center}
 \begin{tabular}{ccc}
@@ -1133,7 +1206,7 @@ O nó irmão de $x$ tem a cor negra: caso 2, 3 ou 4.
 
 \begin{frame}
 \frametitle{Caso 3}
-\framesubtitle{$x \neq \id{root}, \attrib{x}{col} \isequal \const{Black}, \attrib{x}{up} \isequal v, \attrib{w}{up} \isequal v, w \neq x, \attrib{w}{col} \isequal \const{Black}, \attrib{\attrib{w}{left}}{col} \isequal \const{Red}, \attrib{\attrib{w}{right}}{col} \isequal \const{Black}$}
+\framesubtitle{$x \neq \id{root}, \attrib{x}{color} \isequal \const{Black}, \attrib{x}{up} \isequal v, \attrib{w}{up} \isequal v, w \neq x, \attrib{w}{color} \isequal \const{Black}, \attrib{\attrib{w}{left}}{color} \isequal \const{Red}, \attrib{\attrib{w}{right}}{color} \isequal \const{Black}$}
 
 \begin{center}
 \begin{tabular}{ccc}
@@ -1224,7 +1297,7 @@ O nó irmão de $x$ tem a cor negra: caso 2, 3 ou 4.
 
 \begin{frame}
 \frametitle{Caso 4}
-\framesubtitle{$x \neq \id{root}, \attrib{x}{col} \isequal \const{Black}, \attrib{x}{up} \isequal v, \attrib{w}{up} \isequal v, w \neq x, \attrib{w}{col} \isequal \const{Black}, \attrib{\attrib{w}{right}}{col} \isequal \const{Red}$}.
+\framesubtitle{$x \neq \id{root}, \attrib{x}{color} \isequal \const{Black}, \attrib{x}{up} \isequal v, \attrib{w}{up} \isequal v, w \neq x, \attrib{w}{color} \isequal \const{Black}, \attrib{\attrib{w}{right}}{color} \isequal \const{Red}$}.
 
 \begin{center}
 \begin{tabular}{ccc}
@@ -1378,6 +1451,8 @@ O nó irmão de $x$ tem a cor negra: caso 2, 3 ou 4.
 \item Repetidamente remove o valor na raiz até a árvore se tornar vazia
 \item Repetidamente remove o menor valor até a árvore se tornar vazia
 \item Repetidamente remove o maior valor até a árvore se tornar vazia
+\pause
+\item Escrever o algoritmo de remoção
 \end{enumerate}
 
 \end{frame}
