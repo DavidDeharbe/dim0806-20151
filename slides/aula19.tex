@@ -99,17 +99,20 @@
 \framesubtitle{Especificação}
 
   \begin{enumerate}
-  \item raiz $r$, tal que:
+  \item raiz $r$:
   \item atributos do nó $x$:
     \begin{enumerate}
     \item $\attrib{x}{n}$: número de chaves de $x$;
     \item $\attrib{x}{keys}$: vetor ordenado das chaves
       $$\forall i | 1 \leq i < \attrib{x}{n} \cdot \attrib{x}{keys}[i] < \attrib{x}{keys}[i+1];$$
+    \item $\attrib{x}{regs}$: vetor de registros 
+      $$\attrib{\attrib{x}{regs}}{len} = \attrib{\attrib{x}{keys}}{len} \land
+      \forall i \mid 1 \le i \le \attrib{x}{n} \cdot \attrib{\attrib{x}{regs}[i]}{key} = \attrib{x}{keys}[i]$$
     \item $\attrib{x}{leaf}$: booleano indicando se $x$ é uma folha;
     \item se $\neg \attrib{x}{leaf}$: $\attrib{x}{sub}$ vetor de sub-árvores;
     \end{enumerate}
   \item $\attrib{x}{leaf} \lor \id{len}(\attrib{x}{sub}) = 1 + \attrib{x}{n}$
-  \item $k_i \in \id{keys}(\attrib{x}{sub}[i]) \land k_{i+1} \in \id{keys}(\attrib{x}{sub}[i+1]) \Rightarrow k_i < k_{i+1}$;
+  \item $k_i \in \id{keys}(\attrib{x}{sub}[i]) \land k_{i+1} \in \id{keys}(\attrib{x}{sub}[i+1]) \Rightarrow k_i < \attrib{x}{keys}[i] < k_{i+1}$;
   \item $\forall x \cdot \attrib{x}{leaf} \Rightarrow \id{level}(x) = \alpha(r)$;
   \item $g > 1$: grau de ramificação \emph{mínimo} da árvore:
     \begin{enumerate}
@@ -117,14 +120,13 @@
     \item $1 \le \attrib{r}{n} \le 2g - 1$,
     \end{enumerate}
   \end{enumerate}
-  $g = 2$: árvore 2-3-4.
 
 \end{frame}
 
 \begin{frame}
 
 \frametitle{Ilustração}
-
+\framesubtitle{$g = 3$}
 \begin{center}
 \hspace*{-1cm}
 \setlength{\unitlength}{.8cm}
@@ -172,7 +174,8 @@
       3 & $(1 + 342 + 342^2) \times 341$ & $= 40.001.674$
     \end{tabular}
 \end{itemize}
-
+\pause
+$g = 2$: árvore 2-3-4.
 \end{frame}
 
 \begin{frame}
@@ -249,7 +252,7 @@ Escrita/leitura de nós
 \li \While $i < \attrib{x}{n}$ and $\attrib{x}{keys}[i] < k$
 \li \Do $i \gets i + 1$
     \End
-\li \If $i \isequal \attrib{x}{n}$ and $\attrib{x}{keys}[i] \isequal k$
+\li \If $i \le \attrib{x}{n}$ and $\attrib{x}{keys}[i] \isequal k$
 \li \Then \Return $\attrib{x}{refs}[i]$
     \End
 \li \If $\attrib{x}{leaf}$
@@ -265,6 +268,19 @@ Escrita/leitura de nós
 \item total: $O(a) = O(\log_{g} n)$ acessos disco, e $O(ag) = O(g\log_g n)$ 
 operações processador.
 \end{itemize}
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Inserção}
+\framesubtitle{Princípios}
+
+\begin{itemize}
+\item todas as folhas devem ter o mesmo nível antes e \alert{depois} da inserção
+\item na descida recursiva na árvore B, garante-se que há espaço para armazenar o novo registro
+\item se um nó a visitar estiver cheio, ele é \alert{dividido} em dois
+\end{itemize}
+
 \end{frame}
 
 \begin{frame}
@@ -288,19 +304,6 @@ operações processador.
         \item $x$ permanece com $g-1$ chaves
       \end{itemize}
   \end{itemize}
-\end{itemize}
-
-\end{frame}
-
-\begin{frame}
-
-\frametitle{Inserção}
-\framesubtitle{Princípios}
-
-\begin{itemize}
-\item todas as folhas devem ter o mesmo nível antes e \alert{depois} da inserção
-\item na descida recursiva na árvore B, garante-se que há espaço para armazenar o novo registro
-\item se um nó a visitar estiver cheio, ele é \alert{dividido} em dois
 \end{itemize}
 
 \end{frame}
@@ -356,15 +359,14 @@ $g = 3$
 \begin{codebox}
 \Procname{$\proc{Divide-Node}(T, p, i, x)$}
 \li $y \gets \proc{Make-Node}(T)$
-\li $\attrib{y}{n} = \attrib{T}{degree}-1$
-\li \For $j \gets 0$ \To $\attrib{y}{n}$
+\li $\attrib{x}{n} \gets \attrib{y}{n} \gets \attrib{T}{degree}-1$
+\li \For $j \gets 1$ \To $\attrib{y}{n}$
 \li \Do $\attrib{y}{keys}[j] \gets \attrib{x}{keys}[j + \attrib{y}{n}]$
     \End
 \li \If not $\attrib{x}{leaf}$
-\li \Then \For $j \gets 0$ \To $\attrib{y}{n}+1$
+\li \Then \For $j \gets 1$ \To $\attrib{y}{n}+1$
 \li    \Do $\attrib{y}{sub}[j] \gets \attrib{x}{sub}[j + \attrib{y}{n}]$
     \End \End
-\li $\attrib{x}{n} = \attrib{T}{degree}-1$
 \li \For $j \gets \attrib{p}{n}$ \Downto $i$
 \li \Do $\attrib{p}{sub}[j+1] \gets \attrib{p}{sub}[j]$
     \End
@@ -372,7 +374,7 @@ $g = 3$
 \li \For $j \gets \attrib{p}{n}$ \Downto $i-1$
 \li \Do $\attrib{p}{keys}[j+1] \gets \attrib{p}{keys}[j]$
     \End
-\li $\attrib{p}{keys}[i-1] \gets \attrib{x}{keys}[\attrib{y}{n}]$
+\li $\attrib{p}{keys}[i-1] \gets \attrib{x}{keys}[\attrib{x}{n}]$
 \li $\attrib{p}{n} \gets \attrib{p}{n}+1$
 \li $\proc{Write-Node}(T, x)$
 \li $\proc{Write-Node}(T, y)$
@@ -591,13 +593,13 @@ Inserção de F &
 \li \If $\attrib{T}{root} \isequal \const{Nil}$
 \li \Then $y \gets \proc{Make-Node}(T)$
 \li   $\attrib{y}{n} \gets 1$
-\li   $\attrib{y}{leaf} \gets \const{False}$
+\li   $\attrib{y}{leaf} \gets \const{True}$
 \li   $\attrib{y}{keys}[0] \gets \attrib{r}{key}$
 \li   $\attrib{y}{refs}[0] \gets r$
 \li \ElseIf $\attrib{\attrib{T}{root}}{n} \isequal 2 \times \attrib{T}{degree} - 1 $
 \li   \Then $y \gets \proc{Make-Node}(T)$
 \li   $\attrib{y}{n} \gets 1$
-\li   $\attrib{y}{leaf} \gets \const{True}$
+\li   $\attrib{y}{leaf} \gets \const{False}$
 \li   $\attrib{y}{sub}[0] \gets \attrib{T}{root}$
 \li   $\attrib{T}{root} \gets y$
 \li   $\proc{Write-Node}(T, y)$
@@ -1056,8 +1058,8 @@ B é removido &
 \put(5.0, 2.2){\vector(1,-1){1.4}}
 \put(5.5, 2.2){\vector(2,-1){2.8}}
 \put(0.0, 0.0){\framebox(1.2,0.8){~A~~C~}}
-\put(1.4, 0.0){\framebox(1.6,0.8){~E~~J~~K~}}
-\put(3.2, 0.0){\framebox(1.2,0.8){~N~~O~}}
+\put(1.6, 0.0){\framebox(1.2,0.8){~J~~K~}}
+\put(3.1, 0.0){\framebox(1.2,0.8){~N~~O~}}
 \put(4.6, 0.0){\framebox(1.6,0.8){~Q~~R~~S~}}
 \put(6.4, 0.0){\framebox(1.2,0.8){~U~~V~}}
 \put(7.8, 0.0){\framebox(1.2,0.8){~Y~~Z~}}
