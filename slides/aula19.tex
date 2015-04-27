@@ -1,0 +1,1076 @@
+\documentclass{beamer}
+\setbeamertemplate{footline}[frame number]
+%\documentclass{beamer}
+
+\input{preamble}
+
+\title{Aula 17: Árvores B}
+\author{David Déharbe \\
+  Programa de Pós-graduação em Sistemas e Computação \\
+  Universidade Federal do Rio Grande do Norte \\
+  Centro de Ciências Exatas e da Terra \\
+  Departamento de Informática e Matemática Aplicada}
+\date{27 de abril de 2015}
+
+\newcommand{\negro}[1]{\colorbox{black}{\textcolor{white}{\textbf{#1}}}}
+\newcommand{\rubro}[1]{\colorbox{red}{\textcolor{white}{\textbf{#1}}}}
+\newcommand{\bh}[0]{\ensuremath{\id{bh}}}
+
+
+\begin{document}
+\selectlanguage{brazil}
+\begin{frame}
+  \titlepage
+  Download me from \url{http://ufrn.academia.edu/DavidDeharbe}.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Plano da aula}
+
+\begin{center}
+\hspace*{-1cm}
+\setlength{\unitlength}{.8cm}
+\scriptsize
+\begin{picture}(15, 5)(0,0)
+\put(07.0, 3.5){\framebox(0.8,0.8){~50~}}
+\put(07.1, 3.7){\vector(-3,-1){2.7}}
+\put(07.7, 3.7){\vector(3,-1){2.7}}
+\put(03.5, 2.0){\framebox(1.2,0.8){~27~~38~}}
+\put(03.6, 2.2){\vector(-1,-1){1}}
+\put(04.0, 2.2){\vector(0,-1){1}}
+\put(04.5, 2.2){\vector(1,-1){1}}
+\put(10.3, 2.0){\framebox(1.6,0.8){~72~~85~~96~}}
+\put(10.4, 2.2){\vector(-2,-1){2}}
+\put(10.9, 2.2){\vector(-1,-2){.5}}
+\put(11.3, 2.2){\vector(1,-2){.5}}
+\put(11.8, 2.2){\vector(2,-1){2}}
+\put(01.5, 0.5){\framebox(1.2,0.8){~3~~12~}}
+\put(03.5, 0.5){\framebox(1.2,0.8){~30~~34~}}
+\put(05.5, 0.5){\framebox(1.6,0.8){~40~~43~~47~}}
+\put(07.8, 0.5){\framebox(1.2,0.8){~60~~70~}}
+\put(09.8, 0.5){\framebox(1.2,0.8){~77~~83~}}
+\put(11.8, 0.5){\framebox(1.2,0.8){~88~~90~}}
+\put(13.8, 0.5){\framebox(1.2,0.8){~99~~102~}}
+\end{picture}
+\end{center}
+
+  \tableofcontents
+
+\end{frame}
+
+\section{Introdução}
+
+\begin{frame}
+
+  \frametitle{Árvores B}
+  \framesubtitle{Introdução}
+
+  
+  \begin{itemize}
+    
+  \item Em 1971, Rudolf Bayer e Ed McCreight projetaram a estrutura de dados
+    \alert{árvores B binárias simétricas}.
+
+  \item Complexidade
+    \begin{itemize}
+    \item busca em $O(\lg n)$, 
+    \item remoção em $O(\lg n)$ e
+    \item inserção em $O(\lg n)$
+    \end{itemize}
+
+  \item Motivação: hierarquia de memória
+
+  \item Árvores de busca, balanceadas 
+
+    \begin{itemize}
+
+      \item aumentar grau de ramificação
+
+      \item diminuir altura
+
+    \end{itemize}
+
+  \item banco de dados
+
+  \end{itemize}
+
+\end{frame}
+
+\section{Propriedades}
+
+\begin{frame}
+
+\frametitle{Árvores B}
+\framesubtitle{Especificação}
+
+  \begin{enumerate}
+  \item raiz $r$, tal que:
+  \item atributos do nó $x$:
+    \begin{enumerate}
+    \item $\attrib{x}{n}$: número de chaves de $x$;
+    \item $\attrib{x}{keys}$: vetor ordenado das chaves
+      $$\forall i | 1 \leq i < \attrib{x}{n} \cdot \attrib{x}{keys}[i] < \attrib{x}{keys}[i+1];$$
+    \item $\attrib{x}{leaf}$: booleano indicando se $x$ é uma folha;
+    \item se $\neg \attrib{x}{leaf}$: $\attrib{x}{sub}$ vetor de sub-árvores;
+    \end{enumerate}
+  \item $\attrib{x}{leaf} \lor \id{len}(\attrib{x}{sub}) = 1 + \attrib{x}{n}$
+  \item $k_i \in \id{keys}(\attrib{x}{sub}[i]) \land k_{i+1} \in \id{keys}(\attrib{x}{sub}[i+1]) \Rightarrow k_i < k_{i+1}$;
+  \item $\forall x \cdot \attrib{x}{leaf} \Rightarrow \id{level}(x) = \alpha(r)$;
+  \item $g > 1$: grau de ramificação \emph{mínimo} da árvore:
+    \begin{enumerate}
+    \item $x \neq r \Rightarrow g-1 \le \attrib{x}{n} \le 2g - 1$;
+    \item $1 \le \attrib{r}{n} \le 2g - 1$,
+    \end{enumerate}
+  \end{enumerate}
+  $g = 2$: árvore 2-3-4.
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Ilustração}
+
+\begin{center}
+\hspace*{-1cm}
+\setlength{\unitlength}{.8cm}
+\scriptsize
+\begin{picture}(15, 5)(0,0)
+\put(07.0, 3.5){\framebox(0.8,0.8){~50~}}
+\put(07.1, 3.7){\vector(-3,-1){2.7}}
+\put(07.7, 3.7){\vector(3,-1){2.7}}
+\put(03.5, 2.0){\framebox(1.2,0.8){~27~~38~}}
+\put(03.6, 2.2){\vector(-1,-1){1}}
+\put(04.0, 2.2){\vector(0,-1){1}}
+\put(04.5, 2.2){\vector(1,-1){1}}
+\put(10.3, 2.0){\framebox(1.6,0.8){~72~~85~~96~}}
+\put(10.4, 2.2){\vector(-2,-1){2}}
+\put(10.9, 2.2){\vector(-1,-2){.5}}
+\put(11.3, 2.2){\vector(1,-2){.5}}
+\put(11.8, 2.2){\vector(2,-1){2}}
+\put(01.5, 0.5){\framebox(1.2,0.8){~3~~12~}}
+\put(03.5, 0.5){\framebox(1.2,0.8){~30~~34~}}
+\put(05.5, 0.5){\framebox(1.6,0.8){~40~~43~~47~}}
+\put(07.8, 0.5){\framebox(1.2,0.8){~60~~70~}}
+\put(09.8, 0.5){\framebox(1.2,0.8){~77~~83~}}
+\put(11.8, 0.5){\framebox(1.2,0.8){~88~~90~}}
+\put(13.8, 0.5){\framebox(1.2,0.8){~99~~102~}}
+\end{picture}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Grau de ramificação}
+
+\begin{itemize}
+  \item $N$: nó
+  \item $K$: chave
+  \item $A_n$: endereço de um nó
+  \item $A_r$: endereço de um registro de dados
+  \item $g_{max} \times A_n + g_{max} - 1 \times (K + A_r) \le N$
+  \item Supondo: $N = 4096, K = A_n = A_r = 4$
+  \item $g_{max} = 342$
+  \item \begin{tabular}[t]{c|cl}
+      altura & capacidade \\
+      \hline
+      1 & $1 \times 341$ & $=341$ \\
+      2 & $(1 + 342) \times 341$ & $= 116.963$ \\
+      3 & $(1 + 342 + 342^2) \times 341$ & $= 40.001.674$
+    \end{tabular}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Altura de árvore B}
+
+\begin{theorem}
+  A altura $a$ de uma árvore B com $n$ elementos e de grau mínimo $g$ é
+  tal que
+  $$
+  a \leq \log_g \frac{n-1}{2} + 1.
+  $$
+\end{theorem}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Altura de árvore B}
+
+\begin{proof}
+  
+\only<1>{
+  Pior caso: 
+  \begin{itemize}
+  \item raiz: uma chave e dois filhos,
+  \item outros nós internos: $g-1$ chaves e $g$ filhos
+  \item folhas: $g-1$ chaves.
+  \end{itemize}
+
+  \begin{tabular}{r|l}
+    nível & quantidade de nós \\
+    \hline
+    1 & 1 \\
+    2 & 2 \\
+    3 & $2g$ \\
+    4 & $2g^2$ \\
+    $a$ & $2g^{a-2}$
+  \end{tabular}
+}
+
+\only<2>{
+  \begin{eqnarray*}
+    n & \geq & 1 + (g-1)\times 2 \times \Sigma_{i = 0}^{a-2} g^i \\
+    n & \geq & 1 + (g-1)\times 2 \times \frac{1-g^{a-1}}{1-g} \\
+    n & \geq & 1 + 2 \times(g^{a-1}-1) \\
+    \frac{n+1}{2} & \geq & g^{a-1} \\
+    a & \leq & \log_g \frac{n-1}{2} + 1
+  \end{eqnarray*}
+}
+\end{proof}
+
+\end{frame}
+
+\section{Operações}
+
+\begin{frame}
+\frametitle{Implementação}
+
+Escrita/leitura de nós
+\begin{itemize}
+  \item $\proc{Write-Node}$
+  \item $\proc{Read-Node}$
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Busca}
+
+\begin{codebox}
+\Procname{$\proc{Search-Node}(T, x, k)$}
+\li $i \gets 0$
+\li \While $i < \attrib{x}{n}$ and $\attrib{x}{keys}[i] < k$
+\li \Do $i \gets i + 1$
+    \End
+\li \If $i \isequal \attrib{x}{n}$ and $\attrib{x}{keys}[i] \isequal k$
+\li \Then \Return $\attrib{x}{refs}[i]$
+    \End
+\li \If $\attrib{x}{leaf}$
+\li \Then \Return $\const{Nil}$
+    \End
+\li $\proc{Read-Node}(T, \attrib{x}{sub}[i])$
+\li \Return $\proc{Search-Node}(T, \attrib{x}{sub}[i], k)$
+\end{codebox}
+
+\pause
+\begin{itemize}
+\item uma chamada: $O(1)$ acesso disco, $O(g)$ busca sequencial;
+\item total: $O(a) = O(\log_{g} n)$ acessos disco, e $O(ag) = O(g\log_g n)$ 
+operações processador.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Divisão}
+
+\begin{itemize}
+\item operação auxiliar para a inserção
+\item entrada: nó cheio $x$ com $2g-1$ chaves, tal que 
+  \begin{itemize}
+    \item $x$ é a raiz ou
+    \item o nó pai de $x$ não é cheio
+  \end{itemize}
+\item seja $k$ é a chave mediana de $x$
+\item efeito:
+  \begin{itemize}
+    \item se $x = r$, um novo nó raiz é criado, com a chave $k$
+    \item se $x \neq r$:
+      \begin{itemize}
+        \item a chave $k$ é inserida no nó pai
+        \item um novo nó $y$ é criado, e recebe $g-1$ chaves de $x$
+        \item $x$ permanece com $g-1$ chaves
+      \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Inserção}
+\framesubtitle{Princípios}
+
+\begin{itemize}
+\item todas as folhas devem ter o mesmo nível antes e \alert{depois} da inserção
+\item na descida recursiva na árvore B, garante-se que há espaço para armazenar o novo registro
+\item se um nó a visitar estiver cheio, ele é \alert{dividido} em dois
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Divisão}
+\framesubtitle{Exemplo}
+
+$g = 3$
+
+\begin{center}
+\scriptsize
+\begin{tabular}{cc}
+\setlength{\unitlength}{.8cm}
+\begin{picture}(6, 3)(0,0)
+\put(2.0, 2.0){\framebox(1.2,0.8){~N~~W~}}
+\put(1.8, 2.3){$p$}
+\put(2.1, 2.2){\vector(-3,-2){1.5}}
+\put(3.1, 2.2){\vector(3,-2){1.5}}
+\put(2.6, 2.2){\vector(0,-1){1.4}}
+\put(1.4, 0.0){\framebox(2.4,0.8){~P~~Q~~R~~S~~T~}}
+\put(0.8, 0.3){$x$}
+\end{picture}
+&
+\setlength{\unitlength}{.8cm}
+\begin{picture}(6, 3)(0,0)
+\put(2.5, 2.0){\framebox(1.6,0.8){~N~~R~~W~}}
+\put(2.3, 2.3){$p$}
+\put(2.6, 2.2){\vector(-3,-2){2}}
+\put(3.0, 2.2){\vector(-2,-3){0.9}}
+\put(3.5, 2.2){\vector(2,-3){0.9}}
+\put(4.0, 2.2){\vector(3,-2){2}}
+\put(1.2, 0.0){\framebox(1.2,0.8){~P~~Q~}}
+\put(0.8, 0.3){$x$}
+\put(4.2, 0.0){\framebox(1.2,0.8){~S~~T~}}
+\put(3.8, 0.3){$y$}
+\end{picture}
+\\
+(antes) & (depois)
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Divisão}
+\framesubtitle{Algoritmo}
+
+{
+\footnotesize
+\begin{codebox}
+\Procname{$\proc{Divide-Node}(T, p, i, x)$}
+\li $y \gets \proc{Make-Node}(T)$
+\li $\attrib{y}{n} = \attrib{T}{degree}-1$
+\li \For $j \gets 0$ \To $\attrib{y}{n}$
+\li \Do $\attrib{y}{keys}[j] \gets \attrib{x}{keys}[j + \attrib{y}{n}]$
+    \End
+\li \If not $\attrib{x}{leaf}$
+\li \Then \For $j \gets 0$ \To $\attrib{y}{n}+1$
+\li    \Do $\attrib{y}{sub}[j] \gets \attrib{x}{sub}[j + \attrib{y}{n}]$
+    \End \End
+\li $\attrib{x}{n} = \attrib{T}{degree}-1$
+\li \For $j \gets \attrib{p}{n}$ \Downto $i$
+\li \Do $\attrib{p}{sub}[j+1] \gets \attrib{p}{sub}[j]$
+    \End
+\li $\attrib{p}{sub}[i] \gets y$
+\li \For $j \gets \attrib{p}{n}$ \Downto $i-1$
+\li \Do $\attrib{p}{keys}[j+1] \gets \attrib{p}{keys}[j]$
+    \End
+\li $\attrib{p}{keys}[i-1] \gets \attrib{x}{keys}[\attrib{y}{n}]$
+\li $\attrib{p}{n} \gets \attrib{p}{n}+1$
+\li $\proc{Write-Node}(T, x)$
+\li $\proc{Write-Node}(T, y)$
+\li $\proc{Write-Node}(T, p)$
+\end{codebox}
+}
+\end{frame}
+
+\begin{frame}
+\frametitle{Inserção}
+\framesubtitle{Exemplo}
+
+{\footnotesize
+\begin{center}
+\begin{tabular}{cc}
+Estado inicial &
+\setlength{\unitlength}{.8cm}
+\begin{picture}(8.8, 2.8)(0,0)
+\put(3.4, 2.0){\framebox(2.0,0.8){~G~~M~~P~~X~}}
+\put(3.5, 2.2){\vector(-3,-2){2}}
+\put(3.9, 2.2){\vector(-2,-3){0.9}}
+\put(4.4, 2.2){\vector(-1,-4){0.34}}
+\put(4.9, 2.2){\vector(2,-3){0.9}}
+\put(5.3, 2.2){\vector(2,-1){2.7}}
+\put(0.0, 0.0){\framebox(2.0,0.8){~A~~C~~D~~E}}
+\put(2.2, 0.0){\framebox(1.2,0.8){~J~~K~}}
+\put(3.6, 0.0){\framebox(1.2,0.8){~N~~O~}}
+\put(5.0, 0.0){\framebox(2.4,0.8){~R~~S~~T~~U~~V~}}
+\put(7.6, 0.0){\framebox(1.2,0.8){~Y~~Z~}}
+\end{picture}\\
+\\
+Inserção de B &
+\setlength{\unitlength}{.8cm}
+\begin{picture}(9.2, 2.8)(0.0,0)
+\put(3.8, 2.0){\framebox(2.0,0.8){~G~~M~~P~~X~}}
+\put(3.9, 2.2){\vector(-3,-2){2}}
+\put(4.3, 2.2){\vector(-2,-3){0.9}}
+\put(4.8, 2.2){\vector(-1,-4){0.34}}
+\put(5.3, 2.2){\vector(2,-3){0.9}}
+\put(5.7, 2.2){\vector(2,-1){2.7}}
+\put(0.0, 0.0){\framebox(2.4,0.8){~A~~\textbf{B}~~C~~D~~E}}
+\put(2.6, 0.0){\framebox(1.2,0.8){~J~~K~}}
+\put(4.0, 0.0){\framebox(1.2,0.8){~N~~O~}}
+\put(5.4, 0.0){\framebox(2.4,0.8){~R~~S~~T~~U~~V~}}
+\put(8.0, 0.0){\framebox(1.2,0.8){~Y~~Z~}}
+\end{picture}
+\end{tabular}
+\end{center}
+}
+\end{frame}
+
+\begin{frame}
+\frametitle{Inserção}
+\framesubtitle{Exemplo}
+
+{\footnotesize
+\begin{center}
+\begin{tabular}{cc}
+ &
+\setlength{\unitlength}{.8cm}
+\begin{picture}(9.2, 2.8)(0.0,0)
+\put(3.8, 2.0){\framebox(2.0,0.8){~G~~M~~P~~X~}}
+\put(3.9, 2.2){\vector(-3,-2){2}}
+\put(4.3, 2.2){\vector(-2,-3){0.9}}
+\put(4.8, 2.2){\vector(-1,-4){0.34}}
+\put(5.3, 2.2){\vector(2,-3){0.9}}
+\put(5.7, 2.2){\vector(2,-1){2.7}}
+\put(0.0, 0.0){\framebox(2.4,0.8){~A~~\textbf{B}~~C~~D~~E}}
+\put(2.6, 0.0){\framebox(1.2,0.8){~J~~K~}}
+\put(4.0, 0.0){\framebox(1.2,0.8){~N~~O~}}
+\put(5.4, 0.0){\framebox(2.4,0.8){~R~~S~~T~~U~~V~}}
+\put(8.0, 0.0){\framebox(1.2,0.8){~Y~~Z~}}
+\end{picture}\\
+\\
+Inserção de Q &
+\setlength{\unitlength}{.8cm}
+\begin{picture}(10.2, 2.8)(0.0,0)
+\put(3.8, 2.0){\framebox(2.4,0.8){~G~~M~~P~~T~~X~}}
+\put(3.9, 2.2){\vector(-3,-2){2}}
+\put(4.3, 2.2){\vector(-2,-3){0.9}}
+\put(4.8, 2.2){\vector(-1,-4){0.34}}
+\put(5.3, 2.2){\vector(2,-3){0.9}}
+\put(5.7, 2.2){\vector(2,-1){2.7}}
+\put(6.1, 2.2){\vector(3,-1){4.0}}
+\put(0.0, 0.0){\framebox(2.4,0.8){~A~~B~~C~~D~~E}}
+\put(2.6, 0.0){\framebox(1.2,0.8){~J~~K~}}
+\put(4.0, 0.0){\framebox(1.2,0.8){~N~~O~}}
+\put(5.4, 0.0){\framebox(1.6,0.8){~\textbf{Q}~~R~~S~}}
+\put(7.2, 0.0){\framebox(1.6,0.8){~U~~V~}}
+\put(9.0, 0.0){\framebox(1.2,0.8){~Y~~Z~}}
+\end{picture}
+\end{tabular}
+\end{center}
+}
+\end{frame}
+
+\begin{frame}
+\frametitle{Inserção}
+\framesubtitle{Exemplo}
+
+{\footnotesize
+\begin{center}
+\begin{tabular}{cc}
+ &
+\setlength{\unitlength}{.8cm}
+\begin{picture}(10.2, 2.8)(0.0,0)
+\put(3.8, 2.0){\framebox(2.4,0.8){~G~~M~~P~~T~~X~}}
+\put(3.9, 2.2){\vector(-3,-2){2}}
+\put(4.3, 2.2){\vector(-2,-3){0.9}}
+\put(4.8, 2.2){\vector(-1,-4){0.34}}
+\put(5.3, 2.2){\vector(2,-3){0.9}}
+\put(5.7, 2.2){\vector(2,-1){2.7}}
+\put(6.1, 2.2){\vector(3,-1){4.0}}
+\put(0.0, 0.0){\framebox(2.4,0.8){~A~~B~~C~~D~~E}}
+\put(2.6, 0.0){\framebox(1.2,0.8){~J~~K~}}
+\put(4.0, 0.0){\framebox(1.2,0.8){~N~~O~}}
+\put(5.4, 0.0){\framebox(1.6,0.8){~\textbf{Q}~~R~~S~}}
+\put(7.2, 0.0){\framebox(1.6,0.8){~U~~V~}}
+\put(9.0, 0.0){\framebox(1.2,0.8){~Y~~Z~}}
+\end{picture}\\
+\\
+Inserção de L &
+\setlength{\unitlength}{.8cm}
+\begin{picture}(10.6, 4.8)(0.0,0)
+\put(5.1, 4.0){\framebox(0.8,0.8){~P~}}
+\put(5.2, 4.2){\vector(-3,-2){2}}
+\put(5.8, 4.2){\vector(3,-2){2}}
+\put(2.2, 2.0){\framebox(1.2,0.8){~G~~M~}}
+\put(2.3, 2.2){\vector(-1,-1){1.4}}
+\put(2.8, 2.2){\vector(0,-1){1.4}}
+\put(3.3, 2.2){\vector(1,-1){1.4}}
+\put(0.0, 0.0){\framebox(2.4,0.8){~A~~B~~C~~D~~E}}
+\put(2.6, 0.0){\framebox(1.6,0.8){~J~~K~~\textbf{L}~}}
+\put(4.4, 0.0){\framebox(1.2,0.8){~N~~O~}}
+\put(7.6, 2.0){\framebox(1.2,0.8){~T~~X~}}
+\put(7.7, 2.2){\vector(-1,-1){1.4}}
+\put(8.2, 2.2){\vector(0,-1){1.4}}
+\put(8.7, 2.2){\vector(1,-1){1.4}}
+\put(5.8, 0.0){\framebox(1.6,0.8){~Q~~R~~S~}}
+\put(7.6, 0.0){\framebox(1.6,0.8){~U~~V~}}
+\put(9.4, 0.0){\framebox(1.2,0.8){~Y~~Z~}}
+\end{picture}
+\end{tabular}
+\end{center}
+}
+\end{frame}
+
+\begin{frame}
+\frametitle{Inserção}
+\framesubtitle{Exemplo}
+
+\vspace*{-5mm}
+{\footnotesize
+\begin{center}
+\begin{tabular}{cc}
+ &
+\setlength{\unitlength}{.8cm}
+\vspace*{-5mm}
+\begin{picture}(10.6, 4.8)(0.0,0)
+\put(5.1, 4.0){\framebox(0.8,0.8){~P~}}
+\put(5.2, 4.2){\vector(-3,-2){2}}
+\put(5.8, 4.2){\vector(3,-2){2}}
+\put(2.2, 2.0){\framebox(1.2,0.8){~G~~M~}}
+\put(2.3, 2.2){\vector(-1,-1){1.4}}
+\put(2.8, 2.2){\vector(0,-1){1.4}}
+\put(3.3, 2.2){\vector(1,-1){1.4}}
+\put(0.0, 0.0){\framebox(2.4,0.8){~A~~B~~C~~D~~E}}
+\put(2.6, 0.0){\framebox(1.6,0.8){~J~~K~~\textbf{L}~}}
+\put(4.4, 0.0){\framebox(1.2,0.8){~N~~O~}}
+\put(7.6, 2.0){\framebox(1.2,0.8){~T~~X~}}
+\put(7.7, 2.2){\vector(-1,-1){1.4}}
+\put(8.2, 2.2){\vector(0,-1){1.4}}
+\put(8.7, 2.2){\vector(1,-1){1.4}}
+\put(5.8, 0.0){\framebox(1.6,0.8){~Q~~R~~S~}}
+\put(7.6, 0.0){\framebox(1.6,0.8){~U~~V~}}
+\put(9.4, 0.0){\framebox(1.2,0.8){~Y~~Z~}}
+\end{picture}\\
+\\
+Inserção de F &
+\setlength{\unitlength}{.7cm}
+\vspace*{-5mm}
+\begin{picture}(10.6, 4.8)(0.0,0)
+\put(5.3, 4.0){\framebox(0.8,0.8){~P~}}
+\put(5.4, 4.2){\vector(-3,-2){2}}
+\put(6.0, 4.2){\vector(3,-2){2.2}}
+\put(2.4, 2.0){\framebox(1.6,0.8){~C~~G~~M~}}
+\put(2.5, 2.2){\vector(-1,-1){1.4}}
+\put(2.9, 2.2){\vector(-1,-2){0.7}}
+\put(3.4, 2.2){\vector(1,-2){0.7}}
+\put(3.9, 2.2){\vector(1,-1){1.4}}
+\put(0.0, 0.0){\framebox(1.2,0.8){~A~~B~}}
+\put(1.4, 0.0){\framebox(1.6,0.8){~D~~E~~\textbf{F}~}}
+\put(3.2, 0.0){\framebox(1.6,0.8){~J~~K~~L~}}
+\put(5.0, 0.0){\framebox(1.2,0.8){~N~~O~}}
+\put(8.2, 2.0){\framebox(1.2,0.8){~T~~X~}}
+\put(8.3, 2.2){\vector(-1,-1){1.4}}
+\put(8.8, 2.2){\vector(0,-1){1.4}}
+\put(9.3, 2.2){\vector(1,-1){1.4}}
+\put(6.4, 0.0){\framebox(1.6,0.8){~Q~~R~~S~}}
+\put(8.2, 0.0){\framebox(1.6,0.8){~U~~V~}}
+\put(10.0, 0.0){\framebox(1.2,0.8){~Y~~Z~}}
+\end{picture}
+\end{tabular}
+\end{center}
+}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Inserção}
+\framesubtitle{Algoritmo}
+
+{
+\begin{codebox}
+\Procname{$\proc{Insert}(T, r)$}
+\li \If $\attrib{T}{root} \isequal \const{Nil}$
+\li \Then $y \gets \proc{Make-Node}(T)$
+\li   $\attrib{y}{n} \gets 1$
+\li   $\attrib{y}{leaf} \gets \const{False}$
+\li   $\attrib{y}{keys}[0] \gets \attrib{r}{key}$
+\li   $\attrib{y}{refs}[0] \gets r$
+\li \ElseIf $\attrib{\attrib{T}{root}}{n} \isequal 2 \times \attrib{T}{degree} - 1 $
+\li   \Then $y \gets \proc{Make-Node}(T)$
+\li   $\attrib{y}{n} \gets 1$
+\li   $\attrib{y}{leaf} \gets \const{True}$
+\li   $\attrib{y}{sub}[0] \gets \attrib{T}{root}$
+\li   $\attrib{T}{root} \gets y$
+\li   $\proc{Write-Node}(T, y)$
+\li   $\proc{Divide-Node}(T, y, 0, \attrib{y}{sub}[0])$
+    \End
+\li $\proc{Node-Insert}(T, \attrib{T}{root}, r)$
+\end{codebox}
+}
+\end{frame}
+
+\begin{frame}
+\frametitle{Inserção}
+
+{
+\begin{codebox}
+\Procname{$\proc{Node-Insert}(T, x, r)$}
+\li \If $\attrib{x}{leaf} \isequal \const{True}$
+\li \Then $\proc{Leaf-Insert}(T, x, r)$
+\li \Else $\proc{Interior-Insert}(T, x, r)$
+    \End
+\end{codebox}
+}
+\end{frame}
+
+\begin{frame}
+\frametitle{Inserção}
+\framesubtitle{Sub-rotina auxiliar para inserção em folha}
+{
+\begin{codebox}
+\Procname{$\proc{Leaf-Insert}(T, x, r)$}
+\li $i \gets \attrib{x}{n}-1$
+\li \While $i \ge 0$ and $\attrib{r}{key} < \attrib{x}{keys}[i]$
+\li \Do $\attrib{x}{keys}[i+1] \gets \attrib{x}{keys}[i]$
+\li   $i \gets i - 1$
+    \End
+\li $\attrib{x}{keys}[i+1] \gets \attrib{r}{key}$
+\li $\attrib{x}{refs}[i+1] \gets r$
+\li $\proc{Node-Write}(T, x)$
+\end{codebox}
+}
+\end{frame}
+
+\begin{frame}
+\frametitle{Inserção}
+\framesubtitle{Sub-rotina auxiliar para inserção em nó interno}
+
+{
+\begin{codebox}
+\Procname{$\proc{Interior-Insert}(T, x, r)$}
+\li $i \gets \attrib{x}{n}-1$
+\li \While $i \ge 0$ and $\attrib{r}{key} < \attrib{x}{keys}[i]$
+\li \Do $\attrib{x}{keys}[i+1] \gets \attrib{x}{keys}[i]$
+\li   $i \gets i - 1$
+    \End
+\li $i \gets i + 1$
+\li $y \gets \proc{Read-Node}(T, \attrib{x}{sub}[i])$
+\li \If $\attrib{y}{n} \isequal 2 \times \attrib{T}{degree} - 1$
+\li \Then $\proc{Node-Divide}(T, y)$
+\li   \If $\attrib{x}{keys}[i] < c$
+\li   \Then $i \gets i + 1$
+      \End
+    \End
+\li $\proc{Node-Insert}(T, y, r)$
+\end{codebox}
+}
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Remoção}
+\framesubtitle{Princípios}
+
+\begin{itemize}
+\item todas as folhas devem ter o mesmo nível antes e \alert{depois} da remoção
+\item na descida recursiva na árvore B, garante-se que pode se remover um registro sem quebrar o invariante da sub-árvore
+\item se um nó a visitar estiver com $g-1$ chaves, opera-se uma operação de
+\alert{fusão} com um nó vizinho
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Fusão}
+\framesubtitle{Princípios}
+
+\begin{itemize}
+\item dois nós filhos vizinhos $x$ e $y$ de um nó $p$
+\item $g-1$ chaves cada
+\item seja $k$ a chave ``entre'' $x$ e $y$
+\item as chaves de $x$, $k$, e as chaves de $y$ formam o novo nó
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Fusão}
+\framesubtitle{Exemplo, $g = 3$}
+
+\begin{center}
+\begin{tabular}{cc}
+\setlength{\unitlength}{1cm}
+\begin{picture}(6, 3)(0,0)
+\put(2.5, 2.0){\framebox(1.6,0.8){~N~~R~~W~}}
+\put(2.3, 2.3){$p$}
+\put(2.6, 2.2){\vector(-3,-2){2}}
+\put(3.0, 2.2){\vector(-2,-3){0.9}}
+\put(3.5, 2.2){\vector(2,-3){0.9}}
+\put(4.0, 2.2){\vector(3,-2){2}}
+\put(1.2, 0.0){\framebox(1.2,0.8){~P~~Q~}}
+\put(0.8, 0.3){$x$}
+\put(4.2, 0.0){\framebox(1.2,0.8){~S~~T~}}
+\put(3.8, 0.3){$y$}
+\end{picture}
+&
+\setlength{\unitlength}{1cm}
+\begin{picture}(6, 3)(0,0)
+\put(2.0, 2.0){\framebox(1.2,0.8){~N~~W~}}
+\put(1.8, 2.3){$p$}
+\put(2.1, 2.2){\vector(-3,-2){1.5}}
+\put(3.1, 2.2){\vector(3,-2){1.5}}
+\put(2.6, 2.2){\vector(0,-1){1.4}}
+\put(1.4, 0.0){\framebox(2.4,0.8){~P~~Q~~R~~S~~T~}}
+\put(0.8, 0.3){$x$}
+\end{picture}
+\\
+(antes) & (depois)
+\end{tabular}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Remoção}
+\framesubtitle{Princípios}
+
+\begin{itemize}
+  \only<1>{\item se $x = \attrib{T}{root}$ fica sem chaves
+    \begin{itemize}
+      \item se tem filhos, só tem um, e estetorna-se a nova raiz
+      \item caso contrário, a árvore torna-se vazia
+    \end{itemize}
+  }
+  \only<2>{\item se $k \in \attrib{x}{keys}$, e $\attrib{x}{leaf}$, $k$ é eliminado de $x$.}
+  \only<3-5>{\item se $k \in \attrib{x}{keys}$, e $\neg \attrib{x}{leaf}$:
+    \begin{itemize}
+      \only<3>{
+      \item se o filho $y$ que precede $k$ em $x$ tem pelo menos $g$
+        chaves
+        \begin{itemize}
+        \item achar o predecessor $k'$ de $k$ na subárvore $y$
+        \item remover recursivamente $k'$,
+        \item substituir $k$ por $k'$ em $x$.
+        \end{itemize}
+      }
+      \only<4>{
+      \item senão, se o filho $z$ que sucede $k$ no nó $x$ tem
+        pelo menos $g$ chaves:
+        \begin{itemize}
+        \item achar o sucessor $k'$ de $k$ na subárvore $z$
+        \item remover recursivamente $k'$,
+        \item substituir $k$ por $k'$ em $x$.
+        \end{itemize}
+      }
+      \only<5>{
+      \item senão, $\attrib{y}{n} = \attrib{z}{n} = g-1$:
+        \begin{itemize}
+        \item $y$ e $z$ são fusionados em $y$, com chave mediana $k$
+        \item $k$ e $z$ são eliminados de $x$
+        \item $y$ tem $2g-1$ chaves
+        \item liberar o nó $z$ e
+        \item remover recursivamente $k$ de $y$.
+        \end{itemize}
+      }
+    \end{itemize}
+  }
+  \only<6->{
+  \item se $k \not\in \attrib{x}{keys}$ 
+    \begin{itemize}
+    \item determinar a sub-árvore $y$ que deve conter $k$
+      \only<6>{
+      \item se $\attrib{y}{n} \ge n$, eliminar $k$ de $y$
+      }
+      \only<7>{
+      \item se $\attrib{y}{n} = g-1$ e tem um vizinho $z$ com $\attrib{z}{n} \ge g$
+        \begin{itemize}
+        \item deslocar uma chave e um filho de $x$ em $y$
+        \item deslocar uma chave e um filho de $z$ para $x$
+        \item liminar recursivamente $k$ de $y$.
+        \end{itemize}
+      }
+      \only<8>{
+      \item se os vizinhos de $y$ tem $g-1$ chaves,
+        \begin{itemize}
+        \item  fusionar $y$ com um dos irmãos
+        \item liminar recursivamente $k$ de $y$.
+        \end{itemize}
+      }
+    \end{itemize}
+    }
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Remoção}
+\framesubtitle{Exemplos}
+
+{\scriptsize
+\begin{center}
+\begin{tabular}{cc}
+Estado inicial &
+\setlength{\unitlength}{.7cm}
+\begin{picture}(10.6, 4.8)(0.0,0)
+\put(5.3, 4.0){\framebox(0.8,0.8){~P~}}
+\put(5.4, 4.2){\vector(-3,-2){2}}
+\put(6.0, 4.2){\vector(3,-2){2.2}}
+\put(2.4, 2.0){\framebox(1.6,0.8){~C~~G~~M~}}
+\put(2.5, 2.2){\vector(-1,-1){1.4}}
+\put(2.9, 2.2){\vector(-1,-2){0.7}}
+\put(3.4, 2.2){\vector(1,-2){0.7}}
+\put(3.9, 2.2){\vector(1,-1){1.4}}
+\put(0.0, 0.0){\framebox(1.2,0.8){~A~~B~}}
+\put(1.4, 0.0){\framebox(1.6,0.8){~D~~E~~F~}}
+\put(3.2, 0.0){\framebox(1.6,0.8){~J~~K~~L~}}
+\put(5.0, 0.0){\framebox(1.2,0.8){~N~~O~}}
+\put(8.2, 2.0){\framebox(1.2,0.8){~T~~X~}}
+\put(8.3, 2.2){\vector(-1,-1){1.4}}
+\put(8.8, 2.2){\vector(0,-1){1.4}}
+\put(9.3, 2.2){\vector(1,-1){1.4}}
+\put(6.4, 0.0){\framebox(1.6,0.8){~Q~~R~~S~}}
+\put(8.2, 0.0){\framebox(1.6,0.8){~U~~V~}}
+\put(10.0, 0.0){\framebox(1.2,0.8){~Y~~Z~}}
+\end{picture}\\
+Remoção de F &
+\setlength{\unitlength}{.7cm}
+\begin{picture}(10.6, 4.8)(0.0,0)
+\put(5.3, 4.0){\framebox(0.8,0.8){~P~}}
+\put(5.4, 4.2){\vector(-3,-2){2}}
+\put(6.0, 4.2){\vector(3,-2){2.2}}
+\put(2.4, 2.0){\framebox(1.6,0.8){~C~~G~~M~}}
+\put(2.5, 2.2){\vector(-1,-1){1.4}}
+\put(2.9, 2.2){\vector(-1,-2){0.7}}
+\put(3.4, 2.2){\vector(1,-2){0.7}}
+\put(3.9, 2.2){\vector(1,-1){1.4}}
+\put(0.0, 0.0){\framebox(1.2,0.8){~A~~B~}}
+\put(1.4, 0.0){\framebox(1.6,0.8){~D~~E~}}
+\put(3.2, 0.0){\framebox(1.6,0.8){~J~~K~~L~}}
+\put(5.0, 0.0){\framebox(1.2,0.8){~N~~O~}}
+\put(8.2, 2.0){\framebox(1.2,0.8){~T~~X~}}
+\put(8.3, 2.2){\vector(-1,-1){1.4}}
+\put(8.8, 2.2){\vector(0,-1){1.4}}
+\put(9.3, 2.2){\vector(1,-1){1.4}}
+\put(6.4, 0.0){\framebox(1.6,0.8){~Q~~R~~S~}}
+\put(8.2, 0.0){\framebox(1.6,0.8){~U~~V~}}
+\put(10.0, 0.0){\framebox(1.2,0.8){~Y~~Z~}}
+\end{picture}
+\end{tabular}
+\end{center}
+}
+\end{frame}
+
+\begin{frame}
+
+{
+\scriptsize
+\begin{center}
+\begin{tabular}{cc}
+ &
+\setlength{\unitlength}{.7cm}
+\begin{picture}(10.6, 4.8)(0.0,0)
+\put(5.3, 4.0){\framebox(0.8,0.8){~P~}}
+\put(5.4, 4.2){\vector(-3,-2){2}}
+\put(6.0, 4.2){\vector(3,-2){2.2}}
+\put(2.4, 2.0){\framebox(1.6,0.8){~C~~G~~M~}}
+\put(2.5, 2.2){\vector(-1,-1){1.4}}
+\put(2.9, 2.2){\vector(-1,-2){0.7}}
+\put(3.4, 2.2){\vector(1,-2){0.7}}
+\put(3.9, 2.2){\vector(1,-1){1.4}}
+\put(0.0, 0.0){\framebox(1.2,0.8){~A~~B~}}
+\put(1.4, 0.0){\framebox(1.6,0.8){~D~~E~}}
+\put(3.2, 0.0){\framebox(1.6,0.8){~J~~K~~L~}}
+\put(5.0, 0.0){\framebox(1.2,0.8){~N~~O~}}
+\put(8.2, 2.0){\framebox(1.2,0.8){~T~~X~}}
+\put(8.3, 2.2){\vector(-1,-1){1.4}}
+\put(8.8, 2.2){\vector(0,-1){1.4}}
+\put(9.3, 2.2){\vector(1,-1){1.4}}
+\put(6.4, 0.0){\framebox(1.6,0.8){~Q~~R~~S~}}
+\put(8.2, 0.0){\framebox(1.6,0.8){~U~~V~}}
+\put(10.0, 0.0){\framebox(1.2,0.8){~Y~~Z~}}
+\end{picture}\\
+Remoção de M &
+\setlength{\unitlength}{.7cm}
+\begin{picture}(10.6, 4.8)(0.0,0)
+\put(5.3, 4.0){\framebox(0.8,0.8){~P~}}
+\put(5.4, 4.2){\vector(-3,-2){2}}
+\put(6.0, 4.2){\vector(3,-2){2.2}}
+\put(2.4, 2.0){\framebox(1.6,0.8){~C~~G~~L~}}
+\put(2.5, 2.2){\vector(-1,-1){1.4}}
+\put(2.9, 2.2){\vector(-1,-2){0.7}}
+\put(3.4, 2.2){\vector(1,-2){0.7}}
+\put(3.9, 2.2){\vector(1,-1){1.4}}
+\put(0.0, 0.0){\framebox(1.2,0.8){~A~~B~}}
+\put(1.4, 0.0){\framebox(1.6,0.8){~D~~E~}}
+\put(3.2, 0.0){\framebox(1.6,0.8){~J~~K~}}
+\put(5.0, 0.0){\framebox(1.2,0.8){~N~~O~}}
+\put(8.2, 2.0){\framebox(1.2,0.8){~T~~X~}}
+\put(8.3, 2.2){\vector(-1,-1){1.4}}
+\put(8.8, 2.2){\vector(0,-1){1.4}}
+\put(9.3, 2.2){\vector(1,-1){1.4}}
+\put(6.4, 0.0){\framebox(1.6,0.8){~Q~~R~~S~}}
+\put(8.2, 0.0){\framebox(1.6,0.8){~U~~V~}}
+\put(10.0, 0.0){\framebox(1.2,0.8){~Y~~Z~}}
+\end{picture}
+\end{tabular}
+\end{center}
+}
+\end{frame}
+
+
+\begin{frame}
+
+{
+\scriptsize
+\begin{center}
+\begin{tabular}{cc}
+ &
+\setlength{\unitlength}{.7cm}
+\begin{picture}(10.6, 4.8)(0.0,0)
+\put(5.3, 4.0){\framebox(0.8,0.8){~P~}}
+\put(5.4, 4.2){\vector(-3,-2){2}}
+\put(6.0, 4.2){\vector(3,-2){2.2}}
+\put(2.4, 2.0){\framebox(1.6,0.8){~C~~G~~L~}}
+\put(2.5, 2.2){\vector(-1,-1){1.4}}
+\put(2.9, 2.2){\vector(-1,-2){0.7}}
+\put(3.4, 2.2){\vector(1,-2){0.7}}
+\put(3.9, 2.2){\vector(1,-1){1.4}}
+\put(0.0, 0.0){\framebox(1.2,0.8){~A~~B~}}
+\put(1.4, 0.0){\framebox(1.6,0.8){~D~~E~}}
+\put(3.2, 0.0){\framebox(1.6,0.8){~J~~K~}}
+\put(5.0, 0.0){\framebox(1.2,0.8){~N~~O~}}
+\put(8.2, 2.0){\framebox(1.2,0.8){~T~~X~}}
+\put(8.3, 2.2){\vector(-1,-1){1.4}}
+\put(8.8, 2.2){\vector(0,-1){1.4}}
+\put(9.3, 2.2){\vector(1,-1){1.4}}
+\put(6.4, 0.0){\framebox(1.6,0.8){~Q~~R~~S~}}
+\put(8.2, 0.0){\framebox(1.6,0.8){~U~~V~}}
+\put(10.0, 0.0){\framebox(1.2,0.8){~Y~~Z~}}
+\end{picture}\\
+Remoção de G &
+\setlength{\unitlength}{.7cm}
+\begin{picture}(10.6, 4.8)(0.0,0)
+\put(5.3, 4.0){\framebox(0.8,0.8){~P~}}
+\put(5.4, 4.2){\vector(-3,-2){2}}
+\put(6.0, 4.2){\vector(3,-2){2.2}}
+\put(2.4, 2.0){\framebox(1.2,0.8){~C~~L~}}
+\put(2.5, 2.2){\vector(-1,-1){1.4}}
+\put(2.9, 2.2){\vector(-1,-2){0.7}}
+\put(3.4, 2.2){\vector(1,-1){1.4}}
+\put(0.0, 0.0){\framebox(1.2,0.8){~A~~B~}}
+\put(1.4, 0.0){\framebox(2.0,0.8){~D~~E~~J~~K~}}
+\put(3.8, 0.0){\framebox(1.2,0.8){~N~~O~}}
+\put(8.2, 2.0){\framebox(1.2,0.8){~T~~X~}}
+\put(8.3, 2.2){\vector(-1,-1){1.4}}
+\put(8.8, 2.2){\vector(0,-1){1.4}}
+\put(9.3, 2.2){\vector(1,-1){1.4}}
+\put(6.4, 0.0){\framebox(1.6,0.8){~Q~~R~~S~}}
+\put(8.2, 0.0){\framebox(1.6,0.8){~U~~V~}}
+\put(10.0, 0.0){\framebox(1.2,0.8){~Y~~Z~}}
+\end{picture}
+\end{tabular}
+\end{center}
+}
+\end{frame}
+
+\begin{frame}
+
+{
+\scriptsize
+\begin{center}
+\begin{tabular}{cc}
+ &
+\setlength{\unitlength}{.7cm}
+\begin{picture}(10.6, 4.8)(0.0,0)
+\put(5.3, 4.0){\framebox(0.8,0.8){~P~}}
+\put(5.4, 4.2){\vector(-3,-2){2}}
+\put(6.0, 4.2){\vector(3,-2){2.2}}
+\put(2.4, 2.0){\framebox(1.2,0.8){~C~~L~}}
+\put(2.5, 2.2){\vector(-1,-1){1.4}}
+\put(2.9, 2.2){\vector(-1,-2){0.7}}
+\put(3.4, 2.2){\vector(1,-1){1.4}}
+\put(0.0, 0.0){\framebox(1.2,0.8){~A~~B~}}
+\put(1.4, 0.0){\framebox(2.0,0.8){~D~~E~~J~~K~}}
+\put(3.8, 0.0){\framebox(1.2,0.8){~N~~O~}}
+\put(8.2, 2.0){\framebox(1.2,0.8){~T~~X~}}
+\put(8.3, 2.2){\vector(-1,-1){1.4}}
+\put(8.8, 2.2){\vector(0,-1){1.4}}
+\put(9.3, 2.2){\vector(1,-1){1.4}}
+\put(6.4, 0.0){\framebox(1.6,0.8){~Q~~R~~S~}}
+\put(8.2, 0.0){\framebox(1.6,0.8){~U~~V~}}
+\put(10.0, 0.0){\framebox(1.2,0.8){~Y~~Z~}}
+\end{picture} \\
+Remoção de D &
+\setlength{\unitlength}{.7cm}
+\begin{picture}(10.6, 4.8)(0.0,0)
+\put(4.0, 4.0){\framebox(0.8,0.8){~~}}
+\put(4.4, 4.2){\vector(0,-1){1.4}}
+\put(3.2, 2.0){\framebox(2.4,0.8){~C~~L~~P~~T~~X~}}
+\put(3.3, 2.2){\vector(-3,-2){2.1}}
+\put(3.8, 2.2){\vector(-1,-1){1.4}}
+\put(4.2, 2.2){\vector(-1,-2){0.7}}
+\put(4.6, 2.2){\vector(1,-2){0.7}}
+\put(5.0, 2.2){\vector(1,-1){1.4}}
+\put(5.5, 2.2){\vector(2,-1){2.8}}
+\put(0.0, 0.0){\framebox(1.2,0.8){~A~~B~}}
+\put(1.4, 0.0){\framebox(1.6,0.8){~E~~J~~K~}}
+\put(3.2, 0.0){\framebox(1.2,0.8){~N~~O~}}
+\put(4.6, 0.0){\framebox(1.6,0.8){~Q~~R~~S~}}
+\put(6.4, 0.0){\framebox(1.2,0.8){~U~~V~}}
+\put(7.8, 0.0){\framebox(1.2,0.8){~Y~~Z~}}
+\end{picture}
+\end{tabular}
+\end{center}
+}
+\end{frame}
+
+\begin{frame}
+
+{
+\scriptsize
+\begin{center}
+\begin{tabular}{cc}
+A altura diminui &
+\setlength{\unitlength}{.7cm}
+\begin{picture}(10.6, 2.8)(0.0,0)
+\put(3.2, 2.0){\framebox(2.4,0.8){~C~~L~~P~~T~~X~}}
+\put(3.3, 2.2){\vector(-3,-2){2.1}}
+\put(3.8, 2.2){\vector(-1,-1){1.4}}
+\put(4.2, 2.2){\vector(-1,-2){0.7}}
+\put(4.6, 2.2){\vector(1,-2){0.7}}
+\put(5.0, 2.2){\vector(1,-1){1.4}}
+\put(5.5, 2.2){\vector(2,-1){2.8}}
+\put(0.0, 0.0){\framebox(1.2,0.8){~A~~B~}}
+\put(1.4, 0.0){\framebox(1.6,0.8){~E~~J~~K~}}
+\put(3.2, 0.0){\framebox(1.2,0.8){~N~~O~}}
+\put(4.6, 0.0){\framebox(1.6,0.8){~Q~~R~~S~}}
+\put(6.4, 0.0){\framebox(1.2,0.8){~U~~V~}}
+\put(7.8, 0.0){\framebox(1.2,0.8){~Y~~Z~}}
+\end{picture}\\
+\\
+B é removido &
+\setlength{\unitlength}{.7cm}
+\begin{picture}(10.6, 2.8)(0.0,0)
+\put(3.2, 2.0){\framebox(2.4,0.8){~E~~L~~P~~T~~X~}}
+\put(3.3, 2.2){\vector(-3,-2){2.1}}
+\put(3.8, 2.2){\vector(-1,-1){1.4}}
+\put(4.2, 2.2){\vector(-1,-2){0.7}}
+\put(4.6, 2.2){\vector(1,-2){0.7}}
+\put(5.0, 2.2){\vector(1,-1){1.4}}
+\put(5.5, 2.2){\vector(2,-1){2.8}}
+\put(0.0, 0.0){\framebox(1.2,0.8){~A~~C~}}
+\put(1.4, 0.0){\framebox(1.6,0.8){~E~~J~~K~}}
+\put(3.2, 0.0){\framebox(1.2,0.8){~N~~O~}}
+\put(4.6, 0.0){\framebox(1.6,0.8){~Q~~R~~S~}}
+\put(6.4, 0.0){\framebox(1.2,0.8){~U~~V~}}
+\put(7.8, 0.0){\framebox(1.2,0.8){~Y~~Z~}}
+\end{picture}
+\end{tabular}
+\end{center}
+}
+\end{frame}
+
+\end{document}
+
