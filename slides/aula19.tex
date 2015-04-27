@@ -4,18 +4,13 @@
 
 \input{preamble}
 
-\title{Aula 17: Árvores B}
+\title{Aula 19: Árvores B}
 \author{David Déharbe \\
   Programa de Pós-graduação em Sistemas e Computação \\
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
   Departamento de Informática e Matemática Aplicada}
 \date{27 de abril de 2015}
-
-\newcommand{\negro}[1]{\colorbox{black}{\textcolor{white}{\textbf{#1}}}}
-\newcommand{\rubro}[1]{\colorbox{red}{\textcolor{white}{\textbf{#1}}}}
-\newcommand{\bh}[0]{\ensuremath{\id{bh}}}
-
 
 \begin{document}
 \selectlanguage{brazil}
@@ -69,7 +64,7 @@
   \begin{itemize}
     
   \item Em 1971, Rudolf Bayer e Ed McCreight projetaram a estrutura de dados
-    \alert{árvores B binárias simétricas}.
+    \alert{árvores B} (\textit{B-trees\/}).
 
   \item Complexidade
     \begin{itemize}
@@ -90,7 +85,7 @@
 
     \end{itemize}
 
-  \item banco de dados
+  \item Aplicação: banco de dados, sistemas de arquivos
 
   \end{itemize}
 
@@ -166,7 +161,7 @@
   \item $K$: chave
   \item $A_n$: endereço de um nó
   \item $A_r$: endereço de um registro de dados
-  \item $g_{max} \times A_n + g_{max} - 1 \times (K + A_r) \le N$
+  \item $g_{max} \times A_n + (g_{max} - 1) \times (K + A_r) \le N$
   \item Supondo: $N = 4096, K = A_n = A_r = 4$
   \item $g_{max} = 342$
   \item \begin{tabular}[t]{c|cl}
@@ -185,7 +180,7 @@
 \frametitle{Altura de árvore B}
 
 \begin{theorem}
-  A altura $a$ de uma árvore B com $n$ elementos e de grau mínimo $g$ é
+  A altura $a$ de uma árvore B com $n$ registros e de grau mínimo $g$ é
   tal que
   $$
   a \leq \log_g \frac{n-1}{2} + 1.
@@ -418,7 +413,7 @@ Inserção de B &
 \put(4.8, 2.2){\vector(-1,-4){0.34}}
 \put(5.3, 2.2){\vector(2,-3){0.9}}
 \put(5.7, 2.2){\vector(2,-1){2.7}}
-\put(0.0, 0.0){\framebox(2.4,0.8){~A~~\textbf{B}~~C~~D~~E}}
+\put(0.0, 0.0){\framebox(2.4,0.8){~A~~\alert{B}~~C~~D~~E}}
 \put(2.6, 0.0){\framebox(1.2,0.8){~J~~K~}}
 \put(4.0, 0.0){\framebox(1.2,0.8){~N~~O~}}
 \put(5.4, 0.0){\framebox(2.4,0.8){~R~~S~~T~~U~~V~}}
@@ -445,7 +440,7 @@ Inserção de B &
 \put(4.8, 2.2){\vector(-1,-4){0.34}}
 \put(5.3, 2.2){\vector(2,-3){0.9}}
 \put(5.7, 2.2){\vector(2,-1){2.7}}
-\put(0.0, 0.0){\framebox(2.4,0.8){~A~~\textbf{B}~~C~~D~~E}}
+\put(0.0, 0.0){\framebox(2.4,0.8){~A~~\alert{B}~~C~~D~~E}}
 \put(2.6, 0.0){\framebox(1.2,0.8){~J~~K~}}
 \put(4.0, 0.0){\framebox(1.2,0.8){~N~~O~}}
 \put(5.4, 0.0){\framebox(2.4,0.8){~R~~S~~T~~U~~V~}}
@@ -465,7 +460,7 @@ Inserção de Q &
 \put(0.0, 0.0){\framebox(2.4,0.8){~A~~B~~C~~D~~E}}
 \put(2.6, 0.0){\framebox(1.2,0.8){~J~~K~}}
 \put(4.0, 0.0){\framebox(1.2,0.8){~N~~O~}}
-\put(5.4, 0.0){\framebox(1.6,0.8){~\textbf{Q}~~R~~S~}}
+\put(5.4, 0.0){\framebox(1.6,0.8){~\alert{Q}~~R~~S~}}
 \put(7.2, 0.0){\framebox(1.6,0.8){~U~~V~}}
 \put(9.0, 0.0){\framebox(1.2,0.8){~Y~~Z~}}
 \end{picture}
@@ -494,7 +489,7 @@ Inserção de Q &
 \put(0.0, 0.0){\framebox(2.4,0.8){~A~~B~~C~~D~~E}}
 \put(2.6, 0.0){\framebox(1.2,0.8){~J~~K~}}
 \put(4.0, 0.0){\framebox(1.2,0.8){~N~~O~}}
-\put(5.4, 0.0){\framebox(1.6,0.8){~\textbf{Q}~~R~~S~}}
+\put(5.4, 0.0){\framebox(1.6,0.8){~\alert{Q}~~R~~S~}}
 \put(7.2, 0.0){\framebox(1.6,0.8){~U~~V~}}
 \put(9.0, 0.0){\framebox(1.2,0.8){~Y~~Z~}}
 \end{picture}\\
@@ -510,7 +505,7 @@ Inserção de L &
 \put(2.8, 2.2){\vector(0,-1){1.4}}
 \put(3.3, 2.2){\vector(1,-1){1.4}}
 \put(0.0, 0.0){\framebox(2.4,0.8){~A~~B~~C~~D~~E}}
-\put(2.6, 0.0){\framebox(1.6,0.8){~J~~K~~\textbf{L}~}}
+\put(2.6, 0.0){\framebox(1.6,0.8){~J~~K~~\alert{L}~}}
 \put(4.4, 0.0){\framebox(1.2,0.8){~N~~O~}}
 \put(7.6, 2.0){\framebox(1.2,0.8){~T~~X~}}
 \put(7.7, 2.2){\vector(-1,-1){1.4}}
@@ -545,7 +540,7 @@ Inserção de L &
 \put(2.8, 2.2){\vector(0,-1){1.4}}
 \put(3.3, 2.2){\vector(1,-1){1.4}}
 \put(0.0, 0.0){\framebox(2.4,0.8){~A~~B~~C~~D~~E}}
-\put(2.6, 0.0){\framebox(1.6,0.8){~J~~K~~\textbf{L}~}}
+\put(2.6, 0.0){\framebox(1.6,0.8){~J~~K~~\alert{L}~}}
 \put(4.4, 0.0){\framebox(1.2,0.8){~N~~O~}}
 \put(7.6, 2.0){\framebox(1.2,0.8){~T~~X~}}
 \put(7.7, 2.2){\vector(-1,-1){1.4}}
@@ -569,7 +564,7 @@ Inserção de F &
 \put(3.4, 2.2){\vector(1,-2){0.7}}
 \put(3.9, 2.2){\vector(1,-1){1.4}}
 \put(0.0, 0.0){\framebox(1.2,0.8){~A~~B~}}
-\put(1.4, 0.0){\framebox(1.6,0.8){~D~~E~~\textbf{F}~}}
+\put(1.4, 0.0){\framebox(1.6,0.8){~D~~E~~\alert{F}~}}
 \put(3.2, 0.0){\framebox(1.6,0.8){~J~~K~~L~}}
 \put(5.0, 0.0){\framebox(1.2,0.8){~N~~O~}}
 \put(8.2, 2.0){\framebox(1.2,0.8){~T~~X~}}
@@ -1070,6 +1065,46 @@ B é removido &
 \end{tabular}
 \end{center}
 }
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Variantes}
+
+\begin{itemize}
+\item Árvore B+: referências são armazenadas nas folhas apenas
+\begin{itemize}
+\item um número de chaves maior pode ser armazenado nos nós internos
+\item a altura é menor
+\item o tempo de acesso é uniforme
+\end{itemize}
+\item Árvores B*: nós internos tem entre $2g/3$ e $g$ sub-árvores
+\begin{itemize}
+\item melhora ocupação do espaço alocado
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Exercícios}
+
+\begin{enumerate}
+
+\item Projetar o algoritmo de remoção em árvores B.
+\item $S$ é uma coleção de registros $S$. O objetivo é criar uma árvore B
+  contendo exatamente todos os registros de $S$.
+\begin{itemize}
+\item A árvore B pode ser construída por inserção sucessiva. Qual seria o custo?
+\item Projetar uma solução mais eficiente.
+\end{itemize}
+\item Em uma árvore B+, $K$, $R$ e $N$ são respectivamente o tamanho da
+  representação de uma chave, de um registro, e da referência para um nó; $g$ é
+  o grau máximo; $h$ é a altura da árvore.
+
+  Expressar o número máximo de referências que esta árvore pode conter.
+\end{enumerate}
 \end{frame}
 
 \end{document}
