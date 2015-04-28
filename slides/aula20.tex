@@ -1,0 +1,623 @@
+\documentclass{beamer}
+\setbeamertemplate{footline}[frame number]
+%\documentclass{beamer}
+
+\input{preamble}
+
+\title{Aula 19: Estruturas para união e busca}
+\author{David Déharbe \\
+  Programa de Pós-graduação em Sistemas e Computação \\
+  Universidade Federal do Rio Grande do Norte \\
+  Centro de Ciências Exatas e da Terra \\
+  Departamento de Informática e Matemática Aplicada}
+\date{29 de abril de 2015}
+
+\begin{document}
+\selectlanguage{brazil}
+\begin{frame}
+  \titlepage
+  Download me from \url{http://ufrn.academia.edu/DavidDeharbe}.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Plano da aula}
+
+\begin{center}
+  \includegraphics[height=6cm]{fig/connex.pdf}
+\end{center}
+
+  \tableofcontents
+
+\end{frame}
+
+\section{Introdução}
+
+\begin{frame}
+
+  \frametitle{União e busca}
+  \framesubtitle{Introdução}
+
+  
+  \begin{itemize}
+    
+  \item Cenário de aplicação:
+
+    \begin{itemize}
+
+      \item registros devem ser mantidos em grupos
+
+      \item teste se dois elementos pertencem ao mesmo grupo (\alert{busca})
+
+      \item juntar dois grupos (\alert{fusão})
+
+      \item e também: 
+
+        \begin{itemize}
+
+          \item quantos grupos diferentes? 
+
+          \item qual o tamanho de cada grupo?
+
+          \item qual o maior grupo? 
+
+        \end{itemize}
+
+      \item exemplo: componentes conexos em um grafo
+
+    \end{itemize}
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Ilustração}
+
+\begin{center}
+\includegraphics[height=6cm]{fig/connex.pdf}
+\end{center}
+
+\begin{itemize}
+
+\item $G = (V, E)$, 
+\item $V = \{1,2,3,4,5,6,7,8,9,10\}$, e 
+\item $E = \{(1,3),(2,6),(3,4),(3,5),(6,7),(6,9),(8,10)\}$.
+\end{itemize}
+
+\end{frame}
+
+\section{Propriedades}
+
+\begin{frame}
+\frametitle{Propriedades}
+
+\begin{itemize}
+
+  \item Os grupos formam uma \alert{partição} do conjunto dos registros
+
+  \item Esta partição induz uma relação $R$ sobre os registros:
+
+    $$a \sim b \text{ sse } \id{grupo}(A) = \id{grupo}(B)$$
+
+  \item $\sim$ é uma relação de equivalência
+
+    \begin{itemize}
+
+      \item reflexiva $\forall e \cdot e \sim e$
+
+      \item simétrica $\forall e, e' \cdot e \sim e' \Rightarrow e' \sim e$
+
+      \item transitiva $\forall e_0, e_1, e_2 \cdot e_0 \sim e_1 \land e_1 \sim e_2 \Rightarrow e_0 \sim e_2$.
+
+    \end{itemize}
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Especificação das operações}
+
+\begin{itemize}
+
+  \item Criação de um novo grupo $\proc{Make-Set}(x)$
+
+    \begin{itemize}
+
+      \item registro $x$
+
+      \item resultado: o grupo criado
+
+    \end{itemize}
+
+  \item Busca do grupo $\proc{Find-Set}(x)$
+
+    \begin{itemize}
+
+      \item registro $x$
+
+      \item resultado: o grupo de $x$
+
+    \end{itemize}
+    
+  \item Junção de dois grupos $\proc{Union-Set}(x, y)$
+
+    \begin{itemize}
+
+      \item registros $x$, $y$
+
+      \item resultado: o grupo com $x$, $y$, e todos os elementos
+        que estavam com $x$ e com $y$
+
+    \end{itemize}
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Aplicação}
+
+
+\begin{itemize}
+
+  \item Criação de um novo grupo $\proc{Make-Set}(x)$
+
+    \begin{itemize}
+
+      \item registro $x$
+
+      \item resultado: o grupo criado
+
+    \end{itemize}
+
+  \item Busca do grupo $\proc{Find-Set}(x)$
+
+    \begin{itemize}
+
+      \item registro $x$
+
+      \item resultado: o grupo de $x$
+
+    \end{itemize}
+    
+  \item Junção de dois grupos $\proc{Union-Set}(x, y)$
+
+    \begin{itemize}
+
+      \item registros $x$, $y$
+
+      \item resultado: o grupo com $x$, $y$, e todos os elementos
+        que estavam com $x$ e com $y$
+
+    \end{itemize}
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Exemplo de aplicação}
+
+\begin{codebox}
+\Procname{$\proc{Graph-SCC}(G)$}
+\li \For $v \in \attrib{G}{V}$
+\li \Do $\proc{Make-Set}(v)$
+    \End
+\li \For $e \in \attrib{G}{E}$
+\li \Do $\proc{Union-Set}(\attrib{e}{src}, \attrib{e}{dst})$
+    \End
+\end{codebox}
+\pause
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+inicial & $\{1\},\{2\},\{3\},\{4\},\{5\},\{6\},\{7\},\{8\},\{9\},\{10\}$ \\
+\hline
+$(1,3)$ & $\{1,3\},\{2\},\{4\},\{5\},\{6\},\{7\},\{8\},\{9\},\{10\}$ \\
+\hline
+$(2,6)$ & $\{1,3\},\{2,6\},\{4\},\{5\},\{7\},\{8\},\{9\},\{10\}$ \\
+\hline
+$(3,4)$ & $\{1,3,4\},\{2,6\},\{5\},\{7\},\{8\},\{9\},\{10\}$ \\
+\hline
+$(3,5)$ & $\{1,3,4,5\},\{2,6\},\{7\},\{8\},\{9\},\{10\}$ \\
+\hline
+$(6,7)$ & $\{1,3,4,5\},\{2,6,7\},\{8\},\{9\},\{10\}$ \\
+\hline
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+\section{Implementação}
+
+\begin{frame}
+\frametitle{Estruturas de dados}
+
+\begin{description}
+\item[listas encadeadas] busca mais eficiente
+\item[árvores] união mais eficiente
+\end{description}
+
+Princípio comum: 
+\begin{itemize}
+\item cada grupo elege um registro \alert{representante}
+\item o representante identifica o grupo
+\end{itemize}
+
+
+\end{frame}
+
+\subsection{Implementação por listas}
+
+\begin{frame}
+\frametitle{Estado}
+\framesubtitle{Implementação por lista}
+
+Para cada registro $x$
+\begin{itemize}
+  \item $\attrib{x}{rep}$ é o grupo de $x$
+  \item $\attrib{x}{next}$ é o próximo elemento do grupo
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Criação}
+\framesubtitle{Implementação por lista}
+
+\begin{codebox}
+\Procname{$\proc{Make-Set}(x)$}
+\li $\attrib{x}{rep} \gets x$
+\li $\attrib{x}{next} \gets x$
+\end{codebox}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Busca}
+\framesubtitle{Implementação por lista}
+
+\begin{codebox}
+\Procname{$\proc{Find-Set}(x)$}
+\li \Return $\attrib{x}{rep}$
+\end{codebox}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{União}
+\framesubtitle{Implementação por lista}
+
+\begin{codebox}
+\Procname{$\proc{Union-Set}(x_1, x_2)$}
+\li $r_1 \gets \proc{Find-Set}(x_1)$
+\li $r_2 \gets \proc{Find-Set}(x_2)$
+\li $\id{tmp} \gets \attrib{r_1}{next}$
+\li $\attrib{r_1}{next} \gets r_2$
+\li $x \gets r_2$
+\li \Repeat
+\li   $\attrib{x}{rep} \gets r_1$
+\li   $x \gets \attrib{x}{next}$
+\li \Until $x \isequal r_2$
+\li $\attrib{x}{next} \gets tmp$
+\li \Return $r_1$
+\end{codebox}
+\pause
+Complexidade: $\Theta( | \id{grupo}(x_2) |)$
+\end{frame}
+
+\begin{frame}
+\frametitle{Ilustração da união}
+\framesubtitle{Implementação por lista}
+
+\begin{tabular}[t]{c}
+\only<1-3>{\includegraphics[width=.9\textwidth]{fig/union-find-0} \\}
+\only<2-3>{$1 \equiv 2$ \\}
+\only<3-6>{\includegraphics[width=.6\textwidth]{fig/union-find-1} \\}
+\only<5-6>{$3 \equiv 4$ \\}
+\only<6-9>{\includegraphics[width=.6\textwidth]{fig/union-find-2} \\}
+\only<8-9>{$5 \equiv 2$ \\}
+\only<9-12>{\includegraphics[width=.4\textwidth]{fig/union-find-3} \\}
+\only<11-12>{$1 \equiv 3$ \\}
+\end{tabular}
+\only<12>{\includegraphics[width=.4\textwidth]{fig/union-find-4} \\}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{União por tamanho}
+
+\begin{itemize}
+\item a solução apresentada pode ser otimizada facilmente
+\item incluir o menor grupo no maior
+\item $\Theta(\min(|\id{grupo}(x_1)|, |\id{grupo}(x_2)|))$
+\item realização:
+\begin{itemize}
+  \item estado: $\attrib{x}{rank}$ tamanho do grupo
+    (só precisa ser atualizado quando $\attrib{x}{rep} = x$)
+
+  \item união: 
+    \begin{enumerate}
+    \item troque $r_1$ e $r_2$ quando $\attrib{r_1}{rank} < \attrib{r_2}{rank}$
+    \item $\attrib{r_1}{rank} \gets \attrib{r_1}{rank} + \attrib{r_2}{rank}$
+    \end{enumerate}
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\subsection{Implementação por árvores}
+
+\begin{frame}
+\frametitle{Estado}
+\framesubtitle{Implementação por árvores}
+
+\begin{itemize}
+\item $\attrib{x}{up}$ é um registro do mesmo grupo que $x$
+\item $r$ é representante de um grupo quando $\attrib{r}{up} = r$
+\item o fecho transitivo da relação entre nós induzida por $\id{up}$ 
+ relaciona cada registro com seu representante
+\end{itemize}
+\pause
+\begin{center}
+\includegraphics[height=4cm]{fig/union-tree-4}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Criação}
+\framesubtitle{Implementação por árvores}
+
+\begin{codebox}
+\Procname{$\proc{Make-Set}(x)$}
+\li $\attrib{x}{up} \gets x$
+\end{codebox}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Busca}
+\framesubtitle{Implementação por árvores}
+
+\begin{codebox}
+\Procname{$\proc{Find-Set}(x)$}
+\li \While $x \neq \attrib{x}{up}$
+\li \Do $x \gets \attrib{x}{up}$
+    \End
+\li \Return $x$
+\end{codebox}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{União}
+\framesubtitle{Implementação por lista}
+
+\begin{codebox}
+\Procname{$\proc{Union-Set}(x_1, x_2)$}
+\li $r_1 \gets \proc{Find-Set}(x_1)$
+\li $r_2 \gets \proc{Find-Set}(x_2)$
+\li $\attrib{r_2}{up} \gets r_1$
+\li \Return $r_2$
+\end{codebox}
+\pause
+\alert{Complexidade?}
+\end{frame}
+
+\begin{frame}
+\frametitle{Ilustração da união}
+\framesubtitle{Implementação por lista}
+
+\only<1-9>{
+\begin{tabular}[t]{c}
+\only<1-3>{\includegraphics[width=.8\textwidth]{fig/union-tree-0} \\}
+\only<2-3>{$1 \equiv 2$ \\}
+\only<3-6>{\includegraphics[width=.5\textwidth]{fig/union-tree-1} \\}
+\only<5-6>{$3 \equiv 4$ \\}
+\only<6-9>{\includegraphics[width=.5\textwidth]{fig/union-tree-2} \\}
+\only<8-9>{$5 \equiv 2$ \\}
+\end{tabular}
+}
+\begin{tabular}[t]{c}
+\only<9-12>{\includegraphics[width=.3\textwidth]{fig/union-tree-3} \\}
+\only<11-12>{$1 \equiv 3$ \\}
+\end{tabular}
+\only<12>{\includegraphics[width=.3\textwidth]{fig/union-tree-4} \\}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{União por tamanho}
+
+\begin{itemize}
+\item $\proc{Union-Set}(x_1, x_2)$ aumenta a altura de todos os nós 
+  do grupo de $x_2$
+\item o custo da operação de busca depende da altura
+\item o custo da operação de fusão depende da altura
+\item para minimizar o custo ao longo da execução, sempre escolher como
+  grupo destino o que era inicialmente maior
+\item mesma técnica que para as listas
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{União por tamanho}
+\framesubtitle{Estudo experimental}
+
+\begin{itemize}
+\item é gerado aleatoriamente um grafo de 300 vertices e 300 arestas
+\item são impressas as árvores formadas pelos grupos depois de aplicar
+  $\proc{Graph-SCC}$
+\begin{itemize}
+\item sem união por tamanho
+\item com união por tamanho
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{União por tamanho}
+\framesubtitle{Estudo experimental}
+
+\begin{tabular}[t]{cc}
+sem & com \\
+\\
+\includegraphics[width=.25\textwidth]{fig/qu-300-300}
+&
+\includegraphics[width=.7\textwidth,align=top]{fig/wqu-300-300}
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Compressão de caminhos}
+
+\begin{itemize}
+\item a busca é uma operação essencial
+\item o custo depende da altura do valor procurado
+\item como diminuir a altura de forma eficiente?
+\pause
+\item aproveitar a busca para \alert{encurtar} o caminho até o representante
+\begin{itemize}
+\item no final da busca, atribuir $\id{up}$ com o representante do grupo
+\item durante a busca, encurtar o caminho: $\attrib{x}{up} \gets \attrib{\attrib{x}{up}}{up}$
+\end{itemize}
+\item pode ser combinado com a união por tamanho
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Algoritmos revisitado}
+\framesubtitle{Compressão de caminhos}
+
+\begin{itemize}
+\only<1>{
+\item compressão completa:
+\begin{codebox}
+\Procname{$\proc{Find-Set}(x)$}
+\li \While $\id{tmp} \gets x$
+\li \While $x \neq \attrib{x}{up}$
+\li \Do $x \gets \attrib{x}{up}$
+    \End
+\li \While $tmp \neq x$
+\li \Do $y \gets \attrib{tmp}{up}$
+\li   $\attrib{tmp}{up} \gets x$
+\li   $\id{tmp} \gets y$
+    \End
+\li \Return $x$
+\end{codebox}
+}
+\only<2>{
+\item compressão por divisão:
+\begin{codebox}
+\Procname{$\proc{Find-Set}(x)$}
+\li \While $x \neq \attrib{x}{up}$
+\li \Do $\attrib{x}{up} \gets \attrib{\attrib{x}{up}}{up}$
+\li   $x \gets \attrib{x}{up}$
+    \End
+\li \Return $x$
+\end{codebox}
+}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Ilustração}
+\framesubtitle{Compressão de caminhos}
+
+\begin{tabular}{l||l}
+\begin{tabular}{c}
+\includegraphics[width=.05\textwidth]{fig/compressao-init} \\
+Estado inicial
+\end{tabular}
+&
+\begin{tabular}{c}
+\includegraphics[width=.6\textwidth]{fig/compressao-completa} \\
+Após busca de 1, com compressão completa \\
+\hline
+\hline
+\begin{tabular}{p{.25\textwidth}p{.30\textwidth}}
+\includegraphics[width=.2\textwidth]{fig/compressao-divisao} &
+\includegraphics[width=.25\textwidth]{fig/compressao-divisao-2} \\
+Após busca de 1, com compressão por divisão &
+Após duas buscas de 1, com compressão por divisão
+\end{tabular}
+\end{tabular}
+\end{tabular}
+\end{frame}
+
+\begin{frame}
+\frametitle{Estudo experimental}
+
+\begin{itemize}
+\item é gerado aleatoriamente um grafo de 300 vertices e 300 arestas
+\item são impressas as árvores formadas pelos grupos depois de aplicar
+  $\proc{Graph-SCC}$
+\begin{itemize}
+\item compressão completa
+\item compressão por divisão
+\item sem compressão
+\end{itemize}
+\item são impressas as árvores formadas pelos grupos depois de aplicar
+  $\proc{Graph-SCC}$ e 300 buscas aleatórias
+\begin{itemize}
+\item compressão completa
+\item compressão por divisão
+\item sem compressão
+\end{itemize}
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Estudo experimental}
+
+\begin{center}
+\begin{tabular}[t]{c}
+Compressão completa: \\
+\\
+\includegraphics[width=\textwidth]{fig/fp-300-300} \\
+\\
+Compressão por divisão: \\
+\\
+\includegraphics[width=\textwidth]{fig/hp-300-300} \\
+\\
+Sem compressão: \\
+\\
+\includegraphics[width=\textwidth]{fig/wqu-300-300}
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Estudo experimental}
+
+\begin{center}
+\begin{tabular}[t]{c}
+Compressão completa: \\
+\\
+\includegraphics[width=\textwidth]{fig/fp2-300-300} \\
+\\
+Compressão por divisão: \\
+\\
+\includegraphics[width=\textwidth]{fig/hp2-300-300} \\
+\\
+Sem compressão: \\
+\\
+\includegraphics[width=\textwidth]{fig/wqu-300-300}
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+\end{document}
+
+

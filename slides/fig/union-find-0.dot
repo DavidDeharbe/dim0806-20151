@@ -1,0 +1,19 @@
+strict digraph ADTTOXML {
+  edge[color=black]
+  node[color=black, shape=box]
+
+  1 [label="1", style="filled", fillcolor="red"]
+  2 [label="2", style="filled", fillcolor="red"]
+  3 [label="3", style="filled", fillcolor="red"]
+  4 [label="4", style="filled", fillcolor="red"]
+  5 [label="5", style="filled", fillcolor="red"]
+
+  edge[color=black]
+  1 -> 1[label="rep, next"]
+  2 -> 2[label="rep, next"]
+  3 -> 3[label="rep, next"]
+  4 -> 4[label="rep, next"]
+  5 -> 5[label="rep, next"]
+
+  {rank=same;1 2 3 4 5}
+}

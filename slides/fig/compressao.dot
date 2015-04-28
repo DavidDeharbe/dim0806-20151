@@ -1,0 +1,104 @@
+digraph UnionFind {
+
+subgraph initial {
+  node[shape=ellipse, style=filled, color=black, fillcolor=white];
+  i1 [label="1"];
+  i2 [label="2"];
+  i3 [label="3"];
+  i4 [label="4"];
+  i5 [label="5"];
+  i6 [label="6"];
+  i7 [label="7"];
+  i8 [label="8",fillcolor=red];
+  edge[color=black];
+  i1->i2[label="up"];
+  i2->i3[label="up"];
+  i3->i4[label="up"];
+  i4->i5[label="up"];
+  i5->i6[label="up"];
+  i6->i7[label="up"];
+  i7->i8[label="up"];
+
+  style=filled;
+  color=lightgrey;
+
+  ititle[shape=box,label="inicial"]
+}
+
+subgraph full {
+  node[shape=ellipse, style=filled, color=black, fillcolor=white];
+  f1 [label="1"];
+  f2 [label="2"];
+  f3 [label="3"];
+  f4 [label="4"];
+  f5 [label="5"];
+  f6 [label="6"];
+  f7 [label="7"];
+  f8 [label="8",fillcolor=red];
+  edge[color=black];
+  f1->f8[label="up"];
+  f2->f8[label="up"];
+  f3->f8[label="up"];
+  f4->f8[label="up"];
+  f5->f8[label="up"];
+  f6->f8[label="up"];
+  f7->f8[label="up"];
+
+  style=filled;
+  color=lightgrey;
+  ftitle[shape=box,label="compressao completa"]
+}
+
+subgraph halving {
+  node[shape=ellipse, style=filled, color=black, fillcolor=white];
+  h1 [label="1"];
+  h2 [label="2"];
+  h3 [label="3"];
+  h4 [label="4"];
+  h5 [label="5"];
+  h6 [label="6"];
+  h7 [label="7"];
+  h8 [label="8",fillcolor=red];
+  edge[color=black];
+  h1->h3[label="up"];
+  h2->h3[label="up"];
+  h3->h5[label="up"];
+  h4->h5[label="up"];
+  h5->h7[label="up"];
+  h6->h7[label="up"];
+  h7->h8[label="up"];
+
+  style=filled;
+  color=lightgrey;
+  htitle="compressao por divisao";
+}
+
+subgraph halving2 {
+  label="compressão por divisão";
+  node[shape=ellipse, style=filled, color=black, fillcolor=white];
+  hh1 [label="1"];
+  hh2 [label="2"];
+  hh3 [label="3"];
+  hh4 [label="4"];
+  hh5 [label="5"];
+  hh6 [label="6"];
+  hh7 [label="7"];
+  hh8 [label="8",fillcolor=red];
+  edge[color=black];
+  hh1->hh5[label="up"];
+  hh2->hh3[label="up"];
+  hh3->hh5[label="up"];
+  hh4->hh5[label="up"];
+  hh5->hh8[label="up"];
+  hh6->hh7[label="up"];
+  hh7->hh8[label="up"];
+
+  style=filled;
+  color=lightgrey;
+  hhtitle="compressao por divisao";
+}
+
+ititle->ftitle[label="find(1)"]
+ititle->htitle[label="find(1)"]
+htitle->hhtitle[label="find(1)"]
+}
