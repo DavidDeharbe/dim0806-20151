@@ -1,0 +1,145 @@
+\documentclass{article}
+\usepackage[pdftex,active,tightpage]{preview}
+\setlength\PreviewBorder{2mm}
+ 
+\usepackage{tikz}
+\usetikzlibrary{calc,positioning,arrows}
+
+\tikzstyle{splay}=[draw, circle, minimum size=20pt, fill=blue!20, inner sep=4pt, text=black]
+\tikzstyle{tree}=[draw, circle, minimum size=20pt, inner sep=4pt, text=black]
+\tikzstyle{nil}=[draw, rectangle, minimum size=7pt, fill=red!40, thin]
+\tikzstyle{subtree}=[draw, rectangle, minimum size=30pt, fill=blue!20]
+
+\begin{document}
+
+\begin{preview}
+\begin{tikzpicture}[->, very thick, level/.style={sibling distance=30mm/#1}]
+  \node[tree] {10}
+   child {
+      node[tree] {9}
+      child {
+        node[tree] {7}
+        child {
+          node[tree] {5}
+          child {
+            node[tree] {1}
+            child { node[nil] {} }
+            child { 
+              node[splay] {2}
+              child { node[nil] {} }
+              child { node[nil] {} }
+            }
+          }
+          child { node[nil] {} }
+        }
+        child { node[nil] {} }
+      }
+      child { node[nil] {} }
+   }
+   child {
+      node[tree] {11}
+      child { node[nil] {} }
+      child { node[nil] {} }
+   };
+\end{tikzpicture}
+\end{preview}
+%% splaying case 2
+\begin{preview}
+\begin{tikzpicture}[->, very thick, level/.style={sibling distance=30mm/#1}]
+  \node[tree] {10}
+   child {
+      node[tree] {9}
+      child {
+        node[tree] {7}
+        child {
+          node[splay] {2}
+          child {
+            node[tree] {1}
+            child { node[nil] {} }
+            child { node[nil] {} }
+          }
+          child {
+            node[tree] {5}
+            child { node[nil] {} }
+            child { node[nil] {} }
+          }
+        }
+        child { node[nil] {} }
+      }
+      child { node[nil] {} }
+   }
+   child {
+      node[tree] {11}
+      child { node[nil] {} }
+      child { node[nil] {} }
+   };
+\end{tikzpicture}
+\end{preview}
+
+%% splaying case 3
+\begin{preview}
+\begin{tikzpicture}[->, very thick, level/.style={sibling distance=30mm/#1}]
+  \node[tree] {10}
+   child {
+     node[splay] {2}
+     child {
+       node[tree] {1}
+       child { node[nil] {} }
+       child { node[nil] {} }
+     }
+     child {
+       node[tree] {7}
+       child {
+         node[tree] {5}
+         child { node[nil] {} }
+         child { node[nil] {} }
+       }
+       child {
+         node[tree] {9}
+         child { node[nil] {} }
+         child { node[nil] {} }
+       }
+     }
+   }
+   child {
+      node[tree] {11}
+      child { node[nil] {} }
+      child { node[nil] {} }
+   };
+\end{tikzpicture}
+\end{preview}
+
+%% splaying case 1
+\begin{preview}
+\begin{tikzpicture}[->, very thick, level/.style={sibling distance=30mm/#1}]
+  \node[splay] {2}
+  child {
+    node[tree] {1}
+    child { node[nil] {} }
+    child { node[nil] {} }
+  }
+  child {
+    node[tree] {10}
+    child {
+      node[tree] {7}
+      child {
+        node[tree] {5}
+        child { node[nil] {} }
+        child { node[nil] {} }
+      }
+      child {
+        node[tree] {9}
+        child { node[nil] {} }
+        child { node[nil] {} }
+      }
+    }
+    child {
+      node[tree] {11}
+      child { node[nil] {} }
+      child { node[nil] {} }
+    }
+  };
+\end{tikzpicture}
+\end{preview}
+
+\end{document}

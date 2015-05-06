@@ -1,0 +1,60 @@
+\documentclass{article}
+\usepackage[pdftex,active,tightpage]{preview}
+\setlength\PreviewBorder{2mm}
+ 
+\usepackage{tikz}
+\usetikzlibrary{calc,positioning,arrows}
+
+\tikzstyle{tree}=[draw, circle, minimum size=20pt, inner sep=4pt, text=black]
+\tikzstyle{nil}=[draw, rectangle, minimum size=10pt, fill=red!100]
+\tikzstyle{subtree}=[draw, rectangle, minimum size=30pt, fill=blue!20]
+
+\begin{document}
+
+\begin{preview}
+\begin{tikzpicture}[->, very thick, level/.style={sibling distance=60mm/#1}]
+  \node[subtree] {$T$};
+\end{tikzpicture}
+\end{preview}
+
+\begin{preview}
+\begin{tikzpicture}[->, very thick, level/.style={sibling distance=30mm/#1}]
+  \node[tree] {$r$}
+    child {
+      node[subtree] {$T_L$}
+   }
+   child {
+      node[subtree] {$T_R$}
+    };
+\end{tikzpicture}
+\end{preview}
+
+\begin{preview}
+\begin{tikzpicture}[->, very thick, level/.style={sibling distance=30mm/#1}]
+  \node[tree] {$x$}
+   child { node[subtree] {$T_L$} }
+   child {
+      node[tree] {$r$}
+      child { node[nil] {} }
+      child { node[subtree] {$T_L$} }
+    };
+\end{tikzpicture}
+\end{preview}
+
+\end{document}
+
+\begin{preview}
+\begin{tikzpicture}[->, very thick, level/.style={sibling distance=60mm/#1}]
+  \node[tree] {$x$}
+    child {
+      node[subtree] {$T_L$}
+      \node[tree] {$r$}
+        child {
+          node[nilsubtree] {}
+          node[subtree] {$T_R$}
+        }
+    };
+\end{tikzpicture}
+\end{preview}
+
+\end{document}

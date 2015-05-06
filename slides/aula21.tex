@@ -1,0 +1,1029 @@
+\documentclass{beamer}
+%\documentclass{beamer}
+\setbeamertemplate{footline}[frame number]
+
+\input{preamble}
+
+\usepackage{pgf}
+\usepackage{tikz}
+
+\title{Aula 21: Análise amortizada e estruturas de dados}
+\author{David Déharbe \\
+  Programa de Pós-graduação em Sistemas e Computação \\
+  Universidade Federal do Rio Grande do Norte \\
+  Centro de Ciências Exatas e da Terra \\
+  Departamento de Informática e Matemáica Aplicada}
+\date{04 de maio de 2015}
+
+\begin{document}
+\selectlanguage{brazil}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+  \frametitle{Introdução}
+  \tableofcontents
+
+  \begin{enumerate}
+    \item Avaliação de estruturas de dados: análise amortizada
+      \begin{itemize}
+        \item Contador binário
+        \item Arranjos dinâmicos
+      \end{itemize}
+  \end{enumerate}
+
+\end{frame}
+
+\section{Análise amortizada}
+
+\begin{frame}
+\frametitle{Análise amortizada}
+
+\begin{itemize}
+\item Medição da complexidade ao longo de $n$ operações
+\item Custo de execução, no pior caso: $T(n)$
+\item Custo amortizado: $T(n)/n$
+\item Exemplos
+\begin{enumerate}
+  \item contador binário
+  \item arranjo dinâmico
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+\subsection{Método agregado}
+
+\begin{frame}
+
+\frametitle{Método agregado}
+
+\begin{itemize}
+\item Considere uma série de $n$ operações em alguma estrutura de dados, $n$
+  qualquer.
+
+\item Determina o custo $T(n)$ desta série de operações.
+
+\item O custo médio de cada operação é $T(n)/n$.
+
+\item Exemplo: contador binário
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Método agregado: um exemplo}
+
+  \begin{codebox}
+    \Procname{$\proc{Increment}(A)$}
+    \zi \Comment $A$ é um arranjo de $k$ bits
+    \li $i \gets 0$
+    \li \While $i < \id{length}[A] \mbox{ and } A[i] = 1$
+    \li \Do 
+    \li   $A[i] \gets 0$
+    \li   $i \gets i + 1$
+        \End
+    \li \If $i < \id{length}[A]$
+    \li \Then
+    \li    $A[i] \gets 1$
+        \End
+  \end{codebox}
+
+\begin{itemize}
+\item O tamanho da entrada é $k$;
+\item O custo da execução da $\proc{Increment}$ é proporcional ao número de bits
+  invertidos.
+\item No pior caso, a complexidade é proporcional a $k$;
+\item Logo, o custo de uma sequência de $n$ operações é $O(n \times k)$.
+\item Podemos prover uma análise mais precisa?
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Método agregado: um exemplo}
+
+Em uma série de $n$ execuções de $\proc{Increment}$:
+\begin{itemize}
+\item $A[0]$ é invertido $n$ vezes;
+\item $A[1]$ é invertido $n/2$ vezes;
+\item $A[2]$ é invertido $n/4$ vezes;
+\item $A[k-1]$ é invertido $n/2^{k-1}$ vezes;
+\end{itemize}
+O custo total para $n$ operações é 
+\begin{eqnarray*}
+T(n) & = & \sum_{i=1}^{\lfloor \lg n \rfloor} n/2^{i-1} \\
+T(n) & < & \sum_{i=1}^{\infty} n/2^{i-1} \\
+T(n) & < & n \times \sum_{i=1}^{\infty} 1/2^{i-1} = 2n
+\end{eqnarray*}
+
+Logo o custo amortizado de $\proc{Increment}$ é $T(n)/n = 2 \in \Theta(1)$: é \alert{constante}.
+
+\end{frame}
+
+\subsection{Método do contador}
+
+\begin{frame}
+
+\frametitle{Método do contador}
+
+\begin{quote}
+Quanto pagar para executar $n$ operações?
+\end{quote}
+
+\begin{itemize}
+
+\item cada operação tem um custo real
+
+\item a cada operação é atribuído um preço ($\approx$ custo amortizado individual)
+
+\item os preços cobrados devem cobrir os custos reais
+
+\item se o preço é maior que o custo:
+\begin{itemize}
+\item crédito é associado a elementos da estrutura de dados
+\end{itemize}
+
+\item se o custo é maior que o preço
+\begin{itemize}
+\item a diferença deve poder ser paga com os créditos disponíveis
+\end{itemize}
+
+\item custo amortizado total: soma dos preços cobrados
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Critérios de definição do custo}
+
+\begin{itemize}
+
+\item o custo amortizado total deve ser uma cota superior do custo real
+\begin{itemize}
+\item a estrutura de dados não ``empresta''
+\end{itemize}
+
+\item o crédito total associado aos elementos nunca pode ser negativo
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Método do contador: o contador binário}
+
+\begin{itemize}
+
+  \item a unidade de custo é inverter um bit
+
+  \item preço para $0 \rightarrow 1$: 2
+   
+  \begin{itemize}
+
+    \item 1 é o custo
+
+    \item sobra $2 - 1 = 1$ de crédito, associado ao bit setado a 1
+
+  \end{itemize}
+
+  \item preço para $1 \rightarrow 0$: 0
+
+    \begin{itemize}
+
+      \item pago com o crédito
+
+    \end{itemize}
+  
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Método do contador: o contador binário}
+
+  \begin{codebox}
+    \Procname{$\proc{Increment}(A)$}
+    \zi \Comment $A$ é um arranjo de $k$ bits
+    \li $i \gets 0$
+    \li \While $i < \id{length}[A] \mbox{ and } A[i] = 1$
+    \li \Do 
+    \li   $A[i] \gets 0$
+    \li   $i \gets i + 1$
+        \End
+    \li \If $i < \id{length}[A]$
+    \li \Then
+    \li    $A[i] \gets 1$
+        \End
+  \end{codebox}
+
+\begin{itemize}
+\item O custo do laço é pago usando os créditos dos bits setados a 1.
+
+\item no máximo um único bit é setado a 1: custo 1, mais 1 que fica como crédito
+
+\item logo, o custo de uma execução da operação $\proc{Increment}$ é 2
+
+\item o custo de $n$ execuções da operação $\proc{Increment}$ é $O(n)$.
+
+\end{itemize}
+
+\end{frame}
+
+\subsection{Método do potencial}
+
+\begin{frame}
+
+\frametitle{Método do potencial}
+
+\begin{itemize}
+
+\item crédito $\Longrightarrow$ \alert{potencial} para executar futuras operações
+
+\item estrutura de dados inicia em um estado $D_0$
+
+\item $n$ operações são executadas, 
+
+\begin{itemize}
+
+\item custo real $c_1, \ldots c_i, \ldots c_n$
+
+\item levando aos estados $D_1, \ldots D_i, \ldots D_n$
+
+\end{itemize}
+
+\item A função $\Phi$ associa um número real $\Phi_i$ (potencial) ao estado
+  $D_i$
+
+\item \alert{Custo amortizado} $a_i = c_i + \Phi_i - \Phi_{i-1}$
+
+\item Custo amortizado total
+$$
+\sum_{i=1}^n a_i = \sum_{i=1}^n c_i + \Phi_i - \Phi_{i-1} = \sum_{i=1}^n c_i + \Phi_n - \Phi_0
+$$
+\item \alert{se $\forall i \cdot \Phi_i \ge \Phi_0$, então $\sum_{i=1}^n a_i$ é uma cota superior do custo total real}.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Método do potencial}
+\framesubtitle{Relação com o método do contador}
+
+\begin{itemize}
+
+\item $\Phi_0 = 0$
+
+\item mostrar que $\Phi_i \ge 0$, $\forall i$.
+
+\item $\Phi_i > \Phi_{i-1} \approx \text{crédito}$ (potencial aumenta)
+
+\item $\Phi_i < \Phi_{i-1} \approx \text{débito}$ (potencial diminui)
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Método do potencial: o contador binário}
+
+\begin{itemize}
+
+  \item a $i$-ésima chamada de $\proc{Increment}$ zera $t_i$ bits
+
+  \item custo real $c_i = t_i + 1$ (zera $i$, seta 1)
+
+  \item potencial: $\Phi_i = \text{quantidade de bits setados a 1}$
+
+  \item naturalmente, $\forall i \cdot \Phi_i \ge 0$
+
+  \item logo $\Phi_i \le \Phi_{i-1} - t_i + 1$
+
+  \item $\Phi_i - \Phi_{i-1} \le 1 - t_i$
+
+  \item custo amortizado de uma operação
+    $$a_i = c_i + \Phi_i - \Phi_{i-1} \le (t_i + 1) - (1 - t_i) = 2$$
+
+  \item custo amortizado de $n$ operações $O(n)$
+
+\end{itemize}
+
+\end{frame}
+
+\section{Arranjos dinâmicos}
+
+\begin{frame}
+\frametitle{Arranjos dinâmicos}
+
+\begin{itemize}
+
+\item contêiner tabela, cuja capacidade adapta-se ao tamanho da coleção
+\begin{itemize}
+\item inserção e remoção: modelo pilha
+\end{itemize}
+
+\item inserção em uma tabela está cheia
+\begin{itemize}
+\item aloca uma nova tabela de capacidade maior
+\item copia o conteúdo da tabela original para a nova tabela
+\item libera o espaço ocupado pela tabela original
+\item insere o novo elemento
+\end{itemize}
+
+\item política de expansão: dobra o tamanho
+
+\item remoção, quando o fator de carga fica baixo
+\begin{itemize}
+\item aloca uma nova tabela de capacidade menor
+\item copia o conteúdo da tabela original para a nova tabela
+\item libera o espaço ocupado pela tabela original
+\item remove o elemento
+\end{itemize}
+
+\item política de contração: divide a capacidade por dois quando fator de carga chega a $1/4$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Implementação: dados}
+
+\begin{itemize}
+\item $\attrib{T}{table}$ tabela com os elementos
+\item $\attrib{T}{num}$ quantidade de elementos armazenados na tabela
+\item $\attrib{T}{size}$ capacidade máxima
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Inserção}
+
+\begin{codebox}
+\Procname{$\proc{Insert}(T, k)$}
+\li \If $\attrib{T}{size} \isequal 0$ \Comment alocação inicial
+\li \Then $\attrib{T}{table} \gets \proc{Alloc-Table}(1)$
+\li       $\attrib{T}{size} \gets 1$
+\li \ElseIf $\attrib{T}{num} \isequal \attrib{T}{size}$ \Comment expansão
+\li \Then $\id{tab} \gets \attrib{T}{table}$
+\li   $\attrib{T}{table} \gets \proc{Alloc-Table}(\attrib{T}{size} \times 2)$
+\li   \For $i \gets 1$ \To $\attrib{T}{size}$
+\li   \Do $\attrib{T}{table}[i] \gets \id{tab}[i]$
+      \End
+\li   $\attrib{T}{size} \gets \attrib{T}{size} \times 2$
+\li   $\proc{Free-Table}(tab)$
+    \End
+\li $\attrib{T}{num} \gets \attrib{T}{num}+1$ \Comment inserção
+\li $\attrib{T}{table}[\attrib{T}{num}] \gets k$
+\end{codebox}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Análise}
+
+Cenário: $n$ inserções em uma tabela inicialmente vazia
+\begin{itemize}
+\item custo da operação $i$
+\begin{itemize}
+\item sem expansão: 1
+\item com expansão: $i$
+\end{itemize}
+\item Pior caso $O(n^2)$
+\item Melhoria desta análise com análise amortizada
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Método agregado}
+\begin{itemize}
+\item Há expansão quando $i$ é uma potência de 2.
+\item Custo total:
+\begin{eqnarray*}
+\sum_{i=1}^{n} c_i & \le & n + \sum_{j=0}^{\lfloor \log_2 n \rfloor} 2^j \\
+& < & n + 2n \\
+& = & 3n
+\end{eqnarray*}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Método do contador}
+\begin{itemize}
+\item Custo 1 para atribuir uma posição de $\attrib{T}{table}$
+\item Preço de uma operação de inserção: 3
+\item Pagamento de uma operação de inserção, sem expansão:
+\begin{itemize}
+\item 1 vai para a inserção (custo real) $i = \attrib{T}{size}/2 + j$
+\item sobra 2 de crédito
+\item 1 crédito na posição de inserção $i$
+\item 1 crédito para um outro elemento da tabela $j$
+\end{itemize}
+\item Pagamento da expansão:
+\begin{itemize}
+\item todos os itens tem um crédito
+\item o crédito paga a expansão
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Método do potencial}
+\begin{itemize}
+\item Após cada expansão: $\Phi = 0$
+\item $\Phi \uparrow$ quando a tabela é preenchida
+\item até a tabela ser preenchida, e $\Phi$ é gasto na expansão
+\item $\Phi(T) = 2 \times \attrib{T}{num} - \attrib{T}{size}$
+\begin{itemize}
+\item Inicialmente, e após cada expansão $\Phi(T) = 0$
+\item Antes de uma expansão $\Phi(T) = 2 \times \attrib{T}{num} - \attrib{T}{size} = \attrib{T}{size}$
+\item A cada momento $\Phi(T) \ge 0$
+\item Logo, a soma dos custos amortizados é uma cota superior dos custos reais.
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Método do potencial}
+
+\begin{itemize}
+\item $n_i$: número de elementos após operação $i$
+\item $s_i$: capacidade após a operação $i$
+\item inicialmente $n_0 = s_0 = 0$, $\Phi_0 = 0$
+\item $n_i = n_{i-1} + 1$
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Método do potencial}
+
+se a operação $i$ não tem expansão:
+\begin{itemize}
+\item $s_i = s_{i-1}$ e 
+\end{itemize}
+\begin{eqnarray*}
+a_i & = & c_i + \Phi_i - \Phi_{i-1} \\
+    & = & 1 + (2 \cdot n_i - s_i) + (2 \cdot n_{i-1} - s_{i-1}) \\
+    & = & 1 + (2 \cdot n_i - s_i) + (2 \cdot (n_i - 1) - s_i) \\
+    & = & 3
+\end{eqnarray*}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Método do potencial}
+
+se a operação $i$ tem expansão:
+\begin{itemize}
+\item $s_i = 2 \times s_{i-1}$, $s_{i-1} = n_{i-1} = n_i - 1$ e 
+\end{itemize}
+\begin{eqnarray*}
+a_i & = & c_i + \Phi_i - \Phi_{i-1} \\
+    & = & n_i + (2 \cdot n_i - s_i) - (2 \cdot n_{i-1} - s_{i-1}) \\
+    & = & n_i + (2 \cdot n_i - 2 \cdot (n_i - 1)) - (2 \cdot (n_i - 1) - (n_i - 1)) \\
+    & = & 3
+\end{eqnarray*}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Remoção com contração de capacidade}
+
+\begin{itemize}
+\item expansão dobra capacidade
+\item contração ocorre quando capacidade chega a $1/4$ 
+\item por quê não escolher $1/2$?
+\end{itemize}
+
+\begin{codebox}
+\Procname{$\proc{Remove}(T)$}
+\li \If $\attrib{T}{num} \isequal 0$ \Then
+\li   $\attrib{T}{size} \gets 0$
+\li   $\proc{Free-Table}(\attrib{T}{table})$
+\li \ElseIf $\attrib{T}{num} \neq 0$ and $\attrib{T}{num} * 4 < \attrib{T}{size}$ \Comment contração
+\li \Then $\id{tab} \gets \attrib{T}{table}$
+\li   $\attrib{T}{table} \gets \proc{Alloc-Table}(\attrib{T}{size} / 2)$
+\li   \For $i \gets 1$ \To $\attrib{T}{num}$
+\li   \Do $\attrib{T}{table}[i] \gets \id{tab}[i]$
+      \End
+\li   $\attrib{T}{size} \gets \attrib{T}{size} / 2$
+\li   $\proc{Free-Table}(tab)$
+    \End
+\li $\attrib{T}{num} \gets \attrib{T}{num}-1$ \Comment remoção
+\end{codebox}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Análise com o método do potencial}
+
+\begin{itemize}
+\item $\Phi = 0$ logo após contração ou expansão
+\item Fator de carga $\alpha(T) = \attrib{T}{num} / \attrib{T}{size}$, se $T$ não for vazia, 1 se for.
+\item $\attrib{T}{num} = \alpha(T) \cdot \attrib{T}{size}$
+\item Função potencial
+\begin{eqnarray*}
+\Phi(T) & = & \left\{ \begin{array}{ll}
+2 \cdot \attrib{T}{num} - \attrib{T}{size} & \text{se } \alpha{T} \ge 1/2 \\
+\attrib{T}{size}/2 - \attrib{T}{num} & \text{se } 1/4 \le \alpha{T} < 1/2 \\
+\end{array}
+\right.
+\end{eqnarray*}
+\end{itemize}
+A função potencial nunca é negativa: obteremos uma cota superior do custo real
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Análise com o método do potencial}
+\framesubtitle{Justificativa intuitiva}
+
+\begin{itemize}
+\item antes de uma expansão:
+\begin{itemize}
+\item $\alpha(T) = 1$
+\item $\attrib{T}{num} = \attrib{T}{size}$,
+\item $\Phi(T) = \attrib{T}{num}$
+\item permite cópia de $\attrib{T}{num}$ elementos.
+\end{itemize}
+\item antes de uma contração:
+\begin{itemize}
+\item $\alpha(T) = 1/4$
+\item $\attrib{T}{num} \cdot 4 = \attrib{T}{size}$,
+\item $\Phi(T) = \attrib{T}{size}/2 - \attrib{T}{num} = \attrib{T}{num}$
+\item permite cópia de $\attrib{T}{num}$ elementos.
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Análise com o método do potencial}
+\framesubtitle{Notações}
+
+\begin{center}
+\begin{tabular}{rcl}
+$s_i$ & : & capacidade após operação $i$ \\
+$n_i$ & : & número de elementos após operação $i$ \\
+$\Phi_i$ & : & potencial após operação $i$ \\
+$\alpha_i$ & : & fator de carga após operação $i$
+\end{tabular}
+\end{center}
+Inicialmente: $s_0 = n_0 = \Phi_0 = 0, \alpha_0 = 1$
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Análise com o método do potencial}
+\framesubtitle{Inserção}
+
+A operação $i$ é uma inserção:
+\begin{itemize}
+\item já fizemos a análise no caso $\alpha_{i-1} \ge 1/2$: $a_i = 3$
+\item se $\alpha_{i-1} < 1/2$, não há expansão
+\only<2>{
+\item se $\alpha_i < 1/2$:
+\begin{eqnarray*}
+a_i & = & c_i + \Phi_i - \Phi_{i-1} \\
+& = & 1 + (s_i/2 - n_i) - (s_{i-1}/2 - n_{i-1}) \\
+& = & 1 + (s_i/2 - n_i) - (s_i/2 - (n_i-1)) \\
+& = & 0
+\end{eqnarray*}
+O custo amortizado de uma inserção é \alert{3} no máximo.
+}
+\only<1>{
+\item se $\alpha_i \ge 1/2$:
+\begin{eqnarray*}
+a_i & = & c_i + \Phi_i - \Phi_{i-1} \\
+& = & 1 + (2\cdot n_i - s_i) - (s_{i-1}/2 - n_{i-1}) \\
+& = & 1 + (2\cdot (n_{i-1}+1) - s_{i-1}) - (s_{i-1}/2 - n_{i-1}) \\
+& = & 3 \cdot n_{i-1} - \frac{3}{2}\cdot s_{i-1} + 3 \\
+& = & 3 \cdot \alpha_{i-1} \cdot s_{i-1} - \frac{3}{2}\cdot s_{i-1} + 3 \\
+& < & \frac{3}{2} \cdot s_{i-1} - \frac{3}{2}\cdot s_{i-1} + 3 \\
+& = & 3
+\end{eqnarray*}
+}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Análise com o método do potencial}
+\framesubtitle{Remoção}
+$$n_i = n_{i-1} - 1$$
+\begin{itemize}
+\only<1>{
+\item se $\alpha_{i-1} < 1/2$,
+\begin{itemize}
+\item sem contração: $s_i = s_{i-1}$
+\begin{eqnarray*}
+a_i & = & c_i + \Phi_i - \Phi_{i-1} \\
+& = & 1 + (s_i/2 - n_i) - (s_{i-1}/2 - n_{i-1}) \\
+& = & 1 + (s_i/2 - (n_{i-1} - 1)) - (s_i/2 - n_{i-1}) \\
+& = & 2
+\end{eqnarray*}
+\item com contração: $n_{i-1} = n_i - 1 = s_i/2 = s_{i-1}/4$ e $c_i = n_i + 1$
+\begin{eqnarray*}
+a_i & = & c_i + \Phi_i - \Phi_{i-1} \\
+& = & n_i + 1 + (s_i/2 - n_i) - (s_{i-1}/2 - n_{i-1}) \\
+& = & n_{i-1} + (n_{i-1} - (n_{i-1} - 1)) - (2\cdot n_{i-1} - n_{i-1}) \\
+& = & 1
+\end{eqnarray*}
+\end{itemize}
+}
+\only<2-3>{
+\item se $\alpha_{i-1} \ge 1/2$,
+\item não há contração: $s_i = s_{i-1}$, $n_i = n_{i-1} - 1$
+}
+\only<2>{
+\item se $\alpha_i \ge 1/2$
+\begin{eqnarray*}
+a_i & = & c_i + \Phi_i - \Phi_{i-1} \\
+& = & 1 + (2 \cdot n_i - s_i) - (2 \cdot n_{i-1} - s_{i-1}) \\
+& = & 1 + (2 \cdot (n_{i-1} - 1) - s_{i-1}) - (2 \cdot n_{i-1} - s_{i-1}) \\
+& = & -1
+\end{eqnarray*}
+}
+\only<3>{
+\item se $\alpha_i < 1/2$
+\begin{eqnarray*}
+a_i & = & c_i + \Phi_i - \Phi_{i-1} \\
+& = & 1 + (s_i/2 - n_i) - (2 \cdot n_{i-1} - s_{i-1}) \\
+& = & 1 + (s_{i-1}/2 - (n_{i-1} - 1)) - (2 \cdot n_{i-1} - s_{i-1}) \\
+& = & 2 + \frac{3}{2} \cdot s_{i-1} - 3 \cdot n_{i-1} \\
+& = & 2 + \frac{3}{2} \cdot s_{i-1} - 3 \cdot \alpha_{i-1} \cdot s_{i-1} \\
+& \le & 2
+\end{eqnarray*}
+O custo amortizado de uma remoção é \alert{2} no máximo.
+}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Arranjos dinâmicos}
+\framesubtitle{Síntese da análise de complexidade amortizada}
+\begin{itemize}
+  \item inserção tem custo amortizado $O(1)$
+  \item remoção tem custo amortizado $O(1)$
+\end{itemize}
+\end{frame}
+
+\section{Árvores chanfradas}
+
+\begin{frame}
+\frametitle{Árvores chanfradas}
+\framesubtitle{\it splay trees}
+
+\begin{itemize}
+\item árvores binárias de busca
+\item auto-ajustáveis
+\item não necessitam de atributos adicionais
+\item complexidade amortizada $O(\log n)$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Árvores chanfradas}
+
+\begin{itemize}
+\item uma única operação básica: chanfrar
+\begin{itemize}
+\item $\proc{Splay}(T, k)$: chanfra a árvore $T$ com relação ao valor $k$
+\item no término da operação $k$ está na raiz (ou o maior valor $< k$,
+ou o menor valor $> k$
+\end{itemize}
+\item busca, inserção e remoção são todas realizadas após chanfrar a árvore
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Realização das operações e o chanframento}
+
+\begin{itemize}
+\item uma única operação básica: chanfrar
+\begin{itemize}
+\item $\proc{Splay}(T, k)$: chanfra a árvore $T$ com relação ao valor $k$
+\item busca a chave $k$
+\item remaneja $T$ tal que $k$ fica na raiz (ou o maior valor $< k$,
+ou o menor valor $> k$
+\end{itemize}
+\item busca, inserção e remoção são todas realizadas após chanfrar a árvore
+\begin{itemize}
+\item $\proc{Search}(T, k)$: $\proc{Splay}(T, k)$ e consulta a raiz
+\item $\proc{Insert}(T, k)$: $\proc{Splay}(T, k)$ e insere $k$ na raiz
+\item $\proc{Remove}(T, k)$: $\proc{Splay}(T, k)$, remove a raiz, $T_L$ e $T_R$ árvores resultantes, $\proc{Splay}(T_L, k)$, e torne $T_R$ a sub-árvore da nova raiz de $T_L$.
+\item $O(1)$ aplicações de $\proc{Splay}$ + $O(1)$ operações.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Busca}
+
+\begin{itemize}
+\item $\proc{Search}(T, x)$: $\proc{Splay}(T, x)$ e consulta a raiz
+\end{itemize}
+
+\begin{tabular}{c}
+\includegraphics{fig/splay-remove-1.pdf} \pause \\
+$\proc{Splay}(T, x)$ \pause \\
+\includegraphics{fig/splay-remove-2.pdf}
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Inserção}
+
+\begin{itemize}
+\item $\proc{Insert}(T, k)$: $\proc{Splay}(T, k)$ e insere $k$ na raiz
+\end{itemize}
+
+\begin{tabular}{c}
+\only<1-3>{\includegraphics{fig/splay-insert-1.pdf} \\}
+\only<2-3>{$\proc{Splay}(T, x)$ \\}
+\only<3>{\includegraphics{fig/splay-insert-2.pdf} \\}
+\only<4>{\includegraphics[height=.2\textheight]{fig/splay-insert-2.pdf} \\}
+\only<5>{\includegraphics[height=.15\textheight]{fig/splay-insert-2.pdf} \\}
+\only<4-5>{$\attrib{n}{val} \gets x;$ \\}
+\only<4-5>{$\attrib{n}{left} \gets \attrib{\attrib{T}{root}}{left};$ \\}
+\only<4-5>{$\attrib{\attrib{T}{root}}{left} \gets \const{Nil};$ \\}
+\only<4-5>{$\attrib{n}{right} \gets \attrib{T}{root};$ \\}
+\only<4-5>{$\attrib{T}{root} \gets n$ \\}
+\only<5>{\includegraphics[height=.35\textheight]{fig/splay-insert-3.pdf}}
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Remoção}
+
+\begin{itemize}
+\item $\proc{Remove}(T, k)$: $\proc{Splay}(T, k)$, remove a raiz, $T_L$ e $T_R$ árvores resultantes, $\proc{Splay}(T_L, k)$, e torne $T_R$ a sub-árvore da nova raiz de $T_L$.
+\end{itemize}
+
+\begin{tabular}{c}
+\only<1-3>{\includegraphics{fig/splay-remove-1.pdf} \\}
+\only<2-3>{$\proc{Splay}(T, k)$ \\}
+\only<3-5>{\includegraphics{fig/splay-remove-2.pdf} \\}
+\only<4-5>{remove root: $n = \attrib{T}{root}; T_L = \attrib{n}{left}; T_R = \attrib{n}{right}; \proc{Free}(n)$ \\}
+\only<5-7>{\includegraphics{fig/splay-remove-3.pdf} \\}
+\only<6-7>{$\proc{Splay}(T_L, k)$ \\}
+\only<7-9>{\includegraphics{fig/splay-remove-4.pdf} \\}
+\only<8-9>{$\attrib{T_L}{right} \gets T_R$ \\}
+\only<9-10>{\includegraphics{fig/splay-remove-5.pdf}}
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Chanfrar um valor}
+
+\begin{itemize}
+\item aplicar rotações até chegar à raiz
+\item se $x$ for um filho da raiz: rotação simples (\alert{caso 1})
+\item $\attrib{x}{up} = y$ e $\attrib{y}{up} = z$
+\begin{itemize}
+\item se $x = \attrib{y}{left}$ e $y = \attrib{z}{left}$: rotação simples de $y$, rotação simples de $x$ (\alert{caso 2})
+\item se $x = \attrib{y}{right}$ e $y = \attrib{z}{right}$: rotação simples de $y$, rotação simples de $x$  (\alert{caso 2})
+\item se $x = \attrib{y}{left}$ e $y = \attrib{z}{left}$: rotação dupla de $x$  (\alert{caso 3})
+\item se $x = \attrib{y}{left}$ e $y = \attrib{z}{left}$: rotação dupla de $x$  (\alert{caso 3})
+\end{itemize}
+\item complexidade no pior caso $O(n)$
+\item análise amortizada mostra que todas as operações de chanframento tem
+custo amortizado $O(\log n)$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Chanfrar um valor --- caso 1}
+\framesubtitle{se $x$ for um filho da raiz: rotação simples}
+
+\begin{tabular}{c}
+\includegraphics[height=.4\textheight]{fig/splay-1-1.pdf} \\
+$\proc{Rotate-Simple-Right}(T)$ \\
+\includegraphics[height=.4\textheight]{fig/splay-1-2.pdf}
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Chanfrar um valor --- caso 2}
+\framesubtitle{$x = \attrib{y}{left}$ e $y = \attrib{z}{left}$ (e simétrico)}
+
+\begin{tabular}{c}
+\includegraphics[height=.35\textheight]{fig/splay-2-1.pdf} \\
+$\proc{Rotate-Simple-Right}(y)$ \\
+$\proc{Rotate-Simple-Right}(x)$ \\
+\includegraphics[height=.35\textheight]{fig/splay-2-2.pdf}
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Chanfrar um valor --- caso 3}
+\framesubtitle{$x = \attrib{y}{left}$ e $y = \attrib{z}{left}$}
+
+\begin{tabular}{c}
+\includegraphics[height=.4\textheight]{fig/splay-3-1.pdf} \\
+$\proc{Rotate-Double-Right}(y)$ \\
+\includegraphics[height=.4\textheight]{fig/splay-3-2.pdf}
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Chanfrar um valor: exemplo}
+
+\begin{tabular}[t]{ccc}
+\includegraphics[height=.8\textheight]{fig/splay-do-1.pdf} &
+Caso 2 &
+\includegraphics[height=.7\textheight]{fig/splay-do-2.pdf}
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Chanfrar um valor: exemplo}
+
+\begin{tabular}[t]{ccc}
+\includegraphics[height=.7\textheight]{fig/splay-do-2.pdf} &
+Caso 3 &
+\includegraphics[height=.6\textheight]{fig/splay-do-3.pdf}
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Chanfrar um valor: exemplo}
+
+\begin{tabular}[t]{ccc}
+\includegraphics[height=.6\textheight]{fig/splay-do-3.pdf} &
+Caso 1 &
+\includegraphics[height=.5\textheight]{fig/splay-do-4.pdf}
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Análise amortizada: método do contador}
+\begin{itemize}
+\item os nós guardam créditos ($\gamma(x)$)
+\item créditos pagam para efetuar rotações
+\item o preço de $\proc{Splay}$ é $O(\log n)$
+\item invariante: $\gamma(x) = \lfloor \log | T(x) | \rfloor$
+
+  $T(x)$: sub-árvore enraizada em $x$
+
+\item propriedade: $3 \times (\gamma(T) - \gamma(x) + O(1))$ créditos paga $\proc{Splay}(T, x)$ e mantem o invariante. (\alert{vamos mostrar isto depois})
+\item logo $\proc{Splay}$ custa no máximo $3 \lfloor \log n \rfloor + O(1) \in |Theta(\log n)$.
+\item para pagar inserção, busca ou remoção, basta pagar $O(\log n)$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Análise amortizada: método do contador}
+\begin{itemize}
+\item $\gamma(x)$ e $\gamma'(x)$: quantidade de créditos em $x$ antes
+e depois das rotações nos casos 1, 2 e 3
+\item $\proc{Splay}$ cai $k \ge 0$ vezes nos casos 2 e 3 e
+  possivelmente uma vez no caso 1.
+\item vamos mostrar que o custo em cada caso é
+\begin{itemize}
+\item caso 1: $3 \times(\gamma'(x) - \gamma(x)) + O(1)$
+\item caso 2: $3 \times(\gamma'(x) - \gamma(x))$
+\item caso 3: $3 \times(\gamma'(x) - \gamma(x))$
+\end{itemize}
+\item somando, obtemos $3(\gamma(T) - \gamma(x)) + O(1)$
+
+$\gamma(x)$: número de créditos em $\gamma$ antes do $\proc{Splay}$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Caso 1}
+\framesubtitle{$y = \attrib{x}{up}, \attrib{y}{up} = \const{Nil}$}
+
+\begin{itemize}
+\item $\gamma'(x) = \gamma(y)$, $\gamma'(y) \le \gamma'(x)$,
+\item logo 
+\begin{eqnarray*}
+\gamma'(x) + \gamma'(y) - \gamma(x) - \gamma(y) & = & \gamma'(y) - \gamma(x) \\
+& \le & \gamma'(x) - \gamma(x) \\
+& \le & 3 \times(\gamma'(x) - \gamma(x))
+\end{eqnarray*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Caso 2}
+\framesubtitle{$y = \attrib{x}{up}, x = \attrib{x}{left}, z = \attrib{y}{up}, y = \attrib{z}{left}$}
+
+\begin{itemize}
+\item temos: $\gamma'(x) = \gamma(z)$, $\gamma'(y) \le \gamma'(x)$,
+$\gamma'(z) \le \gamma'(x)$, $\gamma(y) \ge \gamma(x)$
+\item logo 
+\begin{eqnarray*}
+\lefteqn{\gamma'(x) + \gamma'(y) + \gamma'(z) - \gamma(x) - \gamma(y) - \gamma(z)} \\
+ & = & 
+\gamma'(y) + \gamma'(z) - \gamma(x) - \gamma(y) \\
+& = & (\gamma'(y) - \gamma(x)) + (\gamma'(z) - \gamma(y)) \\
+& \le & (\gamma'(x) - \gamma(x)) + (\gamma'(x) - \gamma(x)) \\
+& \le & 2 \times(\gamma'(x) - \gamma(x))
+\end{eqnarray*}
+\item resta $\gamma'(x) - \gamma(x)$ créditos para efetuar a rotação.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Caso 2 (continuação)}
+\framesubtitle{Mostramos que há créditos para a rotação}
+
+Resta $\gamma'(x) - \gamma(x)$:
+\begin{itemize}
+\item se $\gamma(x) \neg \gamma'(x)$, então resta $\gamma'(x) - \gamma(x) > 0$ créditos para efetuar a rotação
+\pause
+\item se $\gamma(x) = \gamma'(x)$, mostramos que
+$\gamma'(x) + \gamma'(y) + \gamma'(z) < \gamma(x) + \gamma(y) + \gamma(z)$.
+\item neste caso, é preciso menos créditos na árvore para manter o invariante
+\item este crédito é usado para efetuar a rotação
+\item roteiro da prova:
+\begin{itemize}
+\item supor que 
+$\gamma'(x) + \gamma'(y) + \gamma'(z) \ge \gamma(x) + \gamma(y) + \gamma(z)$.
+\item chegar a uma contradição
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Caso 2 (continuação)}
+\framesubtitle{o caso 2 pode liberar créditos para a rotação}
+
+Supondo
+$\gamma'(x) + \gamma'(y) + \gamma'(z) \ge \gamma(x) + \gamma(y) + \gamma(z)$,
+temos
+\begin{itemize}
+\item $\gamma(x) \le \gamma(y) \le \gamma(z)$
+\item $\gamma'(z) \le \gamma'(y) \le \gamma'(z)$
+\item $\gamma'(x) = \gamma(z)$
+\item logo temos que $\gamma(x) = \gamma(z) = \gamma(y)$
+\item e $\gamma'(x) = \gamma'(y) = \gamma'(z)$
+\item pela definição de $\gamma$, temos
+$\lfloor \log_2 (a + b + 1) \rfloor = \lfloor \log_2 a \rfloor = \lfloor \log_2 b \rfloor$
+\begin{itemize}
+\item se $a \le b$ então $\lfloor \log_2 (a+b+1) \rfloor \ge \lfloor \log_2 2a \rfloor = 1 + \lfloor \log_2 a \rfloor > \lfloor \log_2 a \rfloor$
+\item se $a > b$ então $\lfloor \log_2 (a+b+1) \rfloor \ge \lfloor \log_2 2b \rfloor = 1 + \lfloor \log_2 b \rfloor > \lfloor \log_2 b \rfloor$
+\end{itemize}
+\item em ambos casos chegamos a uma contradição.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Caso 3}
+
+\begin{itemize}
+\item Análogo ao caso 2
+\item deixado como exercício
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Conclusões}
+
+\begin{itemize}
+\item Análise amortizada pode fornecer resultados mais apurados
+\item outro exemplo: árvores rubro-negras
+\begin{itemize}
+\item inserção: $O(\log n)$
+\item mas o custo amortizado de $m$ inserções em uma árvore de $n$ nós
+  é $O(n+m)$
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\end{document}

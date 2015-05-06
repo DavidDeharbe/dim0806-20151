@@ -4,7 +4,7 @@
 
 \input{preamble}
 
-\title{Aula 19: Estruturas para união e busca}
+\title{Aula 20: Estruturas para união e busca}
 \author{David Déharbe \\
   Programa de Pós-graduação em Sistemas e Computação \\
   Universidade Federal do Rio Grande do Norte \\
@@ -23,7 +23,7 @@
   \frametitle{Plano da aula}
 
 \begin{center}
-  \includegraphics[height=6cm]{fig/connex.pdf}
+  \includegraphics[width=\textwidth]{fig/hp2-300-300}
 \end{center}
 
   \tableofcontents
@@ -402,7 +402,7 @@ Complexidade: $\Theta( | \id{grupo}(x_2) |)$
 \li $r_1 \gets \proc{Find-Set}(x_1)$
 \li $r_2 \gets \proc{Find-Set}(x_2)$
 \li $\attrib{r_2}{up} \gets r_1$
-\li \Return $r_2$
+\li \Return $r_1$
 \end{codebox}
 \pause
 \alert{Complexidade?}
@@ -500,7 +500,7 @@ sem & com \\
 \item compressão completa:
 \begin{codebox}
 \Procname{$\proc{Find-Set}(x)$}
-\li \While $\id{tmp} \gets x$
+\li $\id{tmp} \gets x$
 \li \While $x \neq \attrib{x}{up}$
 \li \Do $x \gets \attrib{x}{up}$
     \End
@@ -569,7 +569,7 @@ Após duas buscas de 1, com compressão por divisão
 \begin{itemize}
 \item compressão completa
 \item compressão por divisão
-\item sem compressão
+\item união por tamanho
 \end{itemize}
 
 \end{itemize}
@@ -589,7 +589,7 @@ Compressão por divisão: \\
 \\
 \includegraphics[width=\textwidth]{fig/hp-300-300} \\
 \\
-Sem compressão: \\
+União por tamanho, sem compressão: \\
 \\
 \includegraphics[width=\textwidth]{fig/wqu-300-300}
 \end{tabular}
@@ -610,7 +610,7 @@ Compressão por divisão: \\
 \\
 \includegraphics[width=\textwidth]{fig/hp2-300-300} \\
 \\
-Sem compressão: \\
+União por tamanho, sem compressão: \\
 \\
 \includegraphics[width=\textwidth]{fig/wqu-300-300}
 \end{tabular}

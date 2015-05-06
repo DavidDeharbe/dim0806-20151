@@ -89,6 +89,51 @@ for i in $pages; do mv $file.part$i.$i'_'$i.pdf "$file-$i.pdf"; done
 
 }
 
+function aula21 () {
+
+TEXFILES="splay-insert \
+  splay-remove \
+  splay-do \
+  splay-1 \
+  splay-2 \
+  splay-3"
+
+for file in $TEXFILES; do
+  latexmk -pdf $file
+done
+
+file=splay-insert
+pages="1 2 3"
+./splitPDF.py $file.pdf $pages
+for i in $pages; do mv $file.part$i.$i'_'$i.pdf "$file-$i.pdf"; done
+
+file=splay-remove
+pages="1 2 3 4 5"
+./splitPDF.py $file.pdf $pages
+for i in $pages; do mv $file.part$i.$i'_'$i.pdf "$file-$i.pdf"; done
+
+file=splay-do
+pages="1 2 3 4"
+./splitPDF.py $file.pdf $pages
+for i in $pages; do mv $file.part$i.$i'_'$i.pdf "$file-$i.pdf"; done
+
+file=splay-1
+pages="1 2"
+./splitPDF.py $file.pdf $pages
+for i in $pages; do mv $file.part$i.$i'_'$i.pdf "$file-$i.pdf"; done
+
+file=splay-2
+pages="1 2 3"
+./splitPDF.py $file.pdf $pages
+for i in $pages; do mv $file.part$i.$i'_'$i.pdf "$file-$i.pdf"; done
+
+file=splay-3
+pages="1 2"
+./splitPDF.py $file.pdf $pages
+for i in $pages; do mv $file.part$i.$i'_'$i.pdf "$file-$i.pdf"; done
+
+}
+echo "aula21: splay trees"
 
 function clean () {
 	rm -f *.log *.aux *~ *.pdf
