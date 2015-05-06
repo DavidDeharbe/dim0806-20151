@@ -135,6 +135,22 @@ for i in $pages; do mv $file.part$i.$i'_'$i.pdf "$file-$i.pdf"; done
 }
 echo "aula21: splay trees"
 
+function aula22 () {
+
+TEXFILES="interval-tree \
+  interval-tree-search"
+
+for file in $TEXFILES; do
+  latexmk -pdf $file
+done
+
+file=interval-tree-search
+pages="1 2 3"
+./splitPDF.py $file.pdf $pages
+for i in $pages; do mv $file.part$i.$i'_'$i.pdf "$file-$i.pdf"; done
+
+}
+echo "aula22: interval trees"
 function clean () {
 	rm -f *.log *.aux *~ *.pdf
 }

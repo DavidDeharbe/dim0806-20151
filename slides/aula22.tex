@@ -1,0 +1,413 @@
+\documentclass{beamer}
+%\documentclass{beamer}
+\setbeamertemplate{footline}[frame number]
+
+\input{preamble}
+
+\usepackage{pgf}
+\usepackage{tikz}
+
+\title{Aula 22: Extensão de estruturas de dados}
+\author{David Déharbe \\
+  Programa de Pós-graduação em Sistemas e Computação \\
+  Universidade Federal do Rio Grande do Norte \\
+  Centro de Ciências Exatas e da Terra \\
+  Departamento de Informática e Matemáica Aplicada}
+\date{06 de maio de 2015}
+
+\begin{document}
+\selectlanguage{brazil}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+  \frametitle{Plano}
+  \tableofcontents
+
+Referência: Cormen, cap 15.
+\end{frame}
+
+\section{Introdução}
+
+\begin{frame}
+\frametitle{Motivação}
+
+\begin{itemize}
+\item Estruturas de dados prontas não resolvem todos os problemas práticos
+\item Discernimento para saber adaptar uma estrutura de dados ao problema
+\item Conservar as boas propriedades da estrutura de dados
+\begin{enumerate}
+  \item complexidade
+  \item propriedades de ordenação
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+\section{O problema da seleção}
+
+\begin{frame}
+
+\frametitle{Descrição}
+
+\begin{itemize}
+\item Coleção dinâmica de dados ordenados
+\begin{itemize}
+\item inserção
+\item busca
+\item remoção
+\end{itemize}
+\item + seleção do dado na $k$-ésima posição da classificação
+\item + cálculo da classificação de um dado
+\end{itemize}
+\pause
+\alert{propostas?}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Propostas}
+
+\begin{enumerate}
+\item arranjo
+\item árvore balanceada
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Arranjo}
+
+\begin{enumerate}
+\item ordenado: acesso direto
+  \begin{itemize}
+    \item inserção, remoção são ineficientes
+  \end{itemize}
+\item não ordenado: algoritmo similar ao \textit{quick sort\/}
+  \begin{itemize}
+    \item busca, remoção são ineficientes
+  \end{itemize}
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Árvore balanceada}
+
+\begin{enumerate}
+\item árvore rubro-negra
+\item associar a cada nó o tamanho da sub-árvore enraizada nele
+\end{enumerate}
+
+\begin{codebox}
+\Procname{$\proc{Size}(n)$}
+\li \If $n \isequal \const{Nil}$
+\li \Then \Return 0
+\li \Else \Return $\attrib{n}{size}$
+\End
+\end{codebox}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Seleção do dado na posição $k$}
+
+\begin{codebox}
+\Procname{$\proc{Select}(n, k)$}
+\li $\id{sl} \gets \proc{Size}(\attrib{n}{left})$
+\li \If $k \le \id{sl}$
+\li \Then \Return $\proc{Select}(\attrib{n}{left}, k)$
+\li \ElseIf $k \isequal \id{sl}+1$
+\li \Then \Return $n$
+\li \ElseNoIf \Return $\proc{Select}(\attrib{n}{right}, k - 1 - \id{sl})$
+  \End
+\end{codebox}
+
+\pause
+\alert{Complexidade?}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Cálculo da posição de um dado $x$}
+
+\begin{codebox}
+\Procname{$\proc{Rank}(n, x)$}
+\li \If $x \isequal \attrib{n}{key}$
+\li \Then \Return $\proc{Size}(\attrib{n}{left}) + 1$
+\li \ElseIf $x < \attrib{n}{key}$
+\li \Then \Return $\proc{Rank}(\attrib{n}{left}, x)$
+\li \ElseNoIf \Return $\proc{Size}(\attrib{n}{left}) + 1 + \proc{Rank}(\attrib{n}{right}, x)$
+  \End
+\end{codebox}
+
+\pause
+\alert{Complexidade?}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Como atualizar o atributo $\id{size}$?}
+
+\begin{itemize}
+\item Invariant: $\attrib{x}{size} = 1 + \proc{Size}(\attrib{x}{left}) + \proc{Size}(\attrib{x}{right})$
+\item Inserção:
+\begin{enumerate}
+\item descida recursiva na árvore até o ponto de inserção
+\item criação de um novo vértice
+\item subida até a raiz, com rotações
+\end{enumerate}
+\item Remoção:
+\begin{enumerate}
+\item descida recursiva na árvore até o ponto de remoção
+\item possivelmente remoção auxiliar
+\item subida até a raiz, com rotações
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Como atualizar o atributo $\id{size}$?}
+\framesubtitle{Inserção}
+
+\begin{itemize}
+\item descida até o ponto de inserção: incremento de $\id{size}$
+\pause\item criação de um novo vértice
+\begin{codebox}
+\Procname{$\proc{Make-Node}(x)$}
+\li $n \gets \proc{Alloc-Node}()$
+\li $\attrib{n}{val} \gets x$
+\li $\attrib{n}{color} \gets \const{Red}$
+\li $\attrib{n}{size} \gets 1$
+\end{codebox}
+\pause\item subida até a raiz, com rotações
+\begin{codebox}
+\Procname{$\proc{Rotate-Simple-Right}(x, y)$}
+\zi \assert{\Comment $\attrib{y}{left} \isequal x$ and $\attrib{x}{up \isequal y}$}
+\li $\attrib{y}{left} \gets x$
+\li $\attrib{x}{left} \gets y$
+\li $\attrib{x}{size} \gets \attrib{y}{size}$
+\li $\attrib{y}{size} \gets \proc{Size}(\attrib{y}{left}) + \proc{Size}(\attrib{y}{right}) + 1$
+\end{codebox}
+\pause\alert{Complexidade?}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Como atualizar o atributo $\id{size}$?}
+\framesubtitle{Remoção}
+
+\begin{itemize}
+\item descida até o ponto de inserção: decremento de $\id{size}$  \only<2>{\alert{$O(\log n)$}}
+\item possívelmente remoção auxiliar
+\item eliminação de um vértice \only<2>{\alert{$O(1)$}}
+\item número finito de rotações \only<2>{\alert{$O(1)$}}
+\end{itemize}
+
+\end{frame}
+
+\section{Receita}
+\begin{frame}
+\frametitle{Receita para extender uma estrutura de dados}
+
+\begin{enumerate}
+\item escolha da estrutura mais adequada
+\item identificação dos novos atributos
+\item adaptar operações existentes
+\item novas operações
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Extensão de árvores rubro-negra}
+
+\begin{theorem}
+Seja $a$ um novo atributo para uma árvore rubro-negra com $n$ vértices.
+
+Se, para qualquer nó $x$, $\attrib{x}{a}$ pode ser calculado a partir
+de $x$, $\attrib{x}{left}$ e $\attrib{x}{right}$, então podemos 
+atualizar os valores de $a$ para todos os nós da árvore sem alterar
+a complexidade assintótica das operações básicas.
+\end{theorem}
+
+\pause
+
+\alert{Justificativa}: 
+\begin{itemize}
+\item Mudar $\attrib{x}{a}$ só implica em alterar
+$\attrib{\attrib{x}{up}}{a}$, etc. até $\attrib{\attrib{T}{root}}{a}$, ou seja $O(\log n)$ alterações.
+
+\item Rotações só implicam em alterar $\id{a}$ em um número limitado de vértices.
+
+\item Cada alteração de $\id{a}$ é $O(1)$.
+\end{itemize}
+
+\end{frame}
+
+\section{Coleções de intervalos}
+
+\begin{frame}
+\frametitle{Exemplo: coleção de intervalos}
+
+$i$: intervalo 
+\begin{itemize}
+\item $\attrib{i}{low}$: limite inferior
+\item $\attrib{i}{upp}$: limite superior
+\end{itemize}
+
+comparação de intervalos
+\begin{enumerate}
+\item $\attrib{i}{low} \le \attrib{i'}{high}$ e $\attrib{i'}{low} \le \attrib{i}{high}$: $i$ e $i'$ tem sobreposição
+\item $\attrib{i}{high} < \attrib{i'}{low}$: $i$ antes de $i'$
+\item $\attrib{i'}{low} < \attrib{i}{high}$: $i$ depois de $i'$
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Exemplo: operações}
+
+Operações:
+\begin{itemize}
+\item $\proc{Interval-Insert}(T, x)$: $x$ com $\attrib{x}{int}$ um intervalo;
+\item $\proc{Interval-Delete}(T, x)$: remove $x$;
+\item $\proc{Interval-Search}(T, i)$: retorna um elemento $x$ de $T$ tal que
+  $i$ e $\attrib{x}{int}$ se sobrepõem.
+\end{itemize}
+
+\pause
+\alert{Árvores rubro-negras}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Árvores rubro-negras extendidas para intervalos}
+
+\begin{itemize}
+\item chave: $\attrib{\attrib{x}{int}}{low}$
+\item percurso em ordem: intervalos em ordem crescente de limite inferior
+\item atributo extra: $\attrib{x}{max}$
+\begin{itemize}
+\item valor máximo de qualquer intervalo na sub-árvore enraizada em $x$
+\end{itemize}
+\end{itemize}
+
+\begin{center}
+\includegraphics{fig/interval-tree}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Atualização de novos atributos}
+
+\begin{itemize}
+\item $\attrib{x}{max} = \max \{ \attrib{\attrib{x}{left}}{max}, \attrib{\attrib{x}{right}}{max} \}$
+\item complexidade: $O(1)$
+\item preserva complexidade assintótica das operações básicas (Teorema)
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Novas operações}
+
+\begin{codebox}
+\Procname{$\proc{Interval-Search}(T, i)$}
+\li $x \gets \attrib{T}{root}$
+\li \While $x \neq \const{Nil}$ and not $\proc{Overlap}(i, \attrib{x}{int})$ 
+\li \Do \If $\attrib{x}{left} \neq \const{Nil}$ and $\attrib{\attrib{x}{left}}{max} \ge i$
+\li      \Then $x \gets \attrib{x}{left}$
+\li      \Else $x \gets \attrib{x}{right}$
+         \End
+    \End
+\li \Return $x$
+\end{codebox}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Busca}
+
+\vspace*{-5mm}
+\begin{small}
+\begin{codebox}
+\Procname{$\proc{Interval-Search}(T, i)$}
+\li $x \gets \attrib{T}{root}$
+\li \While $x \neq \const{Nil}$ and not $\proc{Overlap}(i, \attrib{x}{int})$ 
+\li \Do \If $\attrib{x}{left} \neq \const{Nil}$ and $\attrib{\attrib{x}{left}}{max} \ge i$
+\li      \Then $x \gets \attrib{x}{left}$
+\li      \Else $x \gets \attrib{x}{right}$
+         \End
+    \End
+\li \Return $x$
+\end{codebox}
+\end{small}
+
+\pause
+
+\only<2-5>{
+\begin{center}
+\begin{tabular}{c}
+$i = [22, 25]$ \\
+\only<2>{\includegraphics[height=.4\textheight]{fig/interval-tree-search-1.pdf}}
+\only<3>{\includegraphics[height=.4\textheight]{fig/interval-tree-search-2.pdf}}
+\only<4>{\includegraphics[height=.4\textheight]{fig/interval-tree-search-3.pdf}}
+\end{tabular}
+\end{center}
+}
+\only<6-8>{
+\begin{center}
+\begin{tabular}{c}
+$i = [11, 14]$ \\
+\only<6>{\includegraphics[height=.4\textheight]{fig/interval-tree-search-1.pdf}}
+\only<7>{\includegraphics[height=.4\textheight]{fig/interval-tree-search-2.pdf}}
+\only<8>{\includegraphics[height=.4\textheight]{fig/interval-tree-search-3.pdf}}
+\end{tabular}
+\end{center}
+}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Busca}
+
+\begin{codebox}
+\Procname{$\proc{Interval-Search}(T, i)$}
+\li $x \gets \attrib{T}{root}$
+\li \While $x \neq \const{Nil}$ and not $\proc{Overlap}(i, \attrib{x}{int})$ 
+\li \Do \If $\attrib{x}{left} \neq \const{Nil}$ and $\attrib{\attrib{x}{left}}{max} \ge i$
+\li      \Then $x \gets \attrib{x}{left}$
+\li      \Else $x \gets \attrib{x}{right}$
+         \End
+    \End
+\li \Return $x$
+\end{codebox}
+
+\alert{Complexidade}: $O(\log n)$
+\pause
+\alert{Corretude?}
+\end{frame}
+
+\begin{frame}
+\frametitle{Exercícios}
+
+\begin{enumerate}
+\item Adaptar a busca para funcionar com intervalos abertos
+\item Escrever uma operação que
+\begin{itemize}
+\item tem como parâmetro um intervalo $i$ e,
+\item retorna um intervalo que se sobrepões a $i$, com o menor limite
+  inferior, ou $\const{Nil}$ se não existir.
+\end{itemize}
+\item Adapte a estrutura de dados união/fusão para ter a operação que
+  retorna o número de elementos de um conjunto.
+\end{enumerate}
+\end{frame}
+
+\end{document}
