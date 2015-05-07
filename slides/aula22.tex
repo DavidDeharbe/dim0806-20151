@@ -188,7 +188,7 @@ Referência: Cormen, cap 15.
 \begin{codebox}
 \Procname{$\proc{Rotate-Simple-Right}(x, y)$}
 \zi \assert{\Comment $\attrib{y}{left} \isequal x$ and $\attrib{x}{up \isequal y}$}
-\li $\attrib{y}{left} \gets x$
+\li $\attrib{y}{left} \gets \attrib{x}{right}$
 \li $\attrib{x}{left} \gets y$
 \li $\attrib{x}{size} \gets \attrib{y}{size}$
 \li $\attrib{y}{size} \gets \proc{Size}(\attrib{y}{left}) + \proc{Size}(\attrib{y}{right}) + 1$
@@ -307,7 +307,7 @@ Operações:
 \frametitle{Atualização de novos atributos}
 
 \begin{itemize}
-\item $\attrib{x}{max} = \max \{ \attrib{\attrib{x}{left}}{max}, \attrib{\attrib{x}{right}}{max} \}$
+\item $\attrib{x}{max} = \max \{ \attrib{\attrib{x}{left}}{max}, \attrib{\attrib{x}{right}}{max}, \attrib{\attrib{x}{int}}{upp} \}$
 \item complexidade: $O(1)$
 \item preserva complexidade assintótica das operações básicas (Teorema)
 \end{itemize}
@@ -321,7 +321,7 @@ Operações:
 \Procname{$\proc{Interval-Search}(T, i)$}
 \li $x \gets \attrib{T}{root}$
 \li \While $x \neq \const{Nil}$ and not $\proc{Overlap}(i, \attrib{x}{int})$ 
-\li \Do \If $\attrib{x}{left} \neq \const{Nil}$ and $\attrib{\attrib{x}{left}}{max} \ge i$
+\li \Do \If $\attrib{x}{left} \neq \const{Nil}$ and $\attrib{\attrib{x}{left}}{max} \ge \attrib{i}{low}$
 \li      \Then $x \gets \attrib{x}{left}$
 \li      \Else $x \gets \attrib{x}{right}$
          \End

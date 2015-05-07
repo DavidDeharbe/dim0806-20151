@@ -805,8 +805,8 @@ $\proc{Splay}(T, x)$ \pause \\
 \begin{itemize}
 \item se $x = \attrib{y}{left}$ e $y = \attrib{z}{left}$: rotação simples de $y$, rotação simples de $x$ (\alert{caso 2})
 \item se $x = \attrib{y}{right}$ e $y = \attrib{z}{right}$: rotação simples de $y$, rotação simples de $x$  (\alert{caso 2})
-\item se $x = \attrib{y}{left}$ e $y = \attrib{z}{left}$: rotação dupla de $x$  (\alert{caso 3})
-\item se $x = \attrib{y}{left}$ e $y = \attrib{z}{left}$: rotação dupla de $x$  (\alert{caso 3})
+\item se $x = \attrib{y}{right}$ e $y = \attrib{z}{left}$: rotação dupla de $x$  (\alert{caso 3})
+\item se $x = \attrib{y}{left}$ e $y = \attrib{z}{right}$: rotação dupla de $x$  (\alert{caso 3})
 \end{itemize}
 \item complexidade no pior caso $O(n)$
 \item análise amortizada mostra que todas as operações de chanframento tem
@@ -820,7 +820,7 @@ custo amortizado $O(\log n)$
 
 \begin{tabular}{c}
 \includegraphics[height=.4\textheight]{fig/splay-1-1.pdf} \\
-$\proc{Rotate-Simple-Right}(T)$ \\
+$\proc{Rotate-Simple-Right}(x, y)$ \\
 \includegraphics[height=.4\textheight]{fig/splay-1-2.pdf}
 \end{tabular}
 
@@ -832,8 +832,8 @@ $\proc{Rotate-Simple-Right}(T)$ \\
 
 \begin{tabular}{c}
 \includegraphics[height=.35\textheight]{fig/splay-2-1.pdf} \\
-$\proc{Rotate-Simple-Right}(y)$ \\
-$\proc{Rotate-Simple-Right}(x)$ \\
+$\proc{Rotate-Simple-Right}(y, z)$ \\
+$\proc{Rotate-Simple-Right}(x, y)$ \\
 \includegraphics[height=.35\textheight]{fig/splay-2-2.pdf}
 \end{tabular}
 
@@ -841,11 +841,11 @@ $\proc{Rotate-Simple-Right}(x)$ \\
 
 \begin{frame}
 \frametitle{Chanfrar um valor --- caso 3}
-\framesubtitle{$x = \attrib{y}{left}$ e $y = \attrib{z}{left}$}
+\framesubtitle{$x = \attrib{y}{right}$ e $y = \attrib{z}{left}$}
 
 \begin{tabular}{c}
 \includegraphics[height=.4\textheight]{fig/splay-3-1.pdf} \\
-$\proc{Rotate-Double-Right}(y)$ \\
+$\proc{Rotate-Double-Right}(x, y, z)$ \\
 \includegraphics[height=.4\textheight]{fig/splay-3-2.pdf}
 \end{tabular}
 
@@ -895,7 +895,7 @@ Caso 1 &
   $T(x)$: sub-árvore enraizada em $x$
 
 \item propriedade: $3 \times (\gamma(T) - \gamma(x) + O(1))$ créditos paga $\proc{Splay}(T, x)$ e mantem o invariante. (\alert{vamos mostrar isto depois})
-\item logo $\proc{Splay}$ custa no máximo $3 \lfloor \log n \rfloor + O(1) \in |Theta(\log n)$.
+\item logo $\proc{Splay}$ custa no máximo $3 \lfloor \log n \rfloor + O(1) \in |\Theta(\log n)$.
 \item para pagar inserção, busca ou remoção, basta pagar $O(\log n)$.
 \end{itemize}
 \end{frame}
