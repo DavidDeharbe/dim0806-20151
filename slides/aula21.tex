@@ -856,7 +856,7 @@ $\proc{Rotate-Double-Right}(x, y, z)$ \\
 
 \begin{tabular}[t]{ccc}
 \includegraphics[height=.8\textheight]{fig/splay-do-1.pdf} &
-Caso 2 &
+Caso 3 &
 \includegraphics[height=.7\textheight]{fig/splay-do-2.pdf}
 \end{tabular}
 
@@ -867,7 +867,7 @@ Caso 2 &
 
 \begin{tabular}[t]{ccc}
 \includegraphics[height=.7\textheight]{fig/splay-do-2.pdf} &
-Caso 3 &
+Caso 2 &
 \includegraphics[height=.6\textheight]{fig/splay-do-3.pdf}
 \end{tabular}
 
@@ -960,7 +960,7 @@ $\gamma'(z) \le \gamma'(x)$, $\gamma(y) \ge \gamma(x)$
 
 Resta $\gamma'(x) - \gamma(x)$:
 \begin{itemize}
-\item se $\gamma(x) \neg \gamma'(x)$, então resta $\gamma'(x) - \gamma(x) > 0$ créditos para efetuar a rotação
+\item se $\gamma(x) \neq \gamma'(x)$, então resta $\gamma'(x) - \gamma(x) > 0$ créditos para efetuar a rotação
 \pause
 \item se $\gamma(x) = \gamma'(x)$, mostramos que
 $\gamma'(x) + \gamma'(y) + \gamma'(z) < \gamma(x) + \gamma(y) + \gamma(z)$.
@@ -985,7 +985,7 @@ $\gamma'(x) + \gamma'(y) + \gamma'(z) \ge \gamma(x) + \gamma(y) + \gamma(z)$,
 temos
 \begin{itemize}
 \item $\gamma(x) \le \gamma(y) \le \gamma(z)$
-\item $\gamma'(z) \le \gamma'(y) \le \gamma'(z)$
+\item $\gamma'(z) \le \gamma'(y) \le \gamma'(x)$
 \item $\gamma'(x) = \gamma(z)$
 \item logo temos que $\gamma(x) = \gamma(z) = \gamma(y)$
 \item e $\gamma'(x) = \gamma'(y) = \gamma'(z)$
