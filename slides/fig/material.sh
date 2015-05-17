@@ -151,6 +151,23 @@ for i in $pages; do mv $file.part$i.$i'_'$i.pdf "$file-$i.pdf"; done
 
 }
 echo "aula22: interval trees"
+
+function aula23 () {
+
+TEXFILES="bfs-proof\
+  dfs"
+
+for file in $TEXFILES; do
+  latexmk -pdf $file
+done
+
+file=dfs
+pages="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17"
+./splitPDF.py $file.pdf $pages
+for i in $pages; do mv $file.part$i.$i'_'$i.pdf "$file-$i.pdf"; done
+}
+echo "aula23: elementary graph algorithms"
+
 function clean () {
 	rm -f *.log *.aux *~ *.pdf
 }

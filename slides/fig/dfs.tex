@@ -1,0 +1,463 @@
+\documentclass{article}
+
+\usepackage[pdftex,active,tightpage]{preview}
+\setlength\PreviewBorder{2mm}
+
+\usepackage{pgf}
+\usepackage{tikz}
+\usetikzlibrary{shapes.multipart}
+\usetikzlibrary{decorations.pathmorphing}
+
+\tikzstyle{vertex}=[circle,fill=black!25,minimum size=15pt,inner sep=0pt]
+\tikzstyle{selected vertex} = [vertex, fill=red!24]
+\tikzstyle{path} = [draw,thin,decorate,decoration={snake,amplitude=.5mm,segment length=2mm}]
+\tikzstyle{arrow} = [draw,thick,->]
+\tikzstyle{tree arrow} = [draw,thick,->]
+\tikzstyle{non tree arrow} = [draw,thick,->,blue]
+\tikzstyle{weight} = [font=\small]
+\tikzstyle{selected edge} = [draw,line width=3pt,-,red!50]
+\tikzstyle{selected arrow} = [draw,line width=3pt,->,red!50]
+\tikzstyle{ignored edge} = [draw,line width=3pt,-,black!20]
+
+\tikzstyle{todo}=[circle,fill=white,minimum size=30pt,inner sep=0pt,draw,thick]
+\tikzstyle{doing}=[circle solidus,fill=black!35,minimum size=30pt,inner sep=0pt]
+\tikzstyle{done}=[circle solidus,text=white,fill=black!90,minimum size=30pt,inner sep=0pt,draw,thick]
+
+
+\begin{document}
+
+%% initial
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% First we draw the white vertices
+\foreach \id/ \pos in {{u/(0,4)}, {v/(4,4)}, {w/(8,4)}, 
+  {x/(0, 0)}, {y/(4, 0)}, {z/(8, 0)}}
+\node[todo] (\id) at \pos {$\mathsf{\id}$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest in {{u/v}, {u/x}, {v/y}, {w/y}, {w/z}, {x/v}, {y/x}}
+\path[arrow] (\source) -- (\dest);
+\path[arrow] (z) edge [loop right] ();
+\end{tikzpicture}
+\end{preview}
+
+%% select u
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% First we draw the white vertices
+\foreach \id/ \pos in {{v/(4,4)}, {w/(8,4)}, 
+  {x/(0, 0)}, {y/(4, 0)}, {z/(8, 0)}}
+\node[todo] (\id) at \pos {$\mathsf{\id}$};
+% Next the doing vertices
+\foreach \id/ \pos/ \in/ \ou in {{u/(0,4)/1/}}
+\node[doing] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest in {{u/v}, {u/x}, {v/y}, {w/y}, {w/z}, {x/v}, {y/x}}
+\path[arrow] (\source) -- (\dest);
+\path[arrow] (z) edge [loop right] ();
+\end{tikzpicture}
+\end{preview}
+
+%% go to v
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% First we draw the white vertices
+\foreach \id/ \pos in {{w/(8,4)}, 
+  {x/(0, 0)}, {y/(4, 0)}, {z/(8, 0)}}
+\node[todo] (\id) at \pos {$\mathsf{\id}$};
+% Next the doing vertices
+\foreach \id/ \pos/ \in/ \ou in {{u/(0,4)/1/}, {v/(4,4)/2/}}
+\node[doing] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Connect vertices with arrows
+\foreach \source/ \dest in {{u/x}, {v/y}, {w/y}, {w/z}, {x/v}, {y/x}}
+\path[arrow] (\source) -- (\dest);
+% Draw tree arrows
+\foreach \source/ \dest in {{u/v}}
+\path[selected arrow] (\source) -- (\dest);
+\path[arrow] (z) edge [loop right] ();
+\end{tikzpicture}
+\end{preview}
+
+%% go to y
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% First we draw the white vertices
+\foreach \id/ \pos in {{w/(8,4)}, 
+  {x/(0, 0)}, {z/(8, 0)}}
+\node[todo] (\id) at \pos {$\mathsf{\id}$};
+% Next the doing vertices
+\foreach \id/ \pos/ \in/ \ou in {{u/(0,4)/1/}, {v/(4,4)/2/}, {y/(4,0)/3/}}
+\node[doing] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Connect vertices with arrows
+\foreach \source/ \dest in {{u/x}, {w/y}, {w/z}, {x/v}, {y/x}}
+\path[arrow] (\source) -- (\dest);
+% Draw tree arrows
+\foreach \source/ \dest in {{u/v}, {v/y}}
+\path[selected arrow] (\source) -- (\dest);
+% Draw loops
+\path[arrow] (z) edge [loop right] ();
+\end{tikzpicture}
+\end{preview}
+
+%% go to x
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% First we draw the white vertices
+\foreach \id/ \pos in {{w/(8,4)}, 
+  {z/(8, 0)}}
+\node[todo] (\id) at \pos {$\mathsf{\id}$};
+% Next the doing vertices
+\foreach \id/ \pos/ \in/ \ou in {{u/(0,4)/1/}, {v/(4,4)/2/}, {y/(4, 0)/3/}, {x/(0, 0)/4/}}
+\node[doing] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest in {{u/x}, {w/y}, {w/z}, {x/v}}
+\path[arrow] (\source) -- (\dest);
+\foreach \source/ \dest in {{u/v}, {v/y}, {y/x}}
+\path[selected arrow] (\source) -- (\dest);
+\path[arrow] (z) edge [loop right] ();
+\end{tikzpicture}
+\end{preview}
+
+%% mark (x, v) as back edge
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% First we draw the white vertices
+\foreach \id/ \pos in {{w/(8,4)}, 
+  {z/(8, 0)}}
+\node[todo] (\id) at \pos {$\mathsf{\id}$};
+% Next the doing vertices
+\foreach \id/ \pos/ \in/ \ou in {{u/(0,4)/1/}, {v/(4,4)/2/}, {y/(4, 0)/3/}, {x/(0, 0)/4/}}
+\node[doing] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Connect vertices with arrows
+\foreach \source/ \dest in {{u/x}, {w/y}, {w/z}}
+\path[arrow] (\source) -- (\dest);
+% Draw tree arrows
+\foreach \source/ \dest in {{u/v}, {v/y}, {y/x}}
+\path[selected arrow] (\source) -- (\dest);
+% Draw non tree arrows
+\foreach \source/ \dest in {{x/v}}
+\path[non tree arrow] (\source) -- node{B} (\dest);
+\path[arrow] (z) edge [loop right] ();
+\end{tikzpicture}
+\end{preview}
+
+%% finish x
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% First we draw the white vertices
+\foreach \id/ \pos in {{w/(8,4)}, 
+  {z/(8, 0)}}
+\node[todo] (\id) at \pos {$\mathsf{\id}$};
+% Next the doing vertices
+\foreach \id/ \pos/ \in/ \ou in {{u/(0,4)/1/}, {v/(4,4)/2/}, {y/(4, 0)/3/}}
+\node[doing] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Next the done vertices
+\foreach \id/ \pos/ \in/ \ou in {{x/(0, 0)/4/5}}
+\node[done] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Connect vertices with arrows
+\foreach \source/ \dest in {{u/x}, {w/y}, {w/z}}
+\path[arrow] (\source) -- (\dest);
+% Draw tree arrows
+\foreach \source/ \dest in {{u/v}, {v/y}, {y/x}}
+\path[selected arrow] (\source) -- (\dest);
+% Draw non tree arrows
+\foreach \source/ \dest in {{x/v}}
+\path[non tree arrow] (\source) -- node{B} (\dest);
+\path[arrow] (z) edge [loop right] ();
+\end{tikzpicture}
+\end{preview}
+
+%% finish y
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% First we draw the white vertices
+\foreach \id/ \pos in {{w/(8,4)}, 
+  {z/(8, 0)}}
+\node[todo] (\id) at \pos {$\mathsf{\id}$};
+% Next the doing vertices
+\foreach \id/ \pos/ \in/ \ou in {{u/(0,4)/1/}, {v/(4,4)/2/}}
+\node[doing] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Next the done vertices
+\foreach \id/ \pos/ \in/ \ou in {{x/(0, 0)/4/5}, {y/(4, 0)/3/6}}
+\node[done] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Connect vertices with arrows
+\foreach \source/ \dest in {{u/x}, {w/y}, {w/z}}
+\path[arrow] (\source) -- (\dest);
+% Draw tree arrows
+\foreach \source/ \dest in {{u/v}, {v/y}, {y/x}}
+\path[selected arrow] (\source) -- (\dest);
+% Draw non tree arrows
+\foreach \source/ \dest in {{x/v}}
+\path[non tree arrow] (\source) -- node{B} (\dest);
+\path[arrow] (z) edge [loop right] ();
+\end{tikzpicture}
+\end{preview}
+
+%% finish v
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% First we draw the white vertices
+\foreach \id/ \pos in {{w/(8,4)}, 
+  {z/(8, 0)}}
+\node[todo] (\id) at \pos {$\mathsf{\id}$};
+% Next the doing vertices
+\foreach \id/ \pos/ \in/ \ou in {{u/(0,4)/1/}}
+\node[doing] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Next the done vertices
+\foreach \id/ \pos/ \in/ \ou in {{x/(0, 0)/4/5}, {y/(4, 0)/3/6}, {v/(4,4)/2/7}}
+\node[done] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Connect vertices with arrows
+\foreach \source/ \dest in {{u/x}, {w/y}, {w/z}}
+\path[arrow] (\source) -- (\dest);
+% Draw tree arrows
+\foreach \source/ \dest in {{u/v}, {v/y}, {y/x}}
+\path[selected arrow] (\source) -- (\dest);
+% Draw non tree arrows
+\foreach \source/ \dest in {{x/v}}
+\path[non tree arrow] (\source) -- node{B} (\dest);
+\path[arrow] (z) edge [loop right] ();
+\end{tikzpicture}
+\end{preview}
+
+%% mark (u, x) as forward
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% First we draw the white vertices
+\foreach \id/ \pos in {{w/(8,4)}, 
+  {z/(8, 0)}}
+\node[todo] (\id) at \pos {$\mathsf{\id}$};
+% Next the doing vertices
+\foreach \id/ \pos/ \in/ \ou in {{u/(0,4)/1/}}
+\node[doing] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Next the done vertices
+\foreach \id/ \pos/ \in/ \ou in {{x/(0, 0)/4/5}, {y/(4, 0)/3/6}, {v/(4,4)/2/7}}
+\node[done] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Connect vertices with arrows
+\foreach \source/ \dest in {{w/y}, {w/z}}
+\path[arrow] (\source) -- (\dest);
+% Draw tree arrows
+\foreach \source/ \dest in {{u/v}, {v/y}, {y/x}}
+\path[selected arrow] (\source) -- (\dest);
+% Draw back arrows
+\foreach \source/ \dest in {{x/v}}
+\path[non tree arrow] (\source) -- node{B} (\dest);
+% Draw forward arrows
+\foreach \source/ \dest in {{u/x}}
+\path[non tree arrow] (\source) -- node{F} (\dest);
+\path[arrow] (z) edge [loop right] ();
+\end{tikzpicture}
+\end{preview}
+
+%% finalize u
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% First we draw the white vertices
+\foreach \id/ \pos in {{w/(8,4)}, 
+  {z/(8, 0)}}
+\node[todo] (\id) at \pos {$\mathsf{\id}$};
+% Next the doing vertices
+\foreach \id/ \pos/ \in/ \ou in {}
+\node[doing] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Next the done vertices
+\foreach \id/ \pos/ \in/ \ou in {{x/(0, 0)/4/5}, {y/(4, 0)/3/6}, {v/(4,4)/2/7}, {u/(0,4)/1/8}}
+\node[done] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Connect vertices with arrows
+\foreach \source/ \dest in {{w/y}, {w/z}}
+\path[arrow] (\source) -- (\dest);
+% Draw tree arrows
+\foreach \source/ \dest in {{u/v}, {v/y}, {y/x}}
+\path[selected arrow] (\source) -- (\dest);
+% Draw non tree arrows
+\foreach \source/ \dest in {{x/v}}
+\path[non tree arrow] (\source) -- node{B} (\dest);
+% Draw forward arrows
+\foreach \source/ \dest in {{u/x}}
+\path[non tree arrow] (\source) -- node{F} (\dest);
+\path[arrow] (z) edge [loop right] ();
+\end{tikzpicture}
+\end{preview}
+
+%% go to w
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% First we draw the white vertices
+\foreach \id/ \pos in {{z/(8, 0)}}
+\node[todo] (\id) at \pos {$\mathsf{\id}$};
+% Next the doing vertices
+\foreach \id/ \pos/ \in/ \ou in {{w/(8,4)/9/}}
+\node[doing] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Next the done vertices
+\foreach \id/ \pos/ \in/ \ou in {{x/(0, 0)/4/5}, {y/(4, 0)/3/6}, {v/(4,4)/2/7}, {u/(0,4)/1/8}}
+\node[done] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Connect vertices with arrows
+\foreach \source/ \dest in {{w/y}, {w/z}}
+\path[arrow] (\source) -- (\dest);
+% Draw tree arrows
+\foreach \source/ \dest in {{u/v}, {v/y}, {y/x}}
+\path[selected arrow] (\source) -- (\dest);
+% Draw non tree arrows
+\foreach \source/ \dest in {{x/v}}
+\path[non tree arrow] (\source) -- node{B} (\dest);
+% Draw forward arrows
+\foreach \source/ \dest in {{u/x}}
+\path[non tree arrow] (\source) -- node{F} (\dest);
+% Draw loop arrow
+\path[arrow] (z) edge [loop right] ();
+\end{tikzpicture}
+\end{preview}
+
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% First we draw the white vertices
+\foreach \id/ \pos in {{z/(8, 0)}}
+\node[todo] (\id) at \pos {$\mathsf{\id}$};
+% Next the doing vertices
+\foreach \id/ \pos/ \in/ \ou in {{w/(8,4)/9/}}
+\node[doing] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Next the done vertices
+\foreach \id/ \pos/ \in/ \ou in {{x/(0, 0)/4/5}, {y/(4, 0)/3/6}, {v/(4,4)/2/7}, {u/(0,4)/1/8}}
+\node[done] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Connect vertices with arrows
+\foreach \source/ \dest in {{w/z}}
+\path[arrow] (\source) -- (\dest);
+% Draw tree arrows
+\foreach \source/ \dest in {{u/v}, {v/y}, {y/x}}
+\path[selected arrow] (\source) -- (\dest);
+% Draw non tree arrows
+\foreach \source/ \dest in {{x/v}}
+\path[non tree arrow] (\source) -- node{B} (\dest);
+% Draw forward arrows
+\foreach \source/ \dest in {{u/x}}
+\path[non tree arrow] (\source) -- node{F} (\dest);
+% Draw cross arrows
+\foreach \source/ \dest in {{w/y}}
+\path[non tree arrow] (\source) -- node{C} (\dest);
+% Draw loop arrow
+\path[arrow] (z) edge [loop right] ();
+\end{tikzpicture}
+\end{preview}
+
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% First we draw the white vertices
+\foreach \id/ \pos in {}
+\node[todo] (\id) at \pos {$\mathsf{\id}$};
+% Next the doing vertices
+\foreach \id/ \pos/ \in/ \ou in {{w/(8,4)/9/},{z/(8, 0)/10/}}
+\node[doing] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Next the done vertices
+\foreach \id/ \pos/ \in/ \ou in {{x/(0, 0)/4/5}, {y/(4, 0)/3/6}, {v/(4,4)/2/7}, {u/(0,4)/1/8}}
+\node[done] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Connect vertices with arrows
+\foreach \source/ \dest in {}
+\path[arrow] (\source) -- (\dest);
+% Draw tree arrows
+\foreach \source/ \dest in {{u/v}, {v/y}, {y/x}, {w/z}}
+\path[selected arrow] (\source) -- (\dest);
+% Draw non tree arrows
+\foreach \source/ \dest in {{x/v}}
+\path[non tree arrow] (\source) -- node{B} (\dest);
+% Draw forward arrows
+\foreach \source/ \dest in {{u/x}}
+\path[non tree arrow] (\source) -- node{F} (\dest);
+% Draw cross arrows
+\foreach \source/ \dest in {{w/y}}
+\path[non tree arrow] (\source) -- node{C} (\dest);
+% Draw loop arrow
+\path[arrow] (z) edge [loop right] ();
+\end{tikzpicture}
+\end{preview}
+
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% First we draw the white vertices
+\foreach \id/ \pos in {}
+\node[todo] (\id) at \pos {$\mathsf{\id}$};
+% Next the doing vertices
+\foreach \id/ \pos/ \in/ \ou in {{w/(8,4)/9/},{z/(8, 0)/10/}}
+\node[doing] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Next the done vertices
+\foreach \id/ \pos/ \in/ \ou in {{x/(0, 0)/4/5}, {y/(4, 0)/3/6}, {v/(4,4)/2/7}, {u/(0,4)/1/8}}
+\node[done] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Connect vertices with arrows
+\foreach \source/ \dest in {}
+\path[arrow] (\source) -- (\dest);
+% Draw tree arrows
+\foreach \source/ \dest in {{u/v}, {v/y}, {y/x}, {w/z}}
+\path[selected arrow] (\source) -- (\dest);
+% Draw non tree arrows
+\foreach \source/ \dest in {{x/v}}
+\path[non tree arrow] (\source) -- node{B} (\dest);
+% Draw forward arrows
+\foreach \source/ \dest in {{u/x}}
+\path[non tree arrow] (\source) -- node{F} (\dest);
+% Draw cross arrows
+\foreach \source/ \dest in {{w/y}}
+\path[non tree arrow] (\source) -- node{C} (\dest);
+% Draw loop arrow
+\path[non tree arrow] (z) edge [loop right] node{B} ();
+\end{tikzpicture}
+\end{preview}
+
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% First we draw the white vertices
+\foreach \id/ \pos in {}
+\node[todo] (\id) at \pos {$\mathsf{\id}$};
+% Next the doing vertices
+\foreach \id/ \pos/ \in/ \ou in {{w/(8,4)/9/}}
+\node[doing] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Next the done vertices
+\foreach \id/ \pos/ \in/ \ou in {{x/(0, 0)/4/5}, {y/(4, 0)/3/6}, {v/(4,4)/2/7}, {u/(0,4)/1/8}, {z/(8, 0)/10/11}}
+\node[done] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Connect vertices with arrows
+\foreach \source/ \dest in {}
+\path[arrow] (\source) -- (\dest);
+% Draw tree arrows
+\foreach \source/ \dest in {{u/v}, {v/y}, {y/x}, {w/z}}
+\path[selected arrow] (\source) -- (\dest);
+% Draw non tree arrows
+\foreach \source/ \dest in {{x/v}}
+\path[non tree arrow] (\source) -- node{B} (\dest);
+% Draw forward arrows
+\foreach \source/ \dest in {{u/x}}
+\path[non tree arrow] (\source) -- node{F} (\dest);
+% Draw cross arrows
+\foreach \source/ \dest in {{w/y}}
+\path[non tree arrow] (\source) -- node{C} (\dest);
+% Draw loop arrow
+\path[non tree arrow] (z) edge [loop right] node{B} ();
+\end{tikzpicture}
+\end{preview}
+
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% First we draw the white vertices
+\foreach \id/ \pos in {}
+\node[todo] (\id) at \pos {$\mathsf{\id}$};
+% Next the doing vertices
+\foreach \id/ \pos/ \in/ \ou in {}
+\node[doing] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Next the done vertices
+\foreach \id/ \pos/ \in/ \ou in {{x/(0, 0)/4/5}, {y/(4, 0)/3/6}, {v/(4,4)/2/7}, {u/(0,4)/1/8}, {z/(8, 0)/10/11}, {w/(8,4)/9/12}}
+\node[done] (\id) at \pos {$\in/\ou$ \nodepart{lower} $\mathsf{\id}$};
+% Connect vertices with arrows
+\foreach \source/ \dest in {}
+\path[arrow] (\source) -- (\dest);
+% Draw tree arrows
+\foreach \source/ \dest in {{u/v}, {v/y}, {y/x}, {w/z}}
+\path[selected arrow] (\source) -- (\dest);
+% Draw non tree arrows
+\foreach \source/ \dest in {{x/v}}
+\path[non tree arrow] (\source) -- node{B} (\dest);
+% Draw forward arrows
+\foreach \source/ \dest in {{u/x}}
+\path[non tree arrow] (\source) -- node{F} (\dest);
+% Draw cross arrows
+\foreach \source/ \dest in {{w/y}}
+\path[non tree arrow] (\source) -- node{C} (\dest);
+% Draw loop arrow
+\path[non tree arrow] (z) edge [loop right] node{B} ();
+\end{tikzpicture}
+\end{preview}
+
+\end{document}

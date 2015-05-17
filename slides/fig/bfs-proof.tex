@@ -1,0 +1,21 @@
+\documentclass{article}
+
+\usepackage[pdftex,active,tightpage]{preview}
+\setlength\PreviewBorder{2mm}
+
+\usepackage{pgf}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathmorphing}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=.7, auto,swap]
+\node[vertex] (s) at (1,2) {$s$};
+\node[vertex] (u) at (0,0) {$u$};
+\node[vertex] (v) at (2,0) {$v$};
+\path[edge] (u) -- (v);
+\path[path] (s) -- (u) node [left,align=right,midway] {$\delta(s, u)$};
+\path[path] (s) -- (v) node [right,align=left,midway] {$\delta(s, v)$};
+\end{tikzpicture}
+
+\end{document}

@@ -1,0 +1,104 @@
+\documentclass{article}
+
+\usepackage[pdftex,active,tightpage]{preview}
+\setlength\PreviewBorder{2mm}
+
+\usepackage{pgf}
+\usepackage{tikz}
+\usetikzlibrary{shapes.multipart}
+\usetikzlibrary{decorations.pathmorphing}
+
+\tikzstyle{vertex}=[circle,fill=black!25,minimum size=15pt,inner sep=0pt]
+\tikzstyle{selected vertex} = [vertex, fill=red!24]
+\tikzstyle{path} = [draw,thin,decorate,decoration={snake,amplitude=.5mm,segment length=2mm}]
+\tikzstyle{edge} = [draw,thick,-]
+\tikzstyle{arrow} = [draw,thick,->]
+\tikzstyle{weight} = [font=\small]
+\tikzstyle{selected edge} = [draw,line width=3pt,-,red!50]
+\tikzstyle{ignored edge} = [draw,line width=3pt,-,black!20]
+
+\begin{document}
+
+\begin{tikzpicture}[scale=.8, auto,swap]
+% First we draw the vertices
+\foreach \pos/\name in {{(2,3)/0}, {(0,1.5)/1}, {(4,1.5)/2},
+{(2,0)/3}}
+\node[vertex] (\name) at \pos {$\name$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest in {0/1, 0/2, 0/3, 1/3, 2/3}
+\path[edge] (\source) -- (\dest);
+\end{tikzpicture}
+
+\begin{tikzpicture}[scale=.8, auto,swap]
+% First we draw the vertices
+\foreach \pos/\name in {{(2,3)/0}, {(0,1.5)/1}, {(4,1.5)/2},
+{(2,0)/3}}
+\node[vertex] (\name) at \pos {$\name$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest/ \weight in {0/1/1, 2/0/3, 0/3/9, 1/3/2, 3/2/2}
+\path[edge] (\source) -- node[weight]{$\weight$} (\dest);
+\end{tikzpicture}
+
+\begin{tikzpicture}[scale=.8, auto,swap]
+% First we draw the vertices
+\foreach \pos/\name in {{(2,3)/0}, {(0,1.5)/1}, {(4,1.5)/2},
+{(2,0)/3}}
+\node[vertex] (\name) at \pos {$\name$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest in {0/1, 0/2, 3/0, 1/3, 2/3}
+\path[arrow] (\source) -- (\dest);
+\end{tikzpicture}
+
+\begin{tikzpicture}[scale=.8, auto,swap]
+% First we draw the vertices
+\foreach \pos/\name in {{(2,3)/0}, {(0,1.5)/1}, {(4,1.5)/2},
+{(2,0)/3}}
+\node[vertex] (\name) at \pos {$\name$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest/ \weight in {0/1/1, 2/0/3, 3/0/9, 1/3/2, 3/2/2}
+\path[arrow] (\source) -- node[weight]{$\weight$} (\dest);
+\end{tikzpicture}
+
+\begin{tikzpicture}[scale=.8, auto,swap]
+% Draw a 7,11 network
+% First we draw the vertices
+\foreach \pos/\name in {{(2,3)/0}, {(0,1.5)/1}, {(4,1.5)/2},
+{(2,0)/3}}
+\node[vertex] (\name) at \pos {$\name$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest in {0/1, 0/2, 0/3, 1/3, 2/3}
+\path[edge] (\source) -- (\dest);
+\end{tikzpicture}
+
+\begin{tikzpicture}[scale=.8, auto,swap]
+% First we draw the vertices
+\foreach \pos/\name in {{(2,3)/0}, {(0,1.5)/1}, {(4,1.5)/2},
+{(2,0)/3}}
+\node[vertex] (\name) at \pos {$\name$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest/ \weight in {0/1/1, 2/0/3, 0/3/9, 1/3/2, 3/2/2}
+\path[edge] (\source) -- node[weight]{$\weight$} (\dest);
+\end{tikzpicture}
+
+\begin{tikzpicture}[scale=.8, auto,swap]
+% First we draw the vertices
+\foreach \pos/\name in {{(2,3)/0}, {(0,1.5)/1}, {(4,1.5)/2},
+{(2,0)/3}}
+\node[vertex] (\name) at \pos {$\name$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest in {0/1, 0/2, 3/0, 1/3, 2/3}
+\path[arrow] (\source) -- (\dest);
+\end{tikzpicture}
+
+\begin{tikzpicture}[scale=.8, auto,swap]
+% Draw a 7,11 network
+% First we draw the vertices
+\foreach \pos/\name in {{(2,3)/0}, {(0,1.5)/1}, {(4,1.5)/2},
+{(2,0)/3}}
+\node[vertex] (\name) at \pos {$\name$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest/ \weight in {0/1/1, 2/0/3, 3/0/9, 1/3/2, 3/2/2}
+\path[arrow] (\source) -- node[weight]{$\weight$} (\dest);
+\end{tikzpicture}
+
+\end{document}
