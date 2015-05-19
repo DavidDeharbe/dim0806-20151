@@ -1,0 +1,127 @@
+\documentclass{article}
+
+\usepackage[pdftex,active,tightpage]{preview}
+\setlength\PreviewBorder{2mm}
+
+\usepackage{pgf}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric}
+\usetikzlibrary{shapes.misc}
+\tikzstyle{arrow} = [draw,thick,->]
+\tikzstyle{vertex}=[circle,minimum size=12pt,inner sep=0pt,draw,thick]
+\tikzstyle{forefather}=[circle,minimum size=15pt,inner sep=0pt]
+\tikzstyle{scc}=[ellipse,minimum size=18pt,inner sep=3pt]
+
+
+\begin{document}
+
+%% initial
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto, swap]
+% First we draw the white vertices
+\foreach \id/ \pos/ \col in {{a/(0,2)/blue!50}, {b/(2, 2)/blue!50}, {c/(4,2)/red!50}, {d/(6, 2)/red!50}, 
+  {e/(0, 0)/blue!50}, {f/(2, 0)/yellow!60}, {g/(4, 0)/yellow!60}, {h/(6, 0)/black!30}}
+\node[vertex,fill=\col] (\id) at \pos {$\mathsf{\id}$};
+% Draw straight edges
+\foreach \source/ \dest in {{a/b}, {b/e}, {b/c}, {c/g}, {d/h}, {e/a}, {e/f}, {g/h}}
+ \path[arrow] (\source) -- (\dest);
+% Draw bent edges (back-and-forth between pairs of vertices)
+\foreach \source/ \dest in {{f/g}, {c/d}}
+\path 
+  (\source) edge [bend left=45,thick,->] (\dest)
+  (\dest) edge [bend left=45,thick,->] (\source);
+% Loop edges
+\foreach \vertex/ \dir in {{h/right}}
+\path[arrow] (\vertex) edge [loop \dir] ();
+\end{tikzpicture}
+\end{preview}
+
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto, swap]
+% First we draw the white vertices
+\foreach \id/ \pos/ \col in {{abe/(0,1)/blue!50}, {cd/(5,2)/red!50}, 
+  {fg/(3, 0)/yellow!60}, {h/(6, 0)/black!30}}
+\node[scc,fill=\col] (\id) at \pos {$\mathsf{\id}$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest in {{abe/fg}, {abe/cd}, {cd/fg}, {cd/h}, {fg/h}}
+ \path[arrow] (\source) -- (\dest);
+\path[arrow] (h) edge [loop right] ();
+\end{tikzpicture}
+\end{preview}
+
+%% dfs search marks
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto, swap]
+% First we draw the white vertices
+  \foreach \id/ \pos/ \col/ \d/ \f/ \dir in 
+           {{a/(0,2)/blue!50/13/14/left}, 
+             {b/(2, 2)/blue!50/11/16/above}, 
+             {c/(4,2)/red!50/1/10/above}, 
+             {d/(6, 2)/red!50/8/9/right}, 
+             {e/(0, 0)/blue!50/12/15/left}, 
+             {f/(2, 0)/yellow!60/3/4/below}, 
+             {g/(4, 0)/yellow!60/2/7/below}, 
+             {h/(6, 0)/black!30/5/6/below}}
+\node[vertex,fill=\col,label=\dir:{\footnotesize $\d/\f$}] (\id) at \pos {$\mathsf{\id}$};
+% straight edges
+\foreach \source/ \dest in {{a/b}, {b/e}, {b/c}, {c/g}, {d/h}, {e/a}, {e/f}, {g/h}}
+ \path[arrow] (\source) -- (\dest);
+% bent edges
+\foreach \source/ \dest in {{f/g}, {c/d}}
+\path 
+  (\source) edge [bend left=45,thick,->] (\dest)
+  (\dest) edge [bend left=45,thick,->] (\source);
+% loop edges
+\foreach \vertex/ \dir in {{h/right}}
+\path[arrow] (\vertex) edge [loop \dir] ();
+\end{tikzpicture}
+\end{preview}
+
+%% transpose without forefathers
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto, swap]
+% First we draw the non-forefathers
+\foreach \id/ \pos/ \col in {{a/(0,2)/blue!50}, {d/(6, 2)/red!50}, 
+  {e/(0, 0)/blue!50}, {f/(2, 0)/yellow!60},
+  {b/(2, 2)/blue!50}, {c/(4,2)/red!50}, 
+  {g/(4, 0)/yellow!60}, {h/(6, 0)/black!30}}
+\node[vertex,fill=\col] (\id) at \pos {$\mathsf{\id}$};
+% Connect vertices with edges
+\foreach \source/ \dest in {{a/b}, {b/e}, {b/c}, {c/g}, {d/h}, {e/a}, {e/f}, {g/h}}
+ \path[arrow] (\dest) -- (\source);
+% bent edges
+\foreach \source/ \dest in {{f/g}, {c/d}}
+\path 
+  (\dest) edge [bend left=45,thick,->] (\source)
+  (\source) edge [bend left=45,thick,->] (\dest);
+% loop edges
+\foreach \vertex/ \dir in {{h/right}}
+\path[arrow] (\vertex) edge [loop \dir] ();
+\end{tikzpicture}
+\end{preview}
+
+%% transpose with forefathers
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto, swap]
+% First we draw the non-forefathers
+\foreach \id/ \pos/ \col in {{a/(0,2)/blue!50}, {d/(6, 2)/red!50}, 
+  {e/(0, 0)/blue!50}, {f/(2, 0)/yellow!60}}
+\node[vertex,fill=\col] (\id) at \pos {$\mathsf{\id}$};
+% Second draw the forefathers: higher colour intensity
+\foreach \id/ \pos/ \col in {{b/(2, 2)/blue}, {c/(4,2)/red}, 
+  {g/(4, 0)/yellow}, {h/(6, 0)/black!70}}
+\node[forefather,fill=\col] (\id) at \pos {$\mathsf{\id}$};
+% Connect vertices with edges
+\foreach \source/ \dest in {{a/b}, {b/e}, {b/c}, {c/g}, {d/h}, {e/a}, {e/f}, {g/h}}
+ \path[arrow] (\dest) -- (\source);
+% bent edges
+\foreach \source/ \dest in {{f/g}, {c/d}}
+\path 
+  (\dest) edge [bend left=45,thick,->] (\source)
+  (\source) edge [bend left=45,thick,->] (\dest);
+% loop edges
+\path[arrow] (h) edge [loop right] ();
+\end{tikzpicture}
+\end{preview}
+
+\end{document}

@@ -8,7 +8,7 @@
 \usetikzlibrary{shapes.multipart}
 \usetikzlibrary{decorations.pathmorphing}
 
-\title{Aula 23: Grafos: algoritmos elementares}
+\title{Aula 23: Grafos: algoritmos elementares (I)}
 \author{David Déharbe \\
   Programa de Pós-graduação em Sistemas e Computação \\
   Universidade Federal do Rio Grande do Norte \\
@@ -1245,6 +1245,7 @@ caminho é um menor caminho entre $s$ e $v$ em $G$.
       \End
     \End
 \zi $\attrib{v}{color} \gets \const{Black}$
+\zi $\attrib{v}{f} \gets \proc{Tick}$
 \end{codebox}
 
 \end{frame}
@@ -1418,7 +1419,7 @@ $$
 \begin{itemize}
 \item O grafo dos predecessores $G_\pi$ é uma floresta de árvores.
 
-\item as arestas correspondem às chamadas de $\proc{BFS-visit}$
+\item as arestas correspondem às chamadas de $\proc{DFS-visit}$
 
 \end{itemize}
 
@@ -1480,7 +1481,7 @@ Por casos:
 \begin{itemize}
 \item $v$ é descoberto quando $u$ é cinza, logo $v$ é descendente de $u$.
 \item $v$ é mais recente que $u$ e as arestas saindo de $v$ são processadas 
-  antes de finalizar as de $u$, logo $\attrib{v}{f} < attrib{u}{f}$. 
+  antes de finalizar as de $u$, logo $\attrib{v}{f} < \attrib{u}{f}$. 
 \item O intervalo para $v$ é contido no intervalo para $u$.
 \end{itemize}
 \item se $\attrib{u}{f} < \attrib{v}{d}$: 
@@ -1512,14 +1513,14 @@ $\Rightarrow$
 \begin{itemize}
 \item $v$ é um descendente de $u$, 
 \item $w$ é um vértice no caminho de $u$ até $v$,
-\item pelo corolário do aninhamento, $\attrib{d}{u} < \attrib{d}{w}$.
-\item logo, na etapa $\attrib{d}{u}$, $w$ é branco.
+\item pelo corolário do aninhamento, $\attrib{u}{d} < \attrib{w}{d}$.
+\item logo, na etapa $\attrib{w}{d}$, $w$ é branco.
 \end{itemize}
 }
 \only<3>{
 $\Leftarrow$
 \begin{itemize}
-\item na etapa $\attrib{d}{u}$, $v$ é alcançável por um caminho branco a partir de $u$
+\item na etapa $\attrib{u}{d}$, $v$ é alcançável por um caminho branco a partir de $u$
 \item supondo que $v$ não é descendente de $u$ na árvore em profundidade
 \item supondo que os demais vértices no caminho tornam-se descendentes na árvore em profundidade
 \item seja $w$ o predecessor de $v$
@@ -1541,8 +1542,8 @@ $\Leftarrow$
 \item arestas de árvore: são as arestas $(u, v)$ processadas em $\proc{DFS-visit}$ tais que $v$ é encontrado pela primeira vez. \only<3>{\alert{$\attrib{v}{color} = \const{White}$}}
 \item arestas para trás: são as arestas processadas em $\proc{DFS-visit}$ que conectam $v$ a um ancestro de $v$
 \only<4>{\alert{$\attrib{v}{color} = \const{Gray}$}}
-\item arestas para frente: são as arestas processadas em $\proc{DFS-visit}$ que conectam $v$ a um descendente de $v$ já visitado \only<5>{\alert{$\attrib{v}{color} = \const{Black}$}} \only<5-6>{\alert{$\attrib{d}{u} < \attrib{d}{v}$}}
-\item arestas cruzadas: as demais arestas. \only<5-6>{\alert{$\attrib{v}{color} = \const{Black}$}} \only<6>{\alert{$\attrib{d}{u} > \attrib{d}{v}$}}
+\item arestas para frente: são as arestas processadas em $\proc{DFS-visit}$ que conectam $v$ a um descendente de $v$ já visitado \only<5>{\alert{$\attrib{v}{color} = \const{Black}$}} \only<5-6>{\alert{$\attrib{u}{d} < \attrib{v}{d}$}}
+\item arestas cruzadas: as demais arestas. \only<5-6>{\alert{$\attrib{v}{color} = \const{Black}$}} \only<6>{\alert{$\attrib{u}{d} > \attrib{v}{d}$}}
 \begin{itemize}
 \item entre vértices da mesma árvore, tais que nenhuma é ancestro de outra;
 \item entre vértices de árvores diferentes.

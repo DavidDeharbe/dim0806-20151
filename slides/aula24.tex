@@ -1,0 +1,711 @@
+\documentclass{beamer}
+\setbeamertemplate{footline}[frame number]
+
+\input{preamble}
+
+\title{Aula 24: Grafos: algoritmos elementares (II)}
+\author{David Déharbe \\
+  Programa de Pós-graduação em Sistemas e Computação \\
+  Universidade Federal do Rio Grande do Norte \\
+  Centro de Ciências Exatas e da Terra \\
+  Departamento de Informática e Matemática Aplicada}
+\date{18 de maio de 2015}
+
+\begin{document}
+\selectlanguage{brazil}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+  \frametitle{Plano}
+  \tableofcontents
+
+Referência: Cormen, cap 23.
+\end{frame}
+
+\section{Ordenação topológica}
+
+\begin{frame}
+\frametitle{Ordenação topológica}
+
+\begin{itemize}
+\item Grafos dirigidos acíclicos indicam uma relação de precedência
+\begin{itemize}
+\item $u \prec v$: $u$ vem antes de $v$, aresta $(u, v)$
+\item relação parcial
+\item exemplos: pré-requisitos entre componentes curriculares, entre tarefas, etc.
+\end{itemize}
+\item Ordenação topológica:
+\begin{itemize}
+\item entrada: uma relação de precedência
+\item saída: um ``escalonamento'' dos vértices que respeita a precedência
+\end{itemize}
+\item exemplo: grade curricular
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Definição}
+
+\begin{definition}[Grafo dirigido acíclico, DAG]
+Um \emph{grafo dirígido acíclico}, ou \emph{DAG}\footnote{Do inglês \textit{Directed Acyclic Graph}.}  é um grafo dirigido $G$ tal que se existe uma aresta dirigda de $(u, v)$, então não existe caminho de $v$ até $u$.
+\end{definition}
+
+Não há cíclo em DAGs.
+
+\begin{center}
+\includegraphics[height=.5\textheight]{fig/dag-1.pdf}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Exemplo}
+\framesubtitle{Ordenação topológica}
+\begin{center}
+\includegraphics[height=.5\textheight]{fig/dag-1.pdf}
+\end{center}
+
+\begin{center}
+\includegraphics[height=.1\textheight]{fig/dag-2.pdf}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Algoritmo}
+\framesubtitle{Ordenação topológica}
+
+\begin{itemize}
+\item Aplicar $\proc{DFS}$;
+\item Retornar a lista dos vértices em ordem decrescente do atributo $\id{f}$.
+\end{itemize}
+
+\begin{codebox}
+\Procname{$\proc{Topological-Sort}(G)$}
+\zi aplique $\proc{DFS}$ a $G$
+\zi inserindo cada $v$ na cabeça de uma lista quando é finalizado
+\zi \Return a lista dos vértices
+\end{codebox}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Algoritmo detalhado}
+\framesubtitle{Ordenação topológica}
+
+\begin{codebox}
+\Procname{$\proc{Topological-Sort}(G)$}
+\zi \For $v \in \attrib{G}{V}$
+\zi \Do $\attrib{v}{visited} \gets \const{False}$
+    \End
+\zi $l \gets \const{Empty-List}$
+\zi \For $v \in \attrib{G}{V}$
+\zi \Do \If $\neg \attrib{v}{visited}$
+\zi   \Then $\proc{Topological-Sort-Visit}(v)$
+      \End
+    \End
+\zi \Return $l$
+\end{codebox}
+
+\begin{codebox}
+\Procname{$\proc{Topological-Sort-Visit}(v, l)$}
+\zi $\attrib{v}{visited} \gets \const{True}$
+\zi \For $w \in \attrib{v}{adj}$
+\zi \Do \If $\neg \attrib{w}{visited}$
+\zi   \Then $\proc{Topological-Sort-Visit}(v, l)$
+      \End
+    \End
+\zi $l \gets \proc{Push-Front}(v, l)$
+\end{codebox}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Algoritmo}
+\framesubtitle{Exemplo}
+
+\begin{center}
+\includegraphics[height=.5\textheight]{fig/dag-1.pdf}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Complexidade}
+\framesubtitle{Ordenação topológica}
+
+\begin{itemize}
+\item $\proc{DFS}$: $\Theta(|V|+|E|)$
+\item + $\Theta(1)$ cada inserção de vértice $\equiv$ $\Theta(|V|)$
+\item = $\Theta(|V|+|E|)$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Correção}
+\framesubtitle{Ordenação topológica}
+
+\begin{enumerate}
+\item Lema: caracterização de DAG por arestas
+\item Teorema: correção do algoritmo proposto
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Aciclicidade e arestas}
+
+\begin{lemma}[Arestas e DAG]
+Um grafo dirigido $G = (V, E)$ é acíclico (um DAG) se e somente se qualquer aplicação de $\proc{DFS}(G)$ encontra nenhuma aresta de volta.
+\end{lemma}
+\pause
+Plano de prova
+\begin{itemize}
+\item ($\Leftarrow$) nenhuma aresta de volta $\Rightarrow$ nenhum ciclo
+\item ($\Rightarrow$) nenhum ciclo $\Rightarrow$ nenhuma aresta de volta
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Aciclicidade e arestas}
+\framesubtitle{Demonstração}
+
+\begin{proof}
+\only<1>{
+\begin{tabular}{c}
+($\Leftarrow$) nenhuma aresta de volta $\Rightarrow$ nenhum ciclo \\
+$\equiv$
+ciclo $\Rightarrow$ aresta de volta
+\end{tabular}
+\begin{itemize}
+\item $G$ possui um ciclo $c$
+\item seja $v$ o primeiro vértice de $c$ encontrado em uma busca em profundidade
+\item seja $(u, v)$ a aresta de $c$ chegando em $v$
+\item pelo teorema do caminho branco: na etapa $\attrib{v}{d}$, há um caminho branco até $u$ 
+\item $u$ torna-se um descendente de $v$ na floresta em profundidade
+\item logo, $(u, v)$ é uma aresta de volta.
+\end{itemize}
+}
+\only<2>{
+\begin{tabular}{c}
+($\Rightarrow$) nenhum ciclo $\Rightarrow$ nenhuma aresta de volta \\
+$\equiv$ \\
+aresta de volta $\Rightarrow$ ciclo
+\end{tabular}
+\begin{itemize}
+\item seja $(u, v)$ uma aresta de volta.
+\item logo $v$ é um ancestro de $u$ na floresta de profundidade.
+\item então há um caminho de $v$ até $v$, passando por $u$: é um ciclo
+\end{itemize}
+}
+\end{proof}
+\end{frame}
+
+\begin{frame}
+\frametitle{Correção de $\proc{Topological-Sort}$}
+
+\begin{theorem}[Correção do algoritmo $\proc{Topological-Sort}$]
+$\proc{Topological-Sort}(G)$ produz uma ordenação topológica de um grafo dirigido acíclico $G$.
+\end{theorem}
+\end{frame}
+
+\begin{frame}
+\frametitle{Correção de $\proc{Topological-Sort}$}
+
+\begin{proof}
+\begin{itemize}
+\item Basta mostrar que: em um DAG, se há uma aresta $(u, v)$, então $\attrib{v}{f} < \attrib{u}{f}$.
+\item $(u, v)$ não é uma aresta de volta
+\item Quando encontrado, $v$ é branco ou preto
+\begin{itemize}
+\item se $v$ for branco, é um descendente de $u$ e $\attrib{v}{f} < \attrib{u}{f}$
+\item se $v$ for preto, já foi finalizado e $\attrib{v}{f} < \attrib{u}{d} < \attrib{u}{f}$.
+\end{itemize}
+\end{itemize}
+\end{proof}
+\end{frame}
+
+\section{Componentes fortemente conectados}
+
+\begin{frame}
+\frametitle{Componentes fortemente conectados}
+\begin{itemize}
+\item \alert{SCC}: \textit{Strongly connected components}
+\item Decomposição de um grafo dirigido em grafos menores
+\item Permite, para alguns problemas de grafos, aplicar estratégia de
+  divisão e conquista.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Definição}
+
+\begin{itemize}
+\item Notação: $u \leadsto v$ existe um caminho de $u$ até $v$
+\end{itemize}
+
+\begin{definition}[Componente fortemente contectado]
+Um \emph{componente fortemente conectado} de um grafo $G = (V, E)$ é um
+conjunto máximo de vértices $U \subseteq V$ tal que para qualquer $(u, v) \in U^2$,
+então $u \leadsto v$ e $v \leadsto u$.
+\end{definition}
+
+\begin{center}
+\includegraphics[height=.4\textheight]{fig/scc-1.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Matriz transposta}
+
+O algoritmo para encontrar os SCC de $G$ utiliza o grafo transposto de $G$.
+
+\begin{definition}[Grafo transposto]
+O \emph{grafo transposto} de um grafo dirigido $G = (V, E)$ é 
+o grafo dirigido $G^T = (V, E^T)$, onde $E^T = \{ (u, v) | (v, u) \in E\}$.
+
+\end{definition}
+
+
+\begin{center}
+\includegraphics[height=.4\textheight]{fig/scc-4.pdf}
+\end{center}
+
+\only<2-3>{\alert{Complexidade?}}\only<3>{$Theta(|V|+|E|)$}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Algoritmo}
+\framesubtitle{As etapas principais}
+
+\begin{codebox}
+\Procname{$\proc{Graph-SCC}(G)$}
+\li $\proc{DFS}(G)$
+\li $G^T \gets \proc{Graph-Transpose}(G)$
+\li $\proc{DFS}(G^T)$ t.~q. laço principal processa vértices por $\id{f}$ decrescente
+\li cada árvore da floresta de profundidade resultado é um SCC
+\end{codebox}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Ilustração}
+\framesubtitle{Algoritmo}
+
+\only<1-2>{
+\begin{center}
+\includegraphics{fig/scc-1.pdf}
+\end{center}
+}
+
+\only<2-4>{
+\begin{center}
+\includegraphics{fig/scc-3.pdf}
+\end{center}
+}
+
+\only<3>{
+\begin{center}
+\includegraphics{fig/scc-4.pdf}
+\end{center}
+}
+
+\only<4>{
+\begin{center}
+\includegraphics{fig/scc-5.pdf}
+\end{center}
+}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Complexidade}
+\framesubtitle{Algoritmo}
+
+\begin{codebox}
+\Procname{$\proc{Graph-SCC}(G)$}
+\li $\proc{DFS}(G)$ \assert{\Comment $\Theta(|V|+|E|)$}
+\li $G^T \gets \proc{Graph-Transpose}(G)$ \assert{\Comment $\Theta(|V|+|E|)$}
+\li $\proc{DFS}(G^T)$ \assert{\Comment $\Theta(|V|+|E^T|) = \Theta(|V|+|E|)$}
+\end{codebox}
+\pause
+$$
+\Theta(|V|+|E|)
+$$
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Correção (roteiro)}
+\framesubtitle{Algoritmo}
+
+\begin{enumerate}
+\item propriedade dos caminhos entre vértices de um mesmo SCC
+\item propriedade sobre busca em profundidade e vértices de um SCC
+\item noção de \alert{antepassado} de um vértice em uma busca em profundidade
+\item relação entre antepassado na busca e ancestro no grafo
+\item propriedade sobre antepassado e SCC
+\item propriedade sobre antepassados dos vértices de um mesmo SCC
+\item correção do algoritmo
+\end{enumerate}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Caminhos entre vértices de um mesmo SCC}
+\framesubtitle{Correção}
+
+\begin{lemma}[Caminhos entre vértices de um mesmo SCC]
+Seja $u$ e $v$ dois vértices quaisqueres de um mesmo SCC. Então todos
+os vértices nos caminhos entre $u$ e $v$ estão neste mesmo SCC.
+\end{lemma}
+\pause
+\begin{proof}
+Seja $w$ um vértice no caminho de $u$ até $v$. Logo $u \leadsto w$. Precisamos verificar que $w \leadsto u$.
+\begin{itemize}
+\item Como $w$ está no camino de $u$ até $v$, então $w \leadsto v$.
+\item Como $u$ e $v$ estão no mesmo SCC, $v \leadsto u$.
+\end{itemize}
+Logo $w \leadsto u$.
+\end{proof}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Busca em profundidade e vértices de um SCC}
+\framesubtitle{Correção}
+
+\begin{theorem}[Busca em profundidade e vértices de um SCC]
+Em qualquer busca em profundidade, todos os vértices em um SCC
+encontram-se em uma mesma árvore da busca em profundidade.
+\end{theorem}
+\pause
+\begin{proof}
+Seja $u$ o primeiro vértice do SCC encontrado na busca em profundidade,
+e $v$ qualquer outro vértice do $SCC$.
+\begin{itemize}
+\item na etapa $\attrib{u}{d}$, todos os demais vértices do SCC estão brancos
+\item pelo teorema do caminho branco, $v$ é um descendente de $u$ na floresta
+de profundidade
+\end{itemize}
+Logo, $u$ e $v$ estão na mesma árvore de profundidade.
+\end{proof}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Antepassado na busca em profundidade}
+\framesubtitle{Correção}
+
+\begin{itemize}
+\item $\attrib{v}{d}$ e $\attrib{v}{f}$ são os valores obtidos em $\proc{DFS}(G)$
+\end{itemize}
+
+\begin{definition}[Antepassado em uma busca em profundidade]
+Em uma busca em profundidade, para qualquer vértice $u$, o antepassado
+de $u$, denotado $\phi(u)$, é o vértice $v$ tal que $u \leadsto v$ com o
+maior valor de $\id{f}$.
+\end{definition}
+
+\only<2>{
+\begin{itemize}
+\item um antepassado por SCC ($\approx$ representante do componente)
+\item primeiro vértice do SCC descoberto na busca em profundidade de $G$
+\item último a ser finalizado
+\item é a raiz da árvore de profundidade na busca em profundidade de $G^T$
+\end{itemize}
+}
+\only<3>{
+Temos:
+\begin{enumerate}
+\item $\attrib{u}{f} \le \attrib{\phi(u)}{f}$
+\item $u \leadsto v \Rightarrow \attrib{\phi(v)}(f) \le \attrib{\phi(u)}{f}$
+\item $\phi(\phi(u)) = \phi(u)$
+\end{enumerate}
+}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Antepassado na busca em profundidade}
+\framesubtitle{Correção}
+
+\alert{$\attrib{u}{f} \le \attrib{\phi(u)}{f}$}
+
+\begin{itemize}
+\item Pois $u \leadsto u$, e $\forall v | u \leadsto v \cdot \attrib{v}{f} \le \attrib{\phi(u)}{f}$
+\end{itemize}
+
+\alert{$u \leadsto v \Rightarrow \attrib{\phi(v)}(f) \le \attrib{\phi(u)}{f}$}
+
+\begin{itemize}
+\item Pois $\{ w \cdot v \leadsto w\} \subseteq \{ w \cdot u \leadsto w\}$
+\end{itemize}
+
+\alert{$\phi(\phi(u)) = \phi(u)$}
+
+\begin{itemize}
+\item Pois $\attrib{\phi(u)}{f} \le \attrib{\phi(\phi(u))}{f}$,
+\item e, como $u \leadsto \phi(u)$, então $\attrib{\phi(\phi(u))}{f} \le \attrib{\phi(u)}{f}$,
+\item temos $\attrib{\phi(u)}{f} = \attrib{\phi(\phi(u))}{f}$, e
+\item cada vértice tem um valor de $\id{f}$ diferente.
+\end{itemize}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Antepassados e ancestros}
+\framesubtitle{Correção}
+
+\begin{theorem}[Antepassado é ancestro]
+Em um grafo dirigido $G = (V, E)$, o antepassado $\phi(u)$ de qualquer
+$u \in V$ em qualquer busca em profundidadede $G$, sempre é um
+ancestro de $u$.
+\end{theorem}
+\pause
+\begin{proof}
+Por caso sobre a cor de $\phi(u)$ na etapa $\attrib{d}{u}$
+\only<3-5>{
+\begin{itemize}
+\item 
+\only<3>{Se for $\const{Gray}$, então $\phi(u)$ é ancestro de $u$.
+}
+\only<4>{Se for $\const{Black}$, então foi finalizado, e $\attrib{\phi(u)}{f} < \attrib{u}{f}$. \alert{Contradiz} $\attrib{u}{f} \le \attrib{\phi(u)}{f}$.
+}
+\only<5>{
+Se for $\const{White}$, consideramos a cor dos vértices no caminho
+de $u$ até $\phi(u)$
+\begin{itemize}
+\item todos são brancos, logo $\phi(u)$ é descendente de $u$, $\attrib{\phi(u)}{f} < \attrib{u}{f}$: \alert{contradição}
+\item senão, seja $t$ o último vértice não branco do caminho:
+\begin{itemize}
+\item $t$ não pode ser preto, pois tem um sucessor branco
+\item então há um caminho branco de $t$ até $\phi(u)$, e 
+\item $\phi(u)$ é descendente de $t$ (teorema do caminho branco)
+\item logo $\attrib{t}{f} > \attrib{\phi(u)}{f}$
+\item \alert{contradição} por definição de $\phi(u)$ e $u \leadsto t$.
+\end{itemize}
+\end{itemize}
+}
+\end{itemize}
+}
+\end{proof}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Antepassado e SCC}
+\framesubtitle{Correção}
+
+\begin{corollary}[Antepassado e SCC]
+Em qualquer busca em profundidade de um grafo dirigido $G = (V, E)$, 
+para qualquer $u \in V$, ambos $u$ e $\phi(u)$ pertencem ao mesmo SCC.
+\end{corollary}
+\pause
+\begin{proof}
+\begin{itemize}
+\item Por definição de $\phi$, temos $u \leadsto \phi(u)$.
+\item Pelo teorema ``antepassado é ancestro'', $\phi(u) \leadsto u$.
+\end{itemize}
+\end{proof}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Antepassados dos vértices de um SCC}
+\framesubtitle{Correção}
+
+\begin{theorem}[Antepassados dos vértices de um SCC]
+Em um grafo dirigido $G = (V, E)$, os vértices $u$ e $v$ pertencem ao
+mesmo SCC se, e somente se, possuem o mesmo antepassado na busca em
+profundidade de $G$.
+\end{theorem}
+
+\pause
+\begin{proof}
+\begin{itemize}
+\item $(\Rightarrow)$ \only<3>{$u$ e $v$ pertencem ao mesmo SCC:
+\begin{itemize}
+\item logo $\{ w \cdot u \leadsto u \} = \{ w \cdot v \leadsto w\}$.
+\item por definição de $\phi$, $\phi(u) = \phi(v)$.
+\end{itemize}
+}
+\item $(\Leftarrow)$ 
+\only<4>{$\phi(u) = \phi(v)$:
+\begin{itemize}
+\item pelo corolário ``Antepassado e SCC'' $u$ e $\phi(u)$ estão no mesmo SCC
+\item $v$ e $\phi(v)$ estão no mesmo SCC,
+\item logo $u$ e $v$ estão no mesmo SCC.
+\end{itemize}
+}
+\end{itemize}
+\end{proof}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Intuição do algoritmo}
+
+\begin{itemize}
+\item $\proc{DFS}(G)$ marca os antepassados com o maior valor de
+  $\id{f}$ (e o menor valor de $\id{d}$) de cada SCC.
+\item $\proc{DFS}(G^T)$ 
+\begin{itemize}
+\item começa com um vértice $v_1$ de maior $\id{f}$, que é um antepassado
+\item visita todos os vértices do SCC de $v_1$
+\item continua com um vértice $v_2$ de maior $\id{f}$ entre os não visitados,
+também é um antepassado
+\item visita todos os vértices do SCC de $v_2$
+\item e assim sucessivamente
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Teorema da correção}
+\framesubtitle{Correção}
+
+\begin{theorem}[Correção de $\proc{Graph-SCC}$]
+Seja $G$ um grafo dirigido qualquer, $\proc{Graph-SCC}(G)$ calcula
+corretamente os componentes fortemente conectados de $G$.
+\end{theorem}
+
+\pause
+
+Roteiro da demonstração:
+\begin{itemize}
+\item indução 
+\item número de árvores de profundidade encontrados em $\proc{DFS}(G^T)$.
+\item mostramos que, assumindo que as árvores anteriores são SCC, 
+  cada nova árvore formada é um SCC
+\item trivial para a primeira árvore (não existe árvores anteriores)
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Prova do teorema da correção}
+\framesubtitle{Correção}
+
+\begin{proof}
+\begin{itemize}
+\item Seja $T$ uma árvore de profundidade de raiz $r$ produzida por $\proc{DFS}(G^T)$.
+\item Seja $C(r) = \{ w \cdot \phi(w) = r\}$ (é um SCC)
+\item Mostramos que $u$ é incluído em $T$ se e somente se $u \in C(r)$
+\begin{itemize}
+\item $(\Leftarrow)$ \only<2>{
+\begin{itemize}
+\item teorema ``busca em profundidade e vértices de um SCC''
+\item cada vértice em $C(r)$ termina em uma mesma árvore de profundidade
+\item como $r \in C(r)$, e $r$ é a raiz de $T$, então cada elemento de $C(r)$
+termina precisamente em $T$.
+\end{itemize}
+}
+\item $(\Rightarrow)$ \only<3-5>{Mostramos que, para um vértice $w$, se
+$\attrib{\phi(w)}{f} < \attrib{r}{f}$, ou 
+$\attrib{\phi(w)}{f} > \attrib{r}{f}$, $w$ não pertence a $T$
+\only<4>{
+\begin{itemize}
+\item $\attrib{\phi(w)}{f} < \attrib{r}{f}$
+\item se $w$ for colocado em $T$, então $w \leadsto r$
+\item logo, $\attrib{\phi(w)}{f} \le \attrib{\phi(r)}{f} = \attrib{r}{f}$
+\item \alert{contradição}
+\end{itemize}
+}
+\only<5>{
+\begin{itemize}
+\item $\attrib{\phi(w)}{f} > \attrib{r}{f}$
+\item por hipótese de indução, quando $r$ for selecionado em $\proc{DFS}(G^T)$,
+$\attrib{w}{f}$ terá sido inserido na árvore de raiz $\phi(w)$.
+\item um vértice é inserido exatamente em uma árvore.
+\end{itemize}
+}
+}
+\end{itemize}
+\end{itemize}
+\end{proof}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Teorema da correção}
+\framesubtitle{Correção}
+
+\begin{theorem}[Correção de $\proc{Graph-SCC}$]
+Seja $G$ um grafo dirigido qualquer, $\proc{Graph-SCC}(G)$ calcula
+corretamente os componentes fortemente conectados de $G$.
+\end{theorem}
+
+\pause
+
+\begin{proof}
+\begin{itemize}
+\item indução 
+\item número de árvores de profundidade encontrados em $\proc{DFS}(G^T)$.
+\item mostramos que, assumindo que as árvores anteriores são SCC, 
+  cada nova árvore formada é um SCC
+\item trivial para a primeira árvore (não existe árvores anteriores)
+\end{itemize}
+\end{proof}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Exercícios}
+
+\begin{enumerate}
+\item Como pode evoluir a quantidade de SCC em um grafo quando uma
+  aresta é adicionada? removida?
+\item Seja $G$ um grafo dirigido. O grafo dos componentes de $G$ é o grafo
+  $G^{SCC} = (V^{SCC}, E^{SCC})$, tal que $V^{SCC}$ contem um vértice por
+  SCC de $G$, e $E^{SCC}$ contem a aresta $(u, v)$ se existe uma aresta entre
+  um vértice de $u$ e um vértice de $v$ no grafo $G$.
+
+  Mostre que o grafo dos componentes conectados de $G$ é um DAG.
+\item Escreva um algoritmo que calcula o grafo dos componentes de
+  $G=(V, E)$, com complexidade $O(|V|+|E|)$. 
+
+  Nota: o grafo resultado deve ter, ao máximo, uma aresta entre cada
+  par de vértices.
+
+\item Um grafo é semi-conectado se, para qualquer par de vértices $(u, v)$,
+  ou $u \leadsto v$ ou $v \leadsto u$.
+
+  Escreva um algoritmo eficiente que testa se um grafo é semi-conectado.
+  Mostre que seu algoritmo é correto.
+\end{enumerate}
+
+\end{frame}
+
+
+\end{document}

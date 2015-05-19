@@ -168,6 +168,27 @@ for i in $pages; do mv $file.part$i.$i'_'$i.pdf "$file-$i.pdf"; done
 }
 echo "aula23: elementary graph algorithms"
 
+function aula24 () {
+
+TEXFILES="dag\
+  scc"
+
+for file in $TEXFILES; do
+  latexmk -pdf $file
+done
+
+file=dag
+pages="1 2"
+./splitPDF.py $file.pdf $pages
+for i in $pages; do mv $file.part$i.$i'_'$i.pdf "$file-$i.pdf"; done
+
+file=scc
+pages="1 2 3 4 5"
+./splitPDF.py $file.pdf $pages
+for i in $pages; do mv $file.part$i.$i'_'$i.pdf "$file-$i.pdf"; done
+}
+echo "aula24: elementary graph algorithms (ii)"
+
 function clean () {
 	rm -f *.log *.aux *~ *.pdf
 }
