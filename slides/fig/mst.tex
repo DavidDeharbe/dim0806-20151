@@ -1,0 +1,240 @@
+\documentclass{article}
+
+\usepackage[pdftex,active,tightpage]{preview}
+\setlength\PreviewBorder{2mm}
+
+\usepackage{pgf}
+\usepackage{tikz}
+\usetikzlibrary{shapes.multipart}
+\usetikzlibrary{shapes.geometric}
+\usetikzlibrary{shapes.misc}
+\tikzstyle{edge} = [draw,thick,-]
+\tikzstyle{other edge} = [draw,thick,dotted]
+\tikzstyle{vertex}=[circle,minimum size=15pt,inner sep=0pt,draw,thick]
+\tikzstyle{forefather}=[circle,minimum size=15pt,inner sep=0pt]
+\tikzstyle{scc}=[ellipse,minimum size=15pt,inner sep=3pt]
+
+
+\begin{document}
+
+%% initial
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto, swap]
+% vertices
+\foreach \id/ \pos/ \col in {{a/(0,2)}, {b/(2,4)}, {c/(6,4)}, {d/(10,4)}, {e/(12,2)}, {f/(10,0)}, {g/(6,0)}, {h/(2,0)}, {i/(4,2)}}
+\node[vertex] (\id) at \pos {$\mathsf{\id}$};
+% weighted edges
+\foreach \source/ \dest/ \weight in {
+  {a/b/4}, {a/h/8}, 
+  {b/c/8}, {b/h/11}, 
+  {c/d/7}, {c/f/4}, {c/i/2}, 
+  {d/e/9}, 
+  {e/f/10}, 
+  {f/g/2}, 
+  {g/h/1}, 
+  {g/i/6}, 
+  {h/i/7}}
+ \path[edge] (\source) -- node{$\weight$} (\dest);
+\end{tikzpicture}
+\end{preview}
+
+%% cut
+\tikzstyle{vertex s}=[circle solidus,minimum size=15pt,text=white,fill=black!90,inner sep=0pt,draw,thick]
+\tikzstyle{edge in A} = [draw,line width=3pt,-,red!50]
+\tikzstyle{light edge} = [draw,-,line width=2pt, teal, dashed]
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto, swap]
+% vertices in S
+\node (S) at (-1,2.5) {$\uparrow S$};
+\foreach \id/ \pos/ \col in {{a/(0,2)}, {b/(2,4)}, {d/(10,4)}, {e/(12,2)}}
+\node[vertex s] (\id) at \pos {$\mathsf{\id}$};
+% vertices in V-S
+\foreach \id/ \pos/ \col in {{c/(6,4)}, {f/(10,0)}, {g/(6,0)}, {h/(2,0)}, {i/(4,2)}}
+\node[vertex] (\id) at \pos {$\mathsf{\id}$};
+% weighted directed edges
+\node (VS) at (-1,1.3) {$\downarrow V-S$};
+\foreach \source/ \dest/ \weight in {
+  {a/h/8}, 
+  {b/c/8}, {b/h/11}, 
+  {d/e/9}, 
+  {e/f/10}, 
+  {g/i/6}, 
+  {h/i/7}}
+ \path[edge] (\source) -- node{$\weight$} (\dest);
+% edges in A, respecting the cut
+\foreach \source/ \dest/ \weight in {
+  {a/b/4}, 
+  {c/f/4}, {c/i/2}, 
+  {f/g/2}, 
+  {g/h/1}}
+ \path[edge in A] (\source) -- node{$\weight$} (\dest);
+% light edge
+\foreach \source/ \dest/ \weight in {
+  {c/d/7}}
+ \path[light edge] (\source) -- node{$\weight$} (\dest);
+% cut
+\draw[line width=2pt, color=blue!50, dotted] 
+   (-1,2) .. controls (-0.5, 2) and (0.5, 1) .. (1,1)
+          .. controls (2,1) and (5, 5) .. (6,5) 
+          .. controls (7,5) and (10,1) .. (11,1) 
+          .. controls (12,1) and (12,1.5) .. (13,1.5);
+\end{tikzpicture}
+\end{preview}
+
+%% after adding light edge to A
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto, swap]
+% vertices in S
+\node (S) at (-1,2.5) {$\uparrow S$};
+\foreach \id/ \pos/ \col in {{a/(0,2)}, {b/(2,4)}, {c/(6,4)}, {d/(10,4)}, {e/(12,2)}}
+\node[vertex s] (\id) at \pos {$\mathsf{\id}$};
+% vertices in V-S
+\foreach \id/ \pos/ \col in {{f/(10,0)}, {g/(6,0)}, {h/(2,0)}, {i/(4,2)}}
+\node[vertex] (\id) at \pos {$\mathsf{\id}$};
+% weighted directed edges
+\node (VS) at (-1,1.3) {$\downarrow V-S$};
+\foreach \source/ \dest/ \weight in {
+  {a/h/8}, 
+  {b/c/8}, {b/h/11}, 
+  {d/e/9}, 
+  {e/f/10}, 
+  {g/i/6}, 
+  {h/i/7}}
+ \path[edge] (\source) -- node{$\weight$} (\dest);
+% edges in A, respecting the cut
+\foreach \source/ \dest/ \weight in {
+  {a/b/4}, 
+  {c/d/7}, {c/f/4}, {c/i/2}, 
+  {f/g/2}, 
+  {g/h/1}}
+ \path[edge in A] (\source) -- node{$\weight$} (\dest);
+% cut
+\draw[line width=2pt, color=blue!50, dotted] 
+   (-1,2) .. controls (-0.5, 2) and (0.5, 1) .. (1,1)
+          .. controls (2,1) and (3, 3) .. (4,3) 
+          .. controls (5,3) and (10,1) .. (13,1);
+\end{tikzpicture}
+\end{preview}
+
+%% theorem illustration
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto, swap]
+% labeled vertices in S
+\foreach \id/ \pos/ \col in {{u/(0,5)}}
+\node[vertex s] (\id) at \pos {$\mathsf{\id}$};
+% anonymous vertices in S
+\foreach \id/ \pos/ \col in {{c/(3,7)}, {b/(11,9)}, {x/(7,7)}}
+\node[vertex s] (\id) at \pos {};
+% labeled vertices in V-S
+\foreach \id/ \pos/ \col in {{v/(3,0)}}
+\node[vertex] (\id) at \pos {$\mathsf{\id}$};
+% anonymous vertices in V-S
+\foreach \id/ \pos/ \col in {{a/(1,9)}, {d/(6,2)}, {e/(10,0)}, {y/(10,4)}}
+\node[vertex] (\id) at \pos {};
+% edges in MST
+\foreach \source/ \dest in {{a/c}, {u/c}, {x/y}}
+ \path[edge] (\source) -- (\dest);
+% edges in A
+\foreach \source/ \dest in {
+  {c/x}, 
+  {x/b},
+  {d/y}, 
+  {d/e}, 
+  {d/v}}
+ \path[edge in A] (\source) -- (\dest);
+% other edges in graph
+\foreach \source/ \dest/ \weight in {
+  {a/b}, 
+  {b/y}, 
+  {c/d}, 
+  {y/e},
+  {u/v}}
+ \path[other edge] (\source) -- (\dest);
+\end{tikzpicture}
+\end{preview}
+
+%% theorem illustration
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto, swap]
+% labeled vertices in S
+\foreach \id/ \pos/ \col in {{u/(0,5)}}
+\node[vertex s] (\id) at \pos {$\mathsf{\id}$};
+% anonymous vertices in S
+\foreach \id/ \pos/ \col in {{c/(3,7)}, {b/(11,9)}, {x/(7,7)}}
+\node[vertex s] (\id) at \pos {};
+% labeled vertices in V-S
+\foreach \id/ \pos/ \col in {{v/(3,0)}}
+\node[vertex] (\id) at \pos {$\mathsf{\id}$};
+% anonymous vertices in V-S
+\foreach \id/ \pos/ \col in {{a/(1,9)}, {d/(6,2)}, {e/(10,0)}, {y/(10,4)}}
+\node[vertex] (\id) at \pos {};
+% edges in MST
+\foreach \source/ \dest in {{a/c}, {u/c}, {x/y}}
+ \path[edge] (\source) -- (\dest);
+% edges in A
+\foreach \source/ \dest in {
+  {c/x}, 
+  {x/b},
+  {d/y}, 
+  {d/e}, 
+  {d/v}}
+ \path[edge in A] (\source) -- (\dest);
+% other edges in graph
+\foreach \source/ \dest/ \weight in {
+  {a/b}, 
+  {b/y}, 
+  {c/d}, 
+  {y/e},
+  {u/v}}
+ \path[other edge] (\source) -- (\dest);
+% path
+\node[color=blue!50] (p) at (0,4) {$p$};
+\draw[color=blue!50, line width=2pt] 
+   (0,4.5) .. controls (3,6.5) and (7,6.5) .. (8, 5.5)
+           .. controls (8.5,4.5) and (6,2.5) .. (3,0.6);
+\end{tikzpicture}
+\end{preview}
+
+%% theorem illustration
+\begin{preview}
+\begin{tikzpicture}[scale=.8, auto, swap]
+% labeled vertices in S
+\foreach \id/ \pos/ \col in {{u/(0,5)}, {x/(7,7)}}
+\node[vertex s] (\id) at \pos {$\mathsf{\id}$};
+% anonymous vertices in S
+\foreach \id/ \pos/ \col in {{c/(3,7)}, {b/(11,9)}}
+\node[vertex s] (\id) at \pos {};
+% labeled vertices in V-S
+\foreach \id/ \pos/ \col in {{v/(3,0)}, {y/(10,4)}}
+\node[vertex] (\id) at \pos {$\mathsf{\id}$};
+% anonymous vertices in V-S
+\foreach \id/ \pos/ \col in {{a/(1,9)}, {d/(6,2)}, {e/(10,0)}}
+\node[vertex] (\id) at \pos {};
+% edges in MST
+\foreach \source/ \dest in {{a/c}, {u/c}, {x/y}}
+ \path[edge] (\source) -- (\dest);
+% edges in A
+\foreach \source/ \dest in {
+  {c/x}, 
+  {x/b},
+  {d/y}, 
+  {d/e}, 
+  {d/v}}
+ \path[edge in A] (\source) -- (\dest);
+% other edges in graph
+\foreach \source/ \dest/ \weight in {
+  {a/b}, 
+  {b/y}, 
+  {c/d}, 
+  {y/e},
+  {u/v}}
+ \path[other edge] (\source) -- (\dest);
+% path
+\node[color=blue!50] (p) at (0,4) {$p$};
+\draw[color=blue!50, line width=2pt] 
+   (0,4.5) .. controls (3,6.5) and (7,6.5) .. (8, 5.5)
+           .. controls (8.5,4.5) and (6,2.5) .. (3,0.6);
+\end{tikzpicture}
+\end{preview}
+
+\end{document}

@@ -189,6 +189,22 @@ for i in $pages; do mv $file.part$i.$i'_'$i.pdf "$file-$i.pdf"; done
 }
 echo "aula24: elementary graph algorithms (ii)"
 
+function aula25 () {
+
+TEXFILES="mst"
+
+for file in $TEXFILES; do
+  latexmk -pdf $file
+done
+
+file=mst
+pages="1 2 3 4 5 6"
+./splitPDF.py $file.pdf $pages
+for i in $pages; do mv $file.part$i.$i'_'$i.pdf "$file-$i.pdf"; done
+
+}
+echo "aula25: minimum spanning tree"
+
 function clean () {
 	rm -f *.log *.aux *~ *.pdf
 }
