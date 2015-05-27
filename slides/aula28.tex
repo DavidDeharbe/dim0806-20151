@@ -1,0 +1,707 @@
+\documentclass{beamer}
+\setbeamertemplate{footline}[frame number]
+
+\input{preamble}
+
+\title{Aula 28: Algoritmos gulosos}
+\subtitle{\textit{Greedy}}
+\author{David Déharbe \\
+  Programa de Pós-graduação em Sistemas e Computação \\
+  Universidade Federal do Rio Grande do Norte \\
+  Centro de Ciências Exatas e da Terra \\
+  Departamento de Informática e Matemática Aplicada}
+\date{27 de maio de 2015}
+
+\begin{document}
+\selectlanguage{brazil}
+
+%%%%% SLIDE 01 %%%%%
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+  \frametitle{Plano}
+
+  \tableofcontents
+Referência: Cormen, cap 17.
+\end{frame}
+
+\section{Introdução}
+
+%%%%% SLIDE 02 %%%%%
+
+\begin{frame}
+\frametitle{Introdução}
+
+\begin{itemize}
+
+\item Otimização
+
+\item Alternativa à programação dinâmica
+
+\item Em geral, mais simples
+
+\item Nem sempre possível
+
+\item Exemplos:
+
+\begin{itemize}
+
+\item algoritmo de menor caminho (Dijkstra)
+
+\item árvore geradora mínima
+
+\end{itemize}
+
+\end{itemize}
+
+\end{frame}
+
+%%%%% SLIDE 03 %%%%%
+
+\begin{frame}
+\frametitle{Princípios}
+
+\begin{itemize}
+\item a solução é calculada de forma incremental
+\item cada incremento é realizado com a melhor escolha naquele momento
+\item a sequência de decisões localmente ótimas é globalmente ótima
+\item adequado para problemas exibindo certas propriedades
+\begin{itemize}
+\item sub-estrutura ótima
+\item propriedade da escolha gulosa
+\end{itemize}
+
+\end{itemize}
+
+\end{frame}
+
+
+\section{Um exemplo simples}
+
+%%%%% SLIDE 04 %%%%%
+
+\begin{frame}
+\frametitle{Problema de escalonamento de atividades}
+\framesubtitle{Exemplo introdutório}
+
+\begin{itemize}
+\item Temos $n$ atividades
+\item As atividades necessitam de um recurso compartilhado
+\item Cada atividade $i$ tem uma hora de início $s_i$
+e uma hora de término $f_i$
+\item A cada $t$, $s_i \le t < f_i$, a atividade $i$ precisa
+do acesso exclusivo ao recurso para funcionar.
+\item Problema:
+\begin{itemize}
+\item Escalonar a maior quantidade possível de atividades.
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+%%%%% SLIDE 05 %%%%%
+
+\begin{frame}
+\frametitle{Algoritmo}
+\framesubtitle{Escalonamento de atividades}
+
+\begin{codebox}
+\Procname{\proc{Greedy-Scheduler}(s, f)}
+\zi \Comment{$f_1 \le f_2 \le \ldots f_n$}
+\li $n \gets \attrib{s}{length}$
+\zi \Comment{$A$: atividades escalonadas}
+\li $A \gets \{ 1 \}$  \Comment{atividade terminando mais cedo é escalonada}
+\zi \Comment{$j$: última atividade escalonada}
+\li $j \gets 1$
+\li \For $i \gets 2 \To n$ \Comment{escolhe se a atividade $i$ é escalonada}
+\li \Do \If $s_i \ge f_i$
+\li   \Then $A \gets A \cup \{ i \}$
+\li     $j \gets i$
+      \End
+    \End
+\li \Return $A$
+\end{codebox}
+
+\end{frame}
+
+%%%%% SLIDE 06-07 %%%%%
+
+\begin{frame}
+\frametitle{Ilustração}
+
+$$
+\begin{array}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+i & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 \\
+\hline
+\hline
+s & 1 & 3 & 0 & 5 & 3 & 5 & 6 & 8 & 8 & 2 & 12 \\
+\hline
+f & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 & 14
+\end{array}
+$$
+
+\pause
+Por qual razão este algoritmo é qualificado de \alert{guloso}?
+
+\end{frame}
+
+
+%%%%% SLIDE 08-09 %%%%%
+
+\begin{frame}
+\frametitle{Complexidade}
+\framesubtitle{Escalonamento de atividades}
+
+\begin{codebox}
+\Procname{\proc{Greedy-Scheduler}(s, f)}
+\li $n \gets \attrib{s}{length}$
+\li $A \gets \{ 1 \}$
+\li $j \gets 1$
+\li \For $i \gets 2 \To n$ \Comment{\assert{$\Theta(n)$ repetições}}
+\li \Do \If $s_i \ge f_i$ \Comment{\assert{$O(1)$ por repetição}}
+\li   \Then $A \gets A \cup \{ i \}$
+\li     $j \gets i$
+      \End
+    \End
+\li \Return $A$
+\end{codebox}
+\pause
+\alert{$$\Theta(n)$$}
+\end{frame}
+
+%%%%% SLIDE %%%%%
+
+\begin{frame}
+\frametitle{Correção}
+\framesubtitle{Escalonamento de atividades}
+
+\begin{itemize}
+\item O algoritmo sempre tenta maximizar o tempo que o recurso ficará disponível
+\item Será que é correto? Justifique.
+\end{itemize}
+
+\begin{theorem}
+O algoritmo $\proc{Greedy-Scheduler}$ produz soluções de tamanho máximo para o
+problema do escalonamento de atividades.
+\end{theorem}
+
+\end{frame}
+
+%%%%% SLIDE %%%%%
+
+\begin{frame}
+\frametitle{Correção}
+\framesubtitle{Escalonamento de atividades}
+
+\begin{proof}[Por indução]
+\begin{itemize}
+\item Seja $A = \{ A_1, \ldots A_k \} $ uma solução ótima, ordenada por 
+tempo de término crescente.
+\item Queremos mostrar que existe um escalonamento ótimo com $1$
+\item Se $A_1 \neq 1$, seja $B = A - \{ A_1 \} \cup \{ 1 \}$
+\item $B$ é um escalonamento correto das atividades, pois $f_1 \le f_{A_1}$
+\item Logo $B$ é um escalonamento ótimo que começa com $1$.
+\item Sempre existe um escalonamento ótimo começando por $1$.
+\item Uma vez $1$ escolhido, deve-se escalonar a maior quantidade possível
+de tarefas a partir de $f_1$.
+\begin{itemize}
+\item Instância menor do mesmo problema!
+\item Podemos repetir a escolha gulosa.
+\item Por indução a solução é correta.
+\end{itemize}
+\end{itemize}
+\end{proof}
+
+\end{frame}
+
+%%%%% SLIDE %%%%%
+
+\begin{frame}
+\frametitle{Exercícios}
+\begin{enumerate}
+\item Desenvolver um algoritmo para o problema do escalonamento da atividades utilizando \alert{programação dinâmica}.
+\begin{itemize}
+\item Dica: o algoritmo deve calcular $m_i$, para $1 \le i \le n$, onde $m_i$ é 
+a solução para as atividades $\{1, 2, \ldots i\}$.
+\item Compare a complexidade do algoritmo obtido com a de $\proc{Greedy-Schedule}$
+\end{itemize}
+\item A abordagem gulosa nem sempre funciona:
+\begin{itemize}
+\item Encontre um exemplo que mostra por que não funciona se for escolhida a atividade de menor duração no problema do escalonamento de atividades.
+\item Encontre um exemplo que mostra por que não funciona se for escolhida a atividade com menos conflitos no problema do escalonamento de atividades.
+\end{itemize}
+\end{enumerate}
+\end{frame}
+
+\section{Considerações sobre algoritmos gulosos}
+
+%%%%% SLIDE %%%%%
+
+\begin{frame}
+\frametitle{Estratégias gulosas}
+
+\begin{itemize}
+\item Como determinar se uma estratégia gulosa é correta?
+\item Deve-se demonstrar que uma solução globalmente ótima pode ser
+calculada a partir de soluções localmente ótimas
+\begin{itemize}
+\item Exemplo: o teorema sobre $\proc{Greedy-Scheduler}$
+\item Considera uma solução globalmente ótima ($A$).
+\item Mostra que pode se construir uma solução globalmente ótima a partir
+da escolha gulosa ($A - \{ A_1 \} \cup \{ 1 \}$).
+\item Mostrar por indução que a escolha gulosa pode ser repetida.
+\item uma escolha localmente ótima produz uma instância menor do
+mesmo problema de otimização.
+\item \alert{sub-estrutura ótima}
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+%%%%% SLIDE %%%%%
+
+\begin{frame}
+\frametitle{Programação dinâmica e algoritmos gulosos}
+\framesubtitle{Comparação}
+
+\begin{itemize}
+\item Compartilham a propriedade de sub-estrutura ótima
+\item Porém não são equivalentes!
+\item Exemplos:
+\begin{itemize}
+\item problema da mochila 0-1 (ver aula 27)
+\item problema da mochila: itens tem pesos e valores, mas é possível fracionar
+  cada item.
+\end{itemize}
+\item Uma instância: \item $K = 50$, $v_1 = 60$, $w_1 = 10$, $v_2 = 100$, $w_2 = 20$, $v_3 = 120$, $w_1 = 30$, 
+\begin{itemize}
+\item Qual a solução ótima no caso da mochila $0-1$?
+\item Qual a solução ótima no caso da mochila?
+\end{itemize}
+\item Qual pode ser resolvido apenas com programação dinâmica, por que?
+\pause
+\item Como resolver o problema da mochila com um algoritmo guloso?
+\end{itemize}
+\end{frame}
+
+%%%%% SLIDE %%%%%
+
+\begin{frame}
+\frametitle{Exercícios}
+\begin{enumerate}
+\item Demonstrar que o problema da mochila pode ser resolvido de forma gulosa.
+\item Projetar um algoritmo guloso para solucionar o problema da mochila.
+\end{enumerate}
+\end{frame}
+
+%%%%% SLIDE %%%%%
+\section{Exemplo avançado: códigos de Huffman}
+\begin{frame}
+\frametitle{Códigos de Huffman}
+\framesubtitle{Um exemplo avançado}
+
+\begin{itemize}
+\item Utilizado para compactar dados
+\item Dados: sequências de símbolos
+\item Necessita conhecer a frequência de cada símbolo
+\item Atribui código de tamanho menor para símbolos mais frequentes
+\item Alocação de código: algoritmo guloso
+\end{itemize}
+
+\end{frame}
+
+%%%%% SLIDE %%%%%
+\section{Exemplo avançado: códigos de Huffman}
+\begin{frame}
+\frametitle{Ilustração}
+\framesubtitle{Um exemplo avançado}
+
+\begin{itemize}
+\item arquivo de tamanho 100.000 símbolos
+\item seis símbolos diferentes
+\item hipótese: codificação binária
+\item 3 bits por símbolo
+\item custo total (sem compactação): 300 kbits
+\end{itemize}
+\pause
+\begin{center}
+\begin{tabular}{r|c|c|c|c|c|c|}
+& a & b & c & d & e & f \\
+\hline
+frequência & 45 & 13 & 12 & 16 & 9 & 5 \\
+código de tamanho fixo & 000 & 001 & 010 & 011 & 100 & 101 \\
+código de tamanho variável & 0 & 101 & 100 & 111 & 1101 & 1100
+\end{tabular}
+Custo com código de tamanho variável: 224 kbits ($\approx 25\%$)
+\end{center}
+\end{frame}
+
+%%%%% SLIDE %%%%%
+
+\begin{frame}
+\frametitle{Códigos livres de prefixo}
+
+\begin{center}
+\begin{tabular}{r|c|c|c|c|c|c|}
+& a & b & c & d & e & f \\
+\hline
+código de tamanho variável & 0 & 101 & 100 & 111 & 1101 & 1100
+\end{tabular}
+\end{center}
+
+\begin{definition}[Código livre de prefixo]
+Um código é livre de préfixo se, para qualquer par de símbolos $s_1, s_2$
+a codificação de $s_1$ não é prefixo da codificação de $s_2$.
+\end{definition}
+
+\begin{itemize}
+\item O código na tabela é livre de prefixo
+\item Qual texto representa $0101100$? e $101001101$?
+\item Por que é possível decodificar?
+\end{itemize}
+\end{frame}
+
+%%%%% SLIDE %%%%%
+
+\begin{frame}
+\frametitle{Códigos livres de prefixo}
+
+\begin{itemize}
+\item Decodificação é simples
+\item Qual estrutura de dados utilizar para uma decodificação eficiente?
+\pause
+\item Árvore binária
+\begin{itemize}
+\item sem sub-árvore: símbolo decodificado no vértice
+\item 0: selecionar sub-árvore esquerda
+\item 1: selecionar sub-árvore direita
+\item Exemplo:
+\begin{center}
+\begin{tabular}{r|c|c|c|c|c|c|}
+& a & b & c & d & e & f \\
+\hline
+frequência & 45 & 13 & 12 & 16 & 9 & 5 \\
+código de tamanho fixo & 000 & 001 & 010 & 011 & 100 & 101 \\
+código de tamanho variável & 0 & 101 & 100 & 111 & 1101 & 1100
+\end{tabular}
+\end{center}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+%%%%% SLIDE %%%%%
+
+\begin{frame}
+\frametitle{Códigos livres de prefixo}
+\framesubtitle{}
+\begin{itemize}
+\item codificação ótima: árvore binária cheia
+\begin{itemize}
+\item cada vértice ou é uma folha, ou tem duas sub-árvores não vazias
+\end{itemize}
+\item Seja $T$ uma árvore de codificação ótima. Dada a frequência $f(A, c)$ de cada
+  caractere $c$ em um arquivo $A$, qual o tamanho da representação de $A$ com
+  $T$?  \pause
+$$ B(A, T) = \sum_{c} f(A, c) d_T(c) \text{ onde $d_T(c)$ é a profundidade de
+    $c$ em $T$} $$
+é o \alert{custo} de $T$.
+\pause
+\item Dada $f(A, c)$ para cada $c$, como construir uma árvore de codificação ótima? \pause \alert{Códificação de Huffman}
+
+\end{itemize}
+\end{frame}
+
+%%%%% SLIDE %%%%%
+
+\begin{frame}
+\frametitle{Codificação de Huffman}
+\framesubtitle{Um pouco de história}
+
+\begin{itemize}
+\item David Huffman inventou a codificação de Huffman em 1952
+\item doutorando no M.I.T.
+\item avaliação da disciplina \emph{Teoria da Informação}: 
+\begin{itemize}
+\item exame escrito, ou
+\item escrever um artigo original sobre o tema ``codificação binária ótima''
+\end{itemize}
+\item desenvolveu a ideia, que era melhor que as existentes (inclusive do
+  docente da disciplina)
+\end{itemize}
+\end{frame}
+
+%%%%% SLIDE %%%%%
+
+\begin{frame}
+\frametitle{Construção do código de Huffman}
+\framesubtitle{Princípios}
+\begin{itemize}
+\item construção incremental da árvore
+\item abordagem ascendente
+\item inicia com uma floresta de $|C|$ folhas
+\item realiza $|C|-1$ etapas de ``junção'' para criar a árvore final:
+\begin{itemize}
+\item \alert<2>{escolher} duas árvores $T_i$, $T_j$ da floresta
+\item criar uma nova sub-árvore que tem $T_i$ e $T_j$ como sub-árvores.
+\end{itemize}
+\pause
+\item \alert{como escolher?}
+\end{itemize}
+\end{frame}
+
+%%%%% SLIDE %%%%%
+
+\begin{frame}
+\frametitle{Construção do código de Huffman}
+\framesubtitle{Algoritmo}
+
+\begin{itemize}
+\item $\attrib{v}{f}$ frequência dos caracteres da sub-árvore enraizada em $v$
+\item $\attrib{v}{c}$ caractere no vértice-folha $v$.
+\end{itemize}
+\begin{small}
+\begin{codebox}
+\Procname{$\proc{Huffman-Code}(C)$}
+\zi \assert{\Comment $Q$: fila de prioridade com chave $\attrib{v}{f}$}
+\li \For $c \in C$
+\li \Do $v \gets \proc{Alloc-Vertex}()$
+\li   $\attrib{v}{f} \gets \attrib{c}{f}$
+\li   $\attrib{v}{val} \gets c$
+\li   $\proc{Push-Back}(Q, v)$
+    \End
+\li $\proc{Make-Heap}(Q, v)$
+\li \For $i \gets 1 \To |C|-1$
+\li \Do $v \gets \proc{Alloc-Vertex}()$
+\li   $l \gets \attrib{v}{left} \gets \proc{Extract-Min}(Q)$
+\li   $r \gets \attrib{v}{right} \gets \proc{Extract-Min}(Q)$
+\li   $\attrib{v}{f} \gets \attrib{l}{f} + \attrib{r}{f}$
+\li   $\proc{Insert}(Q, v)$
+    \End
+\li \Return $\proc{Extract-Min}(Q)$
+\end{codebox}
+\end{small}
+\end{frame}
+
+%%%%% SLIDE %%%%%
+
+\begin{frame}
+\frametitle{Ilustração}
+
+\begin{center}
+\begin{tabular}{r|c|c|c|c|c|c|}
+& a & b & c & d & e & f \\
+\hline
+frequência & 45 & 13 & 12 & 16 & 9 & 5
+\end{tabular}
+\end{center}
+
+\begin{center}
+quadro
+\end{center}
+\end{frame}
+%%%%% SLIDE %%%%%
+
+\begin{frame}
+\frametitle{Complexidade}
+\framesubtitle{Construção do código de Huffman}
+
+\only<1>{
+\begin{codebox}
+\Procname{$\proc{Huffman-Code}(C)$}
+\zi \assert{\Comment{$Q$: fila de prioridade com chave $\attrib{v}{f}$}}
+\li \For $c \in C$ \assert{\Comment{$\Theta(|C|)$ iterações}}
+\li \Do $v \gets \proc{Alloc-Vertex}()$
+\li   $\attrib{v}{f} \gets \attrib{c}{f}$
+\li   $\attrib{v}{val} \gets c$
+\li   $\proc{Push-Back}(Q, v)$
+    \End
+\li $\proc{Make-Heap}(Q, v)$  \assert{\Comment{\textit{heap\/} binário $\Theta(|C|)$}}
+\li \For $i \gets 1 \To |C|-1$ \assert{\Comment{$|C|$ iterações}}
+\li \Do $v \gets \proc{Alloc-Vertex}()$
+\li   $l \gets \attrib{v}{left} \gets \proc{Extract-Min}(Q)$ \assert{\Comment{$\Theta(\lg |C|)$}}
+\li   $r \gets \attrib{v}{right} \gets \proc{Extract-Min}(Q)$ \assert{\Comment{$\Theta(\lg |C|)$}}
+\li   $\attrib{v}{f} \gets \attrib{l}{f} + \attrib{r}{f}$
+\li   $\proc{Insert}(Q, v)$ \assert{\Comment  $\Theta(\lg |C|)$}
+    \End
+\li \Return $\proc{Extract-Min}(Q)$ \assert{\Comment{$\Theta(\lg |C|)$}}
+\end{codebox}
+}
+\only<2>{
+\begin{center}
+\alert{$\Theta |C| \lg |C|$}
+\end{center}
+}
+\end{frame}
+%%%%% SLIDE %%%%%
+
+\begin{frame}
+\frametitle{Construção do código de Huffman}
+\framesubtitle{Correção}
+
+\begin{lemma}
+Seja $C$ um alfabeto, e $\attrib{c}{f}$ a frequência de cada caractere em
+$C$.  Se $x$ e $y$ são os caracteres com a menor frequência em $C$, então existe
+um código livre de prefixo ótimo para $C$, onde a códificação de $x$ e a de $y$
+tem mesmo comprimento e diferem apenas no último bit.
+\end{lemma}
+
+Roteiro da prova
+\begin{itemize}
+\item Considerar uma árvore $T$ representando um código livre de prefixo ótimo
+  \alert{qualquer}
+\item Construir uma árvore $T'$ a partir de $T$ onde as codificações de $x$ e $y$ têm
+  as propriedades enunciadas.
+\item $x$ e $y$ devem ser irmãos de profundidade máxima em $T'$.
+\end{itemize}
+
+\end{frame}
+
+%%%%% SLIDE %%%%%
+
+\begin{frame}
+\frametitle{Construção do código de Huffman}
+\framesubtitle{Correção}
+
+\begin{proof}
+\begin{itemize}
+\only<1>{\item Seja uma árvore $T$ representando um código livre de prefixo ótimo qualquer.}
+\item Seja $b$ e $c$ dois vizinhos na profundidade máxima, $\attrib{b}{f} \le \attrib{c}{f}$
+
+\item Seja $x$ e $y$ os dois caracteres com a menor frequência, $\attrib{x}{f} \le \attrib{y}{f}$
+
+\item Temos $\attrib{x}{f} \le \attrib{b}{f}$ e $\attrib{y}{f} \le \attrib{c}{f}$
+
+\item $T'$ é obtido a partir de $T$ trocando $x$ e $b$.
+\pause
+\only<2>{
+{\small
+$
+\begin{array}{l}
+B(T) - B(T') \\
+\begin{array}{rcl}
+\quad & = & \sum_c \attrib{c}{f} \cdot d_T(c) - \sum_c \attrib{c}{f} \cdot d_{T'}(c) \\
+& = & \attrib{x}{f} \cdot d_T(x) + \attrib{b}{f} \cdot d_T(b) - \attrib{x}{f}\cdot d_{T'}(x) + \attrib{b}{f} \cdot d_{T'}(b) \\
+& = & \attrib{x}{f} \cdot d_T(x) + \attrib{b}{f} \cdot d_T(b) - \attrib{x}{f} \cdot d_{T}(b) + \attrib{b}{f} \cdot d_{T}(x) \\
+& = & (\attrib{b}{f} - \attrib{x}{f})\cdot(d_T(b) - d_{T}(x)) \\
+& = & \underbrace{(\attrib{b}{f} - \attrib{x}{f})}{\ge 0}\cdot\underbrace{(d_T(b) - d_{T}(x))}{\ge 0} \\
+& \ge & 0
+\end{array}
+\end{array}
+$}
+}
+\only<3>{
+\item $T''$ é obtido a partir de $T'$ trocando $y$ e $c$.
+\item Similarmente, mostramos que $B(T'') \le B(T') \le B(T)$.
+\item Mas $B$ tem custo mínimo, logo $B(T) \le B(T'')$.
+\item Conclusão: $B(T'') = B(T)$ e $T''$, onde a códificação de $x$ e a
+  de $y$ tem mesmo comprimento e diferem apenas no último bit, representa um
+  código livre de prefixo ótimo.
+}
+\end{itemize}
+\end{proof}
+\end{frame}
+
+%%%%% SLIDE %%%%%
+
+\begin{frame}
+\frametitle{Construção do código de Huffman}
+\framesubtitle{Correção}
+
+\begin{lemma}
+Seja $T$ uma árvore binária cheia representando um código livre de prefixo ótimo
+para um alfabeto $C$, com frequência $\attrib{c}{f}$ para cada $c$ em $C$.  
+
+Se $x$ e $y$ são duas folhas vizinhas em $T$, e $z$ o ascendente imediato
+dessas folhas. Então, considerando $z$ como um caractere de frequência $\attrib{x}{f} + \attrib{y}{f}$,
+a árvore $T' = T - \{ x, y \}$ representa código livre de prefixo ótimo para
+o alfabeto $C'= C - \{ x, y \} \cup \{ z \}$.
+
+\end{lemma}
+
+Roteiro da prova
+\begin{itemize}
+\item Relacionar o custo de $T$ com o custo de $T'$
+\item Mostrar, por contradição, que $T'$ é representa um código livre de prefixo ótimo.
+\end{itemize}
+
+\end{frame}
+
+%%%%% SLIDE %%%%%
+
+\begin{frame}
+\frametitle{Construção do código de Huffman}
+\framesubtitle{Correção}
+
+\begin{proof}
+\begin{itemize}
+\item hipótese inicial: $T$ representa um código livre de prefixo ótimo;
+\item Relacionar o custo de $T$ com o custo de $T'$:
+$
+\begin{array}{rcl}
+B(T) & = & 
+\only<1>{
+\sum_{c \in T} \attrib{c}{f} \cdot d_T(c) \\
+  & = & \sum_{c \in T-\{x, y\}} \attrib{c}{f} \cdot d_T(c) + \attrib{x}{f} \cdot d_T(x) + \attrib{y}{f} \cdot d_T(y) \\
+  & = & (\sum \cdots) + \attrib{x}{f} \cdot (d_{T'}(z)+1) + \attrib{y}{f} \cdot (d_{T'}(z)+1) \\
+  & = & (\sum \cdots) + (\attrib{x}{f} + \attrib{y}{f}) \cdot d_{T'}(z) + \attrib{x}{f} + \attrib{y}{f} \\
+  & = & (\sum \cdots) + \attrib{x}{f} + \attrib{y}{f} \\
+  & = & \sum_{c \in T'} \attrib{c}{f} \cdot d_{T'}(c) + \attrib{x}{f} + \attrib{y}{f} \\
+  & = & 
+}
+B(T') + \attrib{x}{f} + \attrib{y}{f}
+\end{array}
+$
+\only<2>{
+\item hipótese adicional: $T'$ não representa um código livre de prefixo ótimo:
+\begin{itemize}
+\item Logo, existe $T''$ ótimo para $C'$, tal que $B(T'') < B(T')$.
+\item $z$ é uma folha em $T'$ e em $T''$.
+\item Substituindo $z$ por $x$ e $y$ em $T''$, obtemos uma nova árvore para $C$, que tem custo menor que $T$.
+\alert{Contradição}
+\end{itemize}
+}
+\end{itemize}
+\end{proof}
+\end{frame}
+
+%%%%% SLIDE %%%%%
+
+\begin{frame}
+\frametitle{Construção do código de Huffman}
+\framesubtitle{Correção}
+
+\begin{theorem}
+O algoritmo $\proc{Huffman-Code}$ produz uma árvore que representa um código livre de prefixo ótimo para $C$.
+\end{theorem}
+
+\begin{proof}
+A partir dos lemas anteriores.
+\end{proof}
+
+\end{frame}
+
+%%%%% SLIDE %%%%%
+
+\begin{frame}
+\frametitle{Exercícios}
+
+\begin{enumerate}
+\item Explique por quais motivos $\proc{Huffman-Code}$ é um algoritmo guloso.
+\item Demonstrar que uma árvore binária não cheia não pode representar um código livre de prefixo ótimo.
+\item Construir um código livre de prefixo ótimo para o alfabeto e as frequências seguintes:
+$$
+a: 1, b: 1, c: 2, d: 3, e: 5, f: 8, g: 13, h: 21
+$$
+\item Construir um código livre de prefixo ótimo para um alfabeto cujas
+  frequências correspondem à sequência de Fibobacci.
+\item Caracterizar instâncias do problema tal que todas as codificações do
+  código livre de prefixo ótimo tenham o mesmo comprimento.
+\end{enumerate}
+
+\end{frame}
+
+\end{document}
+
