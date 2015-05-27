@@ -1,3 +1,4 @@
+%% TODO: illustrations
 \documentclass{beamer}
 \setbeamertemplate{footline}[frame number]
 
@@ -117,7 +118,7 @@ do acesso exclusivo ao recurso para funcionar.
 \zi \Comment{$j$: última atividade escalonada}
 \li $j \gets 1$
 \li \For $i \gets 2 \To n$ \Comment{escolhe se a atividade $i$ é escalonada}
-\li \Do \If $s_i \ge f_i$
+\li \Do \If $s_i \ge f_j$
 \li   \Then $A \gets A \cup \{ i \}$
 \li     $j \gets i$
       \End
@@ -314,7 +315,6 @@ mesmo problema de otimização.
 \end{frame}
 
 %%%%% SLIDE %%%%%
-\section{Exemplo avançado: códigos de Huffman}
 \begin{frame}
 \frametitle{Ilustração}
 \framesubtitle{Um exemplo avançado}
@@ -696,7 +696,7 @@ $$
 a: 1, b: 1, c: 2, d: 3, e: 5, f: 8, g: 13, h: 21
 $$
 \item Construir um código livre de prefixo ótimo para um alfabeto cujas
-  frequências correspondem à sequência de Fibobacci.
+  frequências correspondem à sequência de Fibonacci.
 \item Caracterizar instâncias do problema tal que todas as codificações do
   código livre de prefixo ótimo tenham o mesmo comprimento.
 \end{enumerate}
