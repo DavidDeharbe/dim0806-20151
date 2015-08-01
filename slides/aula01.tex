@@ -14,7 +14,7 @@
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
   Departamento de Informática e Matemáica Aplicada}
-\date{09 de fevereiro de 2015}
+\date{}
 \logo{\includegraphics[width=1cm]{img/logo-ppgsc-icon-text.png}}
 
 \begin{document}
@@ -63,14 +63,65 @@
     \item Docente: David Déharbe.
     \item Carga horária: 60 horas, 4 créditos.
     \item Sala 3D6.
-    \item Segundas e quartas, 13 horas. 
+    \item Segundas e quartas, 08:55. 
       \begin{itemize}
-      \item Horário de reposição: sextas 13 horas.
+      \item Horário de reposição: sextas 08:55.
       \end{itemize}
     \item Aulas expositivas.
     \item Listas de exercícios.
-    \item Provas escritas: 3 provas + reposição.
     \item Dúvidas: fórum da turma virtual (SIGAA)
+    \item Material:
+      \begin{description}
+      \item[2015.1] \url{http://ufrn.academia.edu/DavidDeharbe}
+      \item[2015.2] \url{http://DavidDeharbe.github.io} $\Rightarrow$ Lectures
+      \end{description}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Informações administrativas}
+  \framesubtitle{Calendário}
+
+  \begin{itemize}
+
+    \item Datas sem aula:
+      \begin{description}
+        \item[missões] 27/07, 14/10, 16/11, 18/11
+        \item[proficiência] 29/07
+        \item[feriados] 07/09, 12/10, 02/11
+        \item[férias] 02/12, 07/12, 09/12
+      \end{description}
+
+    \item Datas de reposição: 31/07 14/08, 28/08, 11/09, 25/09, 09/10, 23/10
+
+    \item Datas das avaliações:
+
+      \begin{enumerate}
+        \item 31/08
+        \item 07/10
+        \item 30/11
+      \end{enumerate}
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+  \frametitle{Avaliação}
+
+  \begin{itemize}
+    \item Três provas escritas. \alert{não há prova de recuperação}
+    \item Média: $(P1 + P2 + P3)/3$
+    \item Conversão nota crédito: 
+      \begin{center}
+      \begin{tabular}{c|c|c|c|c}
+        [0, 2[ & [2; 4[ & [4, 6] & ]6, 8] & ]9, 10] \\
+        \hline
+        \hline
+        E & D & C & B & A
+      \end{tabular}
+      \end{center}
   \end{itemize}
 \end{frame}
 
@@ -92,7 +143,7 @@
         \item divisão e conquista; força bruta; abordagem gulosa; programação dinâmica.
       \end{itemize}
     \item Algoritmos em grafos.
-    \item Algoritmos para sequências (textos).
+    \item $\mathcal{NP}$-completude.
   \end{enumerate}
 \end{frame}
 
@@ -343,7 +394,7 @@
   \item A notação algorítmica deve ao mesmo tempo não ter ambigüidade e pode ser
     livre das amarras impostas pelas linguagens de programação.
 
-  \item Todas as notações algorítmica se equivalem essencialmente.
+  \item As notações algorítmicas se equivalem essencialmente.
 
   \end{itemize}
 
@@ -550,7 +601,7 @@ Escreva o algoritmo da \emph{busca linear} que resolve este problema.
 \begin{codebox}
 \Procname{$\proc{Linear-Search}(A, v)$}
 \li $j \gets 1$
-\li \While $A[j] \neq v$ and $j < \id{length}(A)$
+\li \While $A[j] \neq v$ and $j < \id{length}[A]$
 \li \Do
       $j \gets j+1$
     \End
@@ -566,7 +617,7 @@ Escreva o algoritmo da \emph{busca linear} que resolve este problema.
 \begin{codebox}
 \Procname{$\proc{Linear-Search}(A, v)$}
 \li $j \gets 1$
-\li \While $A[j] \neq v$ and $j \le \id{length}(A)$
+\li \While $A[j] \neq v$ and $j \le \id{length}[A]$
 \li \Do
       $j \gets j+1$
     \End
@@ -582,11 +633,11 @@ Escreva o algoritmo da \emph{busca linear} que resolve este problema.
 \begin{codebox}
 \Procname{$\proc{Linear-Search}(A, v)$}
 \li $j \gets 1$
-\li \While $A[j] \neq v$ and $j \le \id{length}(A)$
+\li \While $A[j] \neq v$ and $j \le \id{length}[A]$
 \li \Do
       $j \gets j+1$
     \End
-\li \If $j \le \id{length}(A)$
+\li \If $j \le \id{length}[A]$
 \li \Then
       \Return $j$
 \li \Else
@@ -601,6 +652,24 @@ O algoritmo $A$ é correto se e somente se
 \item ele não é incorreto. \pause
 \item $\neg \exists$ instância $i$ do problema t.q. $A(i)$ não termina ou tem um resultado errado. \pause
 \item $\forall$ instancia $i$ do problema, $A(i)$ termina com resultado certo.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Exercício}
+
+\begin{itemize}
+
+  \item Supondo que não seja autorizado avaliar $A[j]$ quando $j \le
+    0$ ou $j > \id{length}[A]$, o algoritmo continua correto?
+
+  \item Se não for correto, como corrigir?
+
+  \item O que acontece quando $A$ é uma sequência de zero elementos? Está em
+conformidade com a especificação?
+
 \end{itemize}
 
 \end{frame}
@@ -640,7 +709,7 @@ $\Rightarrow$ \emph{Lógica de Hoare}
   \begin{itemize}
     \item Um mesmo problema pode ser resolvido de várias maneiras diferentes.
     \item Como escolher entre diversos algoritmos?
-    \item Estimar \emph{o tempo de execução\/} de executar cada algoritmo.
+    \item Estimar \emph{o tempo de execução\/} de cada algoritmo.
 
       \emph{Complexidade\/} do algoritmo
   \end{itemize}
