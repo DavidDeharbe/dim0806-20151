@@ -1,4 +1,4 @@
-\documentclass[handout]{beamer}
+\documentclass{beamer}
 
 \usepackage[utf8x]{inputenc}
 \usepackage[brazil,british]{babel}
@@ -6,18 +6,18 @@
 \usecolortheme{beaver}
 \setbeamertemplate{footline}[frame number]
 \usepackage{graphicx}
-\usepackage{clrscode}
+\input{preamble}
 \usepackage{hyperref}
 \usepackage{pgf}
 
 % \usecolortheme{dove}
-\title{Aula 02: Análise de algoritmos --- arcabouço teórico}
+\title{Aula 02: Análise de algoritmos --- introdução}
 \author{David Déharbe \\
   Programa de Pós-graduação em Sistemas e Computação \\
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
-  Departamento de Informática e Matemáica Aplicada}
-\date{11 de fevereiro de 2015}
+  Departamento de Informática e Matemática Aplicada}
+\date{}
 \logo{\includegraphics[width=1cm]{img/logo-ppgsc-icon-text.png}}
 
 \newcommand{\sel}[1]{\textcolor{teal}{#1}}
@@ -339,8 +339,8 @@ Em algoritmos iterativos, é a operação que fica no laço mais aninhado.
 
 \input{insertionsort.tex}
 
-  Em outras palavras: quantas comparações são necessárias para ordenar uma
-  sequência de $n$ elementos com o algoritmo de ordenação por inserção?
+  Em outras palavras: quantas comparações são necessárias para ordenar $n$
+  elementos com o algoritmo de ordenação por inserção?
 
 \end{frame}
 
@@ -369,9 +369,12 @@ Qual a operação básica do algoritmo de busca linear?
   \frametitle{Exercício}
 
   \begin{enumerate}
-  \item Considere o algoritmo de soma de duas matrizes $N \times N$.
+  \item Considere o algoritmo de soma de duas matrizes $N \times M$.
+
     Qual a operação básica? Quantas vezes é executada?
-  \item Considere o algoritmo de multiplicação de duas matrizes $N \times N$.
+  \item Considere o algoritmo de multiplicação de uma matriz $N \times M$ 
+    por uma matriz $M \times P$.
+
     Qual a operação básica? Quantas vezes é executada?
   \end{enumerate}
 
@@ -390,7 +393,7 @@ Qual a operação básica do algoritmo de busca linear?
   \item Atenção $T(n)$ é \emph{aproximado}: 
     \begin{itemize}
       \item $c$ é aproximado, 
-      \item as operações básicas não são contabilizadas.
+      \item as operações não básicas não são contabilizadas.
       \item é uma estimativa razoável menos no caso de $n$ ser muito pequeno ou
         muito grande.
       \end{itemize}
@@ -408,8 +411,8 @@ Qual a operação básica do algoritmo de busca linear?
     vezes mais rápido?
 
     \only<2->{\alert{10}}
-  \item Assumindo $C(n) = \frac{1}{2}.n.(n-1)$: quantas vezes mais lento será o
-    algoritmo se multiplicamos o tamanho da entrada por dois?
+  \item Assumindo $C(n) = \frac{1}{2}.n.(n-1)$: quantas vezes mais tempo levará
+    a execução do algoritmo se multiplicarmos o tamanho da entrada por dois?
 
     \only<3>{\begin{eqnarray*}
         T(2n)/T(n) & = & \frac{c \times C(2n)}{c \times C(n)} = \frac{C(2n)}{C(n)} \\
@@ -425,8 +428,8 @@ Qual a operação básica do algoritmo de busca linear?
 
   Para responder a pergunta:
   \begin{itemize}
-  \item Assumindo $C(n) = \frac{1}{2}.n.(n-1)$: quantas vezes mais lento será o
-    algoritmo se multiplicamos o tamanho da entrada por dois?
+  \item Assumindo $C(n) = \frac{1}{2}.n.(n-1)$: quantas vezes mais tempo levará
+    a execução do algoritmo se multiplicarmos o tamanho da entrada por dois?
   \end{itemize}
   \pause
   Observe que:
@@ -486,7 +489,7 @@ $$
 \begin{itemize}
 \item Para qualquer entrada não pequena, o valor é astronômico;
 \item O tempo de execução para entradas grandes excede a idade estimada
-do universo.
+do universo \alert{$\infty$}.
 \item Não são práticos para entradas que não sejam pequenas.
 \end{itemize}
 }
@@ -527,25 +530,6 @@ são iguais:
 
 \end{frame}
 
-\section{Pior caso, melhor caso, caso médio, análise amortizada}
-
-\begin{frame}
-\frametitle{Pior caso, melhor caso, caso médio}
-
-\begin{itemize}
-\item A complexidade do algoritmo de \emph{ordenação por inserção} depende não
-  só do tamanho da entrada, mas também do valor desta entrada.
-\item A complexidade do algoritmo de \emph{busca linear} depende não só do
-  tamanho da entrada, mas também do valor desta entrada.
-\end{itemize}
-\pause
-\begin{description}
-\item[pior caso] é a função que relaciona o tamanho da entrada $n$ ao maior tempo de execução possível para tratar uma entrada de tamanho $n$.
-\item[melhor caso] é a função que relaciona o tamanho da entrada $n$ ao menor tempo de execução possível para tratar uma entrada de tamanho $n$.
-\item[caso médio] é a função que relaciona o tamanho da entrada $n$ ao tempo médio de execução possível para tratar uma entrada de tamanho $n$, \emph{assumindo uma distribuição probabilística} das entradas possíveis.
-\end{description}
-\end{frame}
-
 \section{Notação $\Theta$}
 
 \begin{frame}
@@ -559,9 +543,10 @@ são iguais:
     & &   (c_1+c_2+c_3+\frac{c_4}{2}-\frac{c_5}{2}-\frac{c_6}{2} + c_7).n \\
     & & - (c_2 + c_3 + c_4 + \frac{c_5}{2} + \frac{c_6}{2} + c_7) \\
     \\
-    T(n) & = & a.n² + b.n + c \mbox{ onde $a, b, c$ são constantes que dependem da plataforma de execução.}
+    T(n) & = & a.n² + b.n + c
   \end{array}
   $$
+  onde $a, b, c$ são constantes que dependem da plataforma de execução.
 
   Quando $n$ é grande, o fator predominante é $a.n²$.
 
@@ -569,7 +554,7 @@ são iguais:
   
   \begin{itemize}
 
-    \item $T(n) \in \Theta(n²)$.
+    \item $T(n) \in \alert{\Theta}(n²)$.
 
     \item O crescimento asintótico do tempo de execução é $n²$.
 
@@ -577,6 +562,33 @@ são iguais:
 
   \end{itemize}
   
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Síntese}
+
+\begin{itemize}
+
+\item tamanho da(s) entrada(s)
+
+\item operação básica
+
+\item crescimento asintótico
+
+\item funções tipicamente encontradas
+
+\begin{description}
+\item[logarítmica] $\log n$, 
+\item[linear] $n$, 
+\item[quase-linear] $n \log n$, 
+\item[quadrática] $n^2$, 
+\item[polinomial] $n^k$, onde $k > 1$
+\item[exponencial] $k^n$, onde $k > 1$
+\item[fatorial] $n!$
+\end{description}
+\end{itemize}
+
 \end{frame}
 
 \end{document}

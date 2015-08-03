@@ -1,15 +1,13 @@
   \begin{codebox}
     \Procname{$\proc{Insertion-Sort}(A)$}
-    \li \For $j = 2$ \To $\id{length}[A]$ \> \> \> \> \> \> \> \> \> \> $c_1$ \> $n$
-    \li \Do 
-    \li   $\id{key} \gets A[j]$ \> \> \> \> \> \> \> \> $c_2$ \> $n-1$
-    \li   $i \gets j-1$ \> \> \> \> \> \> \> \> $c_3$ \> $n-1$
-    \li   \While $i > 0 \land A[i] > \id{key}$  \> \> \> \> \> \> \> \> $c_4$ \> $\sum_{j=2}^{n} t_j$
-    \li   \Do
-    \li     $A[i+1] \gets A[i]$ \> \> \> \> \> \> $c_5$ \> $\sum_{j=2}^{n} (t_j-1)$
-    \li     $i \gets i - 1$     \> \> \> \> \> \> $c_6$ \> $\sum_{j=2}^{n} (t_j-1)$
+    \li \For $j = 2$ \To $\id{length}[A]$       \Comment{$c_1 \cdot n$}
+    \li \Do $\id{key} \gets A[j]$               \Comment{$c_2 \cdot (n-1)$}
+    \li   $i \gets j-1$                         \Comment{$c_3 \cdot (n-1)$}
+    \li   \While $i > 0 \land A[i] > \id{key}$  \Comment{$c_4 \cdot \sum_{j=2}^{n} t_j$}
+    \li    \Do $A[i+1] \gets A[i]$              \Comment{$c_5 \cdot \sum_{j=2}^{n} (t_j-1)$}
+    \li     $i \gets i - 1$                     \Comment{$c_6 \cdot \sum_{j=2}^{n} (t_j-1)$}
           \End
-    \li   $A[i+1] \gets \id{key}$ \> \> \> \> \> \> \> \> $c_7$ \> $n-1$
+    \li   $A[i+1] \gets \id{key}$               \Comment{$c_7 \cdot (n-1)$}
         \End
   \end{codebox}
 
