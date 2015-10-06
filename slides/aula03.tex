@@ -13,7 +13,7 @@
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
   Departamento de Informática e Matemáica Aplicada}
-\date{23 de fevereiro de 2015}
+\date{}
 
 \begin{document}
 \selectlanguage{brazil}
@@ -243,8 +243,7 @@ Métodos de resolução
     \zi \Comment $A$ é um arranjo de $k$ bits
     \li $i \gets 0$
     \li \While $i < \id{length}[A] \mbox{ and } A[i] = 1$
-    \li \Do 
-    \li   $A[i] \gets 0$
+    \li \Do $A[i] \gets 0$
     \li   $i \gets i + 1$
         \End
     \li \If $i < \id{length}[A]$
@@ -283,7 +282,7 @@ T(n) & < & \sum_{i=1}^{\infty} n/2^{i-1} \\
 T(n) & < & n \times \sum_{i=1}^{\infty} 1/2^{i-1} = 2n
 \end{eqnarray*}
 
-Logo o custo amortizado de $\proc{Increment}$ é $T(n)/n = 2 \in \Theta(1)$: é \alert{constante}.
+Logo o custo amortizado de $\proc{Increment}$ é $T(n)/n = 2$ \alert{constante}.
 
 \end{frame}
 
@@ -301,7 +300,7 @@ entradas de mesmo tamanho.
 
 Nestes casos, deve-se distinguir melhor caso, pior caso, e complexidade média.
 \item O arcabouço teórico da análise de algoritmos baseia-se na noção de
-  crescimento assintótico de funções.
+  crescimento asintótico de funções.
 \end{itemize}
 \end{frame}
 

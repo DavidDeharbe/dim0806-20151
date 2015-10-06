@@ -14,14 +14,14 @@
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
   Departamento de Informática e Matemática Aplicada}
-\date{06 de abril de 2015}
+\date{}
 
 
 \begin{document}
 \selectlanguage{brazil}
 \begin{frame}
   \titlepage
-  Download me from \url{http://ufrn.academia.edu/DavidDeharbe}.
+  Download me from \url{http://DavidDeharbe.github.io}.
 \end{frame}
 
 \begin{frame}
@@ -433,7 +433,7 @@
       \includegraphics[width=.4\textwidth]{fig/queue-array-3.pdf}
       \pause
       &
-      $\id{Enqueue}(25)$ \pause
+      $\id{Enqueue}(9)$ \pause
       \\
       $\langle 62, 58, 25, 9 \rangle$ &
       \includegraphics[width=.4\textwidth]{fig/queue-array-4.pdf}
@@ -465,7 +465,7 @@
 \begin{codebox}
 \Procname{$\proc{Full}(Q)$}
 \li  \Return $\attrib{Q}{Hd} \isequal \attrib{Q}{Tl} + 1$ or
-\li  \> ($\attrib{Q}{Hd} \isequal 1$ and $\attrib{Q}{Hd} \isequal \attrib{Q}{Size}$)
+\li  \> ($\attrib{Q}{Hd} \isequal 1$ and $\attrib{Q}{Tl} \isequal \attrib{Q}{Size}$)
 \end{codebox}
 
 \end{frame}
@@ -550,15 +550,15 @@
       \begin{itemize}
         \item Inserção na cabeça (\textit{push\_front\/}) e na cauda (\textit{push\_back\/})
           \begin{itemize}
-            \item falha em fila cheia
+            \item falha em \textit{deque} cheia
           \end{itemize}
         \item Remoção na cabeça (\textit{pop\_front\/}) e na cauda (\textit{pop\_back\/})
           \begin{itemize}
-            \item falha em fila vazia
+            \item falha em \textit{deque} vazia
           \end{itemize}
         \item Acesso na cabeça (\textit{front\/}) e na cauda (\textit{back\/})
           \begin{itemize}
-            \item falha em pilha vazia
+            \item falha em \textit{deque} vazia
           \end{itemize}
         \item Consultas ao estado
           \begin{itemize}
@@ -704,7 +704,7 @@
 \li  \If not $\proc{Empty}(Q)$
 \li    \Then \If $\attrib{Q}{Tl} \isequal 1$
 \li      \Then $\attrib{Q}{Tl} \gets \attrib{Q}{Size}$
-\li      \Else $\attrib{Q}{Tl} \gets \attrib{Q}{Hd} - 1$
+\li      \Else $\attrib{Q}{Tl} \gets \attrib{Q}{Tl} - 1$
        \End
      \End
 \end{codebox}

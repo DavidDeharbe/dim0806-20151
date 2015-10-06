@@ -1,0 +1,14 @@
+\begin{codebox}
+\Procname{$\proc{Unicity-Elems}(A)$}
+\li \For $i \gets 1$ \To $\id{length}[A]-1$
+\li \Do
+      \For $j \gets i+1$ \To $\id{length}[A]$
+\li   \Do
+        \If $A[i] = A[j]$
+\li     \Then
+          \Return $\const{False}$
+        \End    
+      \End    
+    \End    
+\li \Return $\const{True}$
+\end{codebox}

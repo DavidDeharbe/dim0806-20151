@@ -1,0 +1,11 @@
+\begin{codebox}
+\Procname{$\proc{Hanoi}(n, \id{src}, \id{dest}, \id{aux})$} 
+\li \If $n = 1$
+\li \Then
+    \Return $\proc{Move}(\id{src}, \id{dest})$
+\li \Else
+\li   $\proc{Hanoi}(n-1, \id{src}, \id{aux}, \id{dest})$
+\li   $\proc{Move}(\id{src}, \id{dest})$
+\li   $\proc{Hanoi}(n-1, \id{aux}, \id{dest}, \id{src})$
+    \End
+\end{codebox}

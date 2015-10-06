@@ -205,7 +205,7 @@ entrada.
 \begin{frame}
   \frametitle{Exemplo}
 
-  \input{insertionsort.tex}
+  \input{algos/Insertion-Sort.tex}
 
   \begin{itemize}
   \item $c_i$: custo de executar cada linha
@@ -246,7 +246,7 @@ entrada.
 
 \frametitle{Exemplo: melhor caso}
 
-  \input{insertionsort.tex}
+  \input{algos/Insertion-Sort.tex}
 
   \begin{itemize}
     \item O teste do laço é avaliado uma vez apenas.
@@ -278,7 +278,7 @@ $\sum_{j=2}^{n} 1 = n-1$ e $\sum_{j=2}^{n} 1 - 1 = 0$.
 
 \frametitle{Exemplo: pior caso}
 
-  \input{insertionsort.tex}
+  \input{algos/Insertion-Sort.tex}
 
   \begin{itemize}
     \item O teste do laço é avaliado $j$ vezes.
@@ -337,7 +337,7 @@ Em algoritmos iterativos, é a operação que fica no laço mais aninhado.
 
 \pause
 
-\input{insertionsort.tex}
+\input{algos/Insertion-Sort.tex}
 
   Em outras palavras: quantas comparações são necessárias para ordenar $n$
   elementos com o algoritmo de ordenação por inserção?
@@ -348,20 +348,7 @@ Em algoritmos iterativos, é a operação que fica no laço mais aninhado.
   \frametitle{Exercício}
 
 Qual a operação básica do algoritmo de busca linear?
-\begin{codebox}
-\Procname{$\proc{Linear-Search}(A, v)$}
-\li $j \gets 1$
-\li \While $A[j] \neq v$ and $j \le \id{length}(A)$
-\li \Do
-      $j \gets j+1$
-    \End
-\li \If $j \le \id{length}(A)$
-\li \Then
-      \Return $j$
-\li \Else
-      \Return \const{nil}
-    \End
-\end{codebox}  
+\input{algos/Linear-Search.tex}
 
 \end{frame}
 

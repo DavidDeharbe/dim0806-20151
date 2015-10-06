@@ -1,3 +1,8 @@
+%
+% IMPROVE
+%   - Add preconditions, postconditions, invariants in algorithms
+%   - Explicit algorithm for heap-sort
+%
 \documentclass{beamer}
 \setbeamertemplate{footline}[frame number]
 %\documentclass{beamer}
@@ -14,15 +19,15 @@
   Programa de Pós-graduação em Sistemas e Computação \\
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
-  Departamento de Informática e Matemáica Aplicada}
-\date{18 de março de 2015}
+  Departamento de Informática e Matemática Aplicada}
+\date{}
 
 
 \begin{document}
 \selectlanguage{brazil}
 \begin{frame}
   \titlepage
-  Download me from \url{http://ufrn.academia.edu/DavidDeharbe}.
+  Download me from \url{http://DavidDeharbe.github.io}.
 \end{frame}
 
 \begin{frame}
@@ -334,16 +339,15 @@ Exercício:
 \li   \ElseIf $\proc{Left}(i) = \id{num}(H)$ and $H[i] > H[\proc{Left}(i)]$
 \li   \Then 
          $\proc{Swap}(H, i, \proc{Left}(i))$
-\li      $\proc{Sift-Down}(H, \proc{Left}(i))$
 \li   \ElseNoIf
 \li       \If $H[\proc{Left}(i)] \ge H[\proc{Right}(i)]$
 \li       \Then $m \gets \proc{Left}(i)$
 \li       \Else $m \gets \proc{Right}(i)$
         \End
-\li     \If $H[\proc{Left}(i)] > H[m]$
+\li     \If $H[i] > H[m]$
 \li       \Then 
-            $\proc{Swap}(H, i, \proc{Left}(i))$
-\li         $\proc{Sift-Down}(H, \proc{Left}(i))$
+            $\proc{Swap}(H, i, m)$
+\li         $\proc{Sift-Down}(H, m)$
           \End 
       \End
 \end{codebox}  
@@ -483,7 +487,8 @@ Exercício:
     & = & O(n \sum_{h=0}^{\lfloor \lg n \rfloor} h/2^h) \\
     & = & O(n \sum_{h=0}^{\infty} h/2^h)
   \end{array}$
-\item $\sum_{k=0}^{\infty} k x^k = \frac{x}{(1-x)^2}$ ($|x| < 1$)
+\item progressão geométrica: $\sum_{k=0}^{\infty} x^k = \frac{1}{1-x}$
+\item derivada: $\sum_{k=1}^{\infty} k x^k = \frac{1}{(1-x)^2}$, $x = 1/2$
 \item $T(n) = O(n)$
 \end{itemize}
 \end{itemize}

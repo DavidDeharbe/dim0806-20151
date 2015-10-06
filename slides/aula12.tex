@@ -14,14 +14,14 @@
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
   Departamento de Informática e Matemática Aplicada}
-\date{25 de março de 2015}
+\date{}
 
 
 \begin{document}
 \selectlanguage{brazil}
 \begin{frame}
   \titlepage
-  Download me from \url{http://ufrn.academia.edu/DavidDeharbe}.
+  Download me from \url{http://DavidDeharbe.github.io}.
 \end{frame}
 
 \begin{frame}
@@ -219,7 +219,7 @@
 \li \For $i \gets 1$ \To $k$
 \li \Do $C[i] \gets 0$
     \End
-\zi \Comment conta em o número de ocorrências de cada valor
+\zi \Comment conta em $C[i]$ o número de ocorrências de cada valor
 \li \For $i \gets 1$ \To $\id{length}(A)$
 \li \Do $C[A[i]] \gets C[A[i]] + 1$
     \End
@@ -227,7 +227,7 @@
 \li \For $i \gets 2$ \To $k$
 \li \Do $C[i] \gets C[i] + C[i-1]$
     \End
-\zi \Comment copia cada element de $A$ na sua posição final em $B$
+\zi \Comment copia cada elemento de $A$ na sua posição final em $B$
 \li \For $i \gets \id{length}(A)$ \Downto 1
 \li \Do $B[C[A[i]]] \gets A[i]$
 \li   $C[A[i]] \gets C[A[i]] - 1$
@@ -306,11 +306,11 @@ $A = \langle 3, 6, 4, 1, 3, 4, 1 \rangle, k = 8, B = \langle ?, ?, ?, ?, ?, ?, ?
 \end{center}
 
 \begin{itemize}
-\item 80 colunas $\times$ 12 linhas
+\item $N$ colunas $\times$ 10 linhas
 \item máquina de ordenar cartões: 
 \begin{itemize}
   \item configurada com um número de coluna $c$
-  \item separa os cartões em 12 caixas em função de qual linha foi perfurada naquela coluna.
+  \item separa os cartões em 10 caixas em função de qual linha foi perfurada naquela coluna.
   \item o operador junta as pilhas de cartões: furo na 1a posição primeiro, etc.
 \end{itemize}
 \end{itemize}
@@ -320,7 +320,6 @@ $A = \langle 3, 6, 4, 1, 3, 4, 1 \rangle, k = 8, B = \langle ?, ?, ?, ?, ?, ?, ?
   \frametitle{Ordenação \textit{radix sort\/}}
   \framesubtitle{Ideia}
   \begin{itemize}
-    \item Para números decimais, só 10 linhas são usadas.
     \item Como configurar a máquina para ordenar cartões?
       \pause
     \item Solução

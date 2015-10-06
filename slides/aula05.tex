@@ -13,7 +13,7 @@
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
   Departamento de Informática e Matemáica Aplicada}
-\date{02 de março de 2015}
+\date{}
 
 \begin{document}
 \selectlanguage{brazil}
@@ -42,13 +42,13 @@
 
   \frametitle{Estrutura da apresentação}
 
-  \begin{description}
-  \item[11/02] arcabouço teórico;
-  \item[23/02] melhor caso, pior caso, caso médio;
-  \item[25/02] notações assintóticas; $O$, $\Omega$, $\Theta$;
-  \item[02/03] \alert{análise de algoritmos não recursivos};
-  \item[04/03] análise de algoritmos recursivos.
-  \end{description}
+  \begin{enumerate}
+  \item arcabouço teórico;
+  \item melhor caso, pior caso, caso médio;
+  \item notações asintóticas; $O$, $\Omega$, $\Theta$;
+  \item \alert{análise de algoritmos não recursivos};
+  \item análise de algoritmos recursivos.
+  \end{enumerate}
 \end{frame}
 
 \begin{frame}
@@ -56,7 +56,7 @@
   \frametitle{Bibliografia usada}
 
   \begin{center}
-    \includegraphics[height=.8\textheight]{../img/capa-levitin.jpg}
+    \includegraphics[height=.8\textheight]{img/capa-levitin.jpg}
   \end{center}
   (seção 2.3)
 \end{frame}
@@ -67,37 +67,16 @@
   \frametitle{Exemplo}
 
   \begin{example}[Busca do maior elemento em uma sequência]
-\begin{codebox}
-\Procname{$\proc{Max-item}(A)$}
-\li $\id{max} \gets A[1]$
-\li \For $i \gets 2$ \To $\id{length}[A]$
-\li \Do
-\li   \If $A[i] > \id{max}$
-\li   \Then
-        $\id{max} \gets A[i]$
-      \End    
-    \End    
-\li \Return $\id{max}$
-\end{codebox}
+    \input{algos/Max-item.tex}
   \end{example}
 \end{frame}
 
 \begin{frame}
   \frametitle{Exemplo}
 
-\begin{small}
-\begin{codebox}
-\Procname{$\proc{Max-item}(A)$}
-\li $\id{max} \gets A[1]$
-\li \For $i \gets 2$ \To $\id{length}[A]$
-\li \Do
-\li   \If $A[i] > \id{max}$
-\li   \Then
-        $\id{max} \gets A[i]$
-      \End    
-    \End    
-\end{codebox}
-\end{small}
+  \begin{small}
+    \input{algos/Max-item.tex}
+  \end{small}
 
 \begin{itemize}
 \item Tamanho da entrada: $\id{length}[A]$, digamos $n$.
@@ -120,19 +99,9 @@
 \begin{frame}
   \frametitle{Exemplo}
 
-\begin{small}
-\begin{codebox}
-\Procname{$\proc{Max-item}(A)$}
-\li $\id{max} \gets A[1]$
-\li \For $i \gets 2$ \To $\id{length}[A]$
-\li \Do
-\li   \If $A[i] > \id{max}$
-\li   \Then
-        $\id{max} \gets A[i]$
-      \End    
-    \End    
-\end{codebox}
-\end{small}
+  \begin{small}
+    \input{algos/Max-item.tex}
+  \end{small}
 
 Seja $C(n)$ o número de comparações realizadas.
 \begin{itemize}
@@ -154,7 +123,7 @@ Seja $C(n)$ o número de comparações realizadas.
 
 \alert{$\Rightarrow$} Caso contrário, o pior caso, o caso médio e o melhor caso devem ser aferidos individualmente
 \item Escreva um somatório que expressa quantas vezes a operação básica é executada
-\item Usando as leis da aritmética, encontre uma formulação que só depende de $n$, ou pelo menos o seu crescimento assintótico.
+\item Usando as leis da aritmética, encontre uma formulação que só depende de $n$, ou pelo menos o seu crescimento asintótico.
 \end{enumerate}
 
 \end{frame}
@@ -175,20 +144,7 @@ Seja $C(n)$ o número de comparações realizadas.
 \begin{frame}
 \frametitle{Um segundo exemplo}
 \begin{example}[Teste de unicidade dos elementos]
-\begin{codebox}
-\Procname{$\proc{Unicity-Elems}(A)$}
-\li \For $i \gets 1$ \To $\id{length}[A]-1$
-\li \Do
-\li   \For $j \gets i+1$ \To $\id{length}[A]$
-\li   \Do
-\li     \If $A[i] = A[j]$
-\li     \Then
-          \Return $\const{False}$
-        \End    
-      \End    
-    \End    
-\li \Return $\const{True}$
-\end{codebox}
+\input{algos/Unicity-Elems.tex}
 \end{example}
 \end{frame}
 
@@ -196,20 +152,7 @@ Seja $C(n)$ o número de comparações realizadas.
 \frametitle{Aplicação da estratégia}
 
 \begin{small}
-\begin{codebox}
-\Procname{$\proc{Unicity-Elems}(A)$}
-\li \For $i \gets 1$ \To $\id{length}[A]-1$
-\li \Do
-\li   \For $j \gets i+1$ \To $\id{length}[A]$
-\li   \Do
-\li   \If $A[i] = A[j]$
-\li     \Then
-          \Return $\const{False}$
-        \End    
-      \End    
-    \End    
-\li \Return $\const{True}$
-\end{codebox}
+\input{algos/Unicity-Elems.tex}
 \end{small}
 
 \begin{enumerate}
@@ -227,20 +170,7 @@ Seja $C(n)$ o número de comparações realizadas.
 \frametitle{Aplicação da estratégia}
 
 \begin{small}
-\begin{codebox}
-\Procname{$\proc{Unicity-Elems}(A)$}
-\li \For $i \gets 1$ \To $\id{length}[A]-1$
-\li \Do
-\li   \For $j \gets i+1$ \To $\id{length}[A]$
-\li   \Do
-\li     \If $A[i] = A[j]$
-\li     \Then
-          \Return $\const{False}$
-        \End    
-      \End    
-    \End    
-\li \Return $\const{True}$
-\end{codebox}
+\input{algos/Unicity-Elems.tex}
 \end{small}
 
 O pior caso é quando o número de comparações é o maior possível.
@@ -257,20 +187,7 @@ C_{\textit{pior}}(n) & = & \sum_{i = 1}^{n-1} \sum_{j = i+1}^{n} 1
 \frametitle{Aplicação da estratégia}
 
 \begin{small}
-\begin{codebox}
-\Procname{$\proc{Unicity-Elems}(A)$}
-\li \For $i \gets 1$ \To $\id{length}[A]-1$
-\li \Do
-\li   \For $j \gets i+1$ \To $\id{length}[A]$
-\li   \Do
-\li     \If $A[i] = A[j]$
-\li     \Then
-          \Return $\const{False}$
-        \End    
-      \End    
-    \End    
-\li \Return $\const{True}$
-\end{codebox}
+\input{algos/Unicity-Elems.tex}
 \end{small}
 
 \begin{eqnarray*}
@@ -284,20 +201,7 @@ C_{\textit{pior}}(n) & = & \sum_{i = 1}^{n-1} \sum_{j = i+1}^{n} 1 \pause = \sum
 \begin{frame}
 \frametitle{Um terceiro exemplo}
 \begin{example}{Multiplicação de duas matrizes quadradas}
-\begin{codebox}
-\Procname{$\proc{Mult-Matrix}(A, B, C)$}
-\li \For $i \gets 1$ \To $\id{NbLines}[A]$
-\li \Do
-\li   \For $j \gets 1$ \To $\id{NbCols}[B]$
-\li   \Do
-\li     $C[i,j] \gets 0$
-\li     \For $k \gets 1$ \To $\id{NbCols}[A]$
-\li     \Do
-\li     $C[i,j] \gets C[i,j] + A[i, k] \times B[k, j]$
-        \End    
-      \End    
-    \End    
-\end{codebox}
+\input{algos/Mult-Matrix.tex}
 \end{example}
 \end{frame}
 
@@ -305,20 +209,7 @@ C_{\textit{pior}}(n) & = & \sum_{i = 1}^{n-1} \sum_{j = i+1}^{n} 1 \pause = \sum
 \frametitle{Aplicação da estratégia}
 
 \begin{small}
-\begin{codebox}
-\Procname{$\proc{Mult-Matrix}(A, B, C)$}
-\li \For $i \gets 1$ \To $\id{NbLines}[A]$
-\li \Do
-\li   \For $j \gets 1$ \To $\id{NbCols}[B]$
-\li   \Do
-\li     $C[i,j] \gets 0$
-\li     \For $k \gets 1$ \To $\id{NbCols}[A]$
-\li     \Do
-\li     $C[i,j] \gets C[i,j] + A[i, k] \times B[k, j]$
-        \End    
-      \End    
-    \End    
-\end{codebox}
+\input{algos/Mult-Matrix.tex}
 \end{small}
 
 \begin{itemize}
@@ -336,32 +227,14 @@ M(n) & = & \sum_{i=1}^n \sum_{j=1}^{n} \sum_{k=1}^n 1 = \sum_{i=1}^n \sum_{j=1}^
 \begin{frame}
 \frametitle{Um exemplo não tão simples}
 \begin{example}{Tamanho da representação binária de um inteiro}
-\begin{codebox}
-\Procname{$\proc{Binary}(n)$}
-\li $\id{count} \gets 1$
-\li \While $n > 1$
-\li \Do
-\li   $\id{count} \gets \id{count}+1$
-\li   $n \gets \lfloor n/2 \rfloor$
-    \End    
-\li \Return $\id{count}$
-\end{codebox}
+\input{algos/Binary.tex}
 \end{example}
 \end{frame}
 
 \begin{frame}
 \frametitle{Aplicação da estratégia}
 \begin{footnotesize}
-\begin{codebox}
-\Procname{$\proc{Binary}(n)$}
-\li $\id{count} \gets 1$
-\li \While $n > 1$
-\li \Do
-\li   $\id{count} \gets \id{count}+1$
-\li   $n \gets \lfloor n/2 \rfloor$
-    \End    
-\li \Return $\id{count}$
-\end{codebox}
+\input{algos/Binary.tex}
 \end{footnotesize}
 \begin{itemize}
 \item A entrada é um inteiro $n$. O tamanho da entrada é o próprio $n$.
@@ -399,7 +272,7 @@ variação de amostra com cada uma das fórmulas.
 \Procname{$\proc{Mystery-1}(n)$}
 \li $s \gets 0$
 \li \For $i \gets 1$ \To $n$
-\li \Do
+    \Do
 \li   $s \gets s + i \times i$
     \End
 \li \Return $s$
@@ -422,7 +295,7 @@ variação de amostra com cada uma das fórmulas.
 \li $m_1 \gets A[1]$, $m_2 \gets A[1]$
 \li \For $i \gets 2$ \To $\id{length}[A]$
 \li \Do
-\li   \If $A[i] < m_1 \kw{then}\, m_1 \gets A[i]$
+      \If $A[i] < m_1 \kw{then}\, m_1 \gets A[i]$
 \li   \If $A[i] > m_2 \kw{then}\, m_2 \gets A[i]$
     \End
 \li \Return $m_2 - m_1$
@@ -444,9 +317,9 @@ variação de amostra com cada uma das fórmulas.
 \Procname{$\proc{Mystery-3}(A)$}
 \li \For $i \gets 1$ \To $\id{NbLines}[A]-1$
 \li \Do
-\li   \For $j \gets i+1$ \To $\id{NbLines}[A]$
+      \For $j \gets i+1$ \To $\id{NbLines}[A]$
 \li   \Do
-\li     \If $A[i,j] \neq A[j,i]$ \kw{then} \Return $\const{False}$
+        \If $A[i,j] \neq A[j,i]$ \kw{then} \Return $\const{False}$
       \End
     \End
 \li \Return $\const{True}$

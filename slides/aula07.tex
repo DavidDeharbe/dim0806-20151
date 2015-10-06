@@ -9,8 +9,8 @@
   Programa de Pós-graduação em Sistemas e Computação \\
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
-  Departamento de Informática e Matemáica Aplicada}
-\date{09 de março de 2015}
+  Departamento de Informática e Matemática Aplicada}
+\date{}
 
 \begin{document}
 \selectlanguage{brazil}
@@ -134,13 +134,13 @@
 \li $m \gets \lfloor (\id{length}(A)/2 \rfloor$
 \li \While $l \le u$ and $v \neq A[m]$
 \li \Do
-\li    \If $v < A[m]$
+       \If $v < A[m]$
 \li    \Then
          $u \gets m-1$
 \li    \Else
          $l \gets m+1$
        \End
-\only<1-2>{\li    $m \gets (u + l)/2$} \only<2>{\alert{$\Longleftarrow$ Bug (aritmética em harware)}}
+\only<1-2>{\li    $m \gets (u + l)/2$} \only<2>{\alert{$\Longleftarrow$ Bug (aritmética em hardware)}}
 \only<3>{\li $m \gets l + \lfloor (u + 1 - l)/2 \rfloor$}
     \End
 \li \If $v = A[m]$
@@ -231,7 +231,7 @@
 
     \item Teorema Master, caso 2
 
-    \item $T(N) \in \Theta(\log n)$
+    \item $T(n) \in \Theta(\log n)$
 
     \end{itemize}
 

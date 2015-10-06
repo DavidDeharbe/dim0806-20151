@@ -11,14 +11,14 @@
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
   Departamento de Informática e Matemática Aplicada}
-\date{13 de abril de 2015}
+\date{}
 
 
 \begin{document}
 \selectlanguage{brazil}
 \begin{frame}
   \titlepage
-  Download me from \url{http://ufrn.academia.edu/DavidDeharbe}.
+  Download me from \url{http://DavidDeharbe.github.io}.
 \end{frame}
 
 \begin{frame}
@@ -136,8 +136,10 @@
 
     \item Descrever um procedimento para encontrar o dado com maior chave
       em uma tabela de indexação direta.
-
-      Qual o custo deste procedimento?
+      \begin{itemize}
+        \item Qual o custo deste procedimento?
+        \item Como alterar a estrutura de dados para ter um custo $\Theta(1)$?
+      \end{itemize}
   \end{enumerate}
 
 \end{frame}
@@ -200,7 +202,7 @@
 
       \begin{itemize}
 
-        \item A função da tabela de indexação direta é sobrejetora.
+        \item A função da tabela de indexação direta é injetora.
 
         \item A função $h$ é chamada \alert{função de espalhamento}
 
@@ -247,7 +249,7 @@
       \item A função ideal mapearia cada chave para uma posição
         diferente.
 
-      \item Como $| U | > m$, a função ideal não existe.
+      \item Em geral: $| U | > m$, e a função ideal não existe.
 
       \end{itemize}
 
@@ -574,7 +576,7 @@
       \item o resultado do espalhamento deve ser independente de qualquer padrão
         que possa ocorrer nos dados
 
-        Exemmplo de chaves comum em tabela de símbolos:
+        Exemplo de chaves comum em tabela de símbolos:
         \texttt{"i"}, \texttt{"j"}, \texttt{"pt"}, \texttt{"ptr"}, \texttt{"pt1"}
 
     \end{itemize}
@@ -640,7 +642,7 @@
 
     \item Potências de 10 são valores a evitar para $m$ se as chaves são números decimais
 
-    \item Receita para umm $m$ geralmente bom:
+    \item Receita para um $m$ geralmente bom:
 
       \begin{itemize}
 
@@ -670,7 +672,7 @@
     
   \item Escolher uma constante $A \in \mathbb{R}$ tal que $0 < A < 1$
 
-  \item Seja $\varphi(k) = k \cdot A - \lfloor k \cdot A \rfloor \rfloor$ a parte
+  \item Seja $\varphi(k) = k \cdot A - \lfloor k \cdot A \rfloor $ a parte
     fracionária do produto da chave por $A$.
 
   \item $h = \lambda k . 1 + \lfloor m \cdot \varphi(A) \rfloor$ é a função de espalhamento obtida.
@@ -777,11 +779,11 @@
 
 \item $m$ é um número primo
 
-\item cada chave $k$ é considerada como uma sequência $\langle k_1, \ldots, k_r$
-  de $r$ cadeias de $t$ bits (condição $2^t < m$)
+\item cada chave $k$ é considerada como uma sequência $\langle k_1, \ldots, k_r
+  \rangle$ de $r$ cadeias de $t$ bits (condição $2^t < m$)
 
-\item Seja $a = \langle a_1, \ldots, a_r \rangle$ uma sequênciada formada $r$
-  elementos escolhidos do conjunto $1 \twodots m$
+\item Seja $a = \langle a_1, \ldots, a_r \rangle$ uma sequência formada por
+  $r$ elementos escolhidos do conjunto $1 \twodots m$
 
 \item A função de espalhamento $h_a = \lambda k . \sum_{i=1}^{r} a_i k_i$ 
 
@@ -930,9 +932,9 @@ Seja $x \neq y$ e $h(x) = h(y)$. Assumimos que $x_1 \neq y_1$ (poderia ser qualq
     \li $i \gets 1$
     \li \Repeat 
     \li   $p \gets h(\attrib{x}{key}, i)$ 
-    \li   \If $T[p] \isequal k$
+    \li   \If $\attrib{T[p]}{key} \isequal k$
     \li   \Then $T[p] \gets \const{Nil}$
-                \Return
+    \li         \Return
           \End
     \li   $i \gets i+1$
           \End
@@ -945,7 +947,7 @@ Seja $x \neq y$ e $h(x) = h(y)$. Assumimos que $x_1 \neq y_1$ (poderia ser qualq
 \begin{itemize}
 
 \item Assumindo $m = 10$, $h = \lambda k, i \cdot 1 + ((k + i - 1) \mod m)$, $\attrib{x}{key} = x$,
-\item simular $\proc{Inserir}(5)$, $\proc{Inserir}(15)$, $\proc{Remover}(5)$, $\proc{Buscar}(15)$
+\item $\proc{Inserir}(5)$, $\proc{Inserir}(15)$, $\proc{Remover}(5)$, $\proc{Buscar}(15)$
 \pause
 \item \alert{...problema...} \pause solução: $\const{Deleted}$
 \end{itemize}
@@ -1006,7 +1008,7 @@ Seja $x \neq y$ e $h(x) = h(y)$. Assumimos que $x_1 \neq y_1$ (poderia ser qualq
     \li $i \gets 1$
     \li \Repeat 
     \li   $p \gets h(\attrib{x}{key}, i)$ 
-    \li   \If $T[p] \isequal k$
+    \li   \If $\attrib{T[p]}{key} \isequal k$
     \li   \Then $T[p] \gets \const{Deleted}$
     \li     \Return
           \End
@@ -1101,7 +1103,7 @@ $$h_D = \lambda k, i \cdot 1 + (h_1(k) + (i-1)\cdot h_2(k) \mod m)$$
 
 \item o deslocamento para as próximas tentativas também depende de $k$.
 
-\item para $m$ tentativas visitem $m$ posiçõs diferentes,
+\item para $m$ tentativas visitar $m$ posições diferentes,
   o valor de $h_2(k)$ deve ser relativamente primo com relação a $m$.
 
 \begin{itemize}

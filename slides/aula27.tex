@@ -7,18 +7,17 @@
 
 \input{preamble}
 
-\title{Aula 27: Programação dinâmica}
+\title{Aula 26: Grafos: caminho de custo mínimo}
+\subtitle{Árvores de extensão mínima}
 \author{David Déharbe \\
   Programa de Pós-graduação em Sistemas e Computação \\
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
   Departamento de Informática e Matemática Aplicada}
-\date{25 de maio de 2015}
+\date{22 de maio de 2015}
 
 \begin{document}
 \selectlanguage{brazil}
-
-%%%%% SLIDE %%%%%
 
 \begin{frame}
   \titlepage
@@ -26,630 +25,691 @@
 
 \begin{frame}
   \frametitle{Plano}
-
+\begin{center}
+\includegraphics[height=.5\textheight]{img/map.pdf}
+\end{center}
   \tableofcontents
-Referência: Cormen, cap 16.
+Referência: Cormen, cap 25.
 \end{frame}
 
 \section{Introdução}
-
-%%%%% SLIDE %%%%%
 
 \begin{frame}
 \frametitle{Introdução}
 
 \begin{itemize}
-\item qual forma ótima de escolher $N$ objetos, cada um com peso $w_1, \ldots,
-  w_n$, e valores $v_1, \ldots v_n$, para levar em uma mala de até $K$
-  kilogramas?
-\item qual a maior subsequência comum a duas sequências?
-\item qual a quantidade mínima de edições (adição/remoção/troca) para passar de uma palavra à outra?
-\item qual a ordem ótima para multiplicar $N$ matrizes $A_1, \ldots A_N$?
-\item como escolher valores dentre de um conjunto de tal forma que a soma deles seja nula?
+\item qual o menor caminho para ir de Natal até o Rio de Janeiro?
+\item problema de grafo?
+\begin{itemize}
+\item vértices: cruzamentos
+\item arestas: há uma estrada/rua entre esses dois cruzamentos
+\item peso: distância entre dois cruzamentos
+\end{itemize}
+\item muitas possibilidades!
+\item soluções não tem ciclos
+\item pesos podem ser outras medidas (tempo, custo financeiro, pontos turísticos)
+\item \alert{otimização combinatória}: caminho de custo mínimo
+
+\textit{single source shortest path},
+\textit{all pairs shortest path}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Definições}
+
+\begin{center}
+$G = (V, E, W)$ : grafo dirigido com pesos 
+\end{center}
+
+\begin{definition}[Custo de um caminho]
+Seja um caminho $\pi = (v_0, v_1, \ldots v_k)$. Então, temos que cada $(v_i,
+v_{i+1}) \in E$. O \alert{peso do caminho} $\pi$, denotado $W(\pi)$ é tal que
+$$W(\pi) = \sum_{i=1}^{k} W(v_{i-1}, v_i).$$
+\end{definition}
+
+\begin{definition}[Caminho de custo mínimo]
+O \alert{custo mínimo} entre dois vértices $u$ e $v$, denotado $\delta(u, v)$ é
+tal que:
+$$
+\delta(u, v) =
+\left\{
+\begin{array}{ll}
+\min \{ W(p) : u \overset{p}{\leadsto} v\} & \text{ se existe um caminho de $u$ até $v$}\\
+\infty & \text{ caso contrário}
+\end{array}
+\right.
+$$
+\end{definition}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Diferentes problemas de caminho de custo mínimo}
+
+\begin{itemize}
+\item se não há pesos: busca em largura
+\item vértice origem fixado
+\begin{itemize}
+\item custo mínimo de $s$ para todos os demais vértices
+\end{itemize}
+\item vértice destino fixado
+\begin{itemize}
+\item custo mínimo de cada vértice até $s$
+\item obtido do anterior com o grafo transposto
+\end{itemize}
+\item vértices origem e destino fixados
+\begin{itemize}
+\item não há solução asintoticamente melhor do que quando o vértice origem é fixado
+\end{itemize}
+\item entre todos os pares de vértices
+\begin{itemize}
+\item fixar sucessivamente a origem em todos os vértices
+\item mas existe algoritmos assintoticamente melhores para este problema
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Pesos negativos}
+
+\begin{itemize}
+\item a presença ou ausência de pesos negativos muda os algoritmos possíveis
+\begin{itemize}
+\item sem pesos negativos: algoritmo de Dijkstra
+\item com pesos negativos: algoritmo de Bellman-Ford
+\end{itemize}
+\item se há um ciclo tal que a soma dos pesos é negativa, então o custo
+mínimo é $-\infty$!
+\begin{itemize}
+\item Bellman-Ford detecta ciclos negativos
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Representação de caminhos de custo mínimo}
+
+\begin{itemize}
+\item outra saída esperada: caminho de custo mínimo
+\item dados: $\attrib{v}{up}$
+\item o caminho de custo mínimo de $s$ até $v$ é obtido 
+  seguindo $v, \attrib{v}{up}, \attrib{\attrib{v}{up}}, \ldots$
+  até $s$
+\item durante a aplicação do algoritmo, o valor de $\id{up}$ é 
+  atualizado
+\begin{itemize}
+\item cada $(v, \attrib{v}{up})$ forma uma aresta da \alert{árvore dos caminhos de custo mínimo} 
+\end{itemize}
+\item em um grafo pode haver várias árvores dos caminhos de custo mínimo
+\end{itemize}
+\end{frame}
+
+\section{Algumas propriedades de caminhos de custo mínimo}
+
+\begin{frame}
+\frametitle{Propriedades dos caminhos de custo mínimo}
+
+\begin{enumerate}
+\item Supondo que $\pi = (v_0, v_1, \ldots v_{k-1})$ é um caminho de custo
+  mínimo de $v_0$ até $v_{k-1}$:
+\begin{itemize}
+\item O que podemos dizer do caminho $(v_i, v_{i+1}, \ldots v_{j})$ contido em
+  $\pi$?
 \end{itemize}
 \pause
-\alert{programação dinâmica!}
-
-\end{frame}
-
-%%%%% SLIDE %%%%%
-
-\begin{frame}
-\frametitle{Origem}
-
+\item Supondo que: $s \overset{p}{\leadsto} v$ é o caminho de custo mínimo de $s$ até $v$
+  e é composto por $s \overset{p'}{\leadsto} u$ e $(u, v)$:
 \begin{itemize}
-\item 1940--1950 Richard Bellman
-\begin{itemize}
-\item o mesmo do algoritmo de Bellman-Ford
+\item o que podemos dizer de $\delta(s, u)$, $\delta(s, v)$, $W(u, v)$?
 \end{itemize}
-\item contexto: resolução de problemas envolvendo tomadas de decisões sucessivas
-\item \textit{dynamic programming}: construção dinâmica de uma programação.
-\end{itemize}
-
-\end{frame}
-
-\section{Princípios gerais}
-
-%%%%% SLIDE %%%%%
-
-\begin{frame}
-\frametitle{Princípios}
-
-\begin{itemize}
-\item decomposição: a solução para uma instância $I$ pode ser expressa a partir
-  das soluções para instâncias menores $I_1, \ldots I_n$ derivadas de $I$
-\item aplicar sucessivamente esta decomposição leva a ter que solucionar várias
-  vezes o mesmo sub-problema. \alert{sub-problemas sobrepostos}
-\item a melhor solução para $I$ pode ser obtida a partir das melhores
-  soluções para $I_1, \ldots I_n$. \alert{sub-estrutura ótima}
-\end{itemize}
-
-\end{frame}
-
-\section{Exemplo introdutório}
-
-\begin{frame}
-
-\frametitle{Exemplo 1}
-
-\begin{eqnarray*}
-\id{fib}(0) & = & 0 \\
-\id{fib}(1) & = & 1 \\
-\id{fib}(n) & = & \id{fib}(n-1) + \id{fib}(n-2) \text{para $n \ge 2$}
-\end{eqnarray*}
-
-\begin{enumerate}
-\item sub-estrutura ótima: não há otimização
-\item sub-problemas sobrepostos: não calcular duas vezes o mesmo resultado
-\end{enumerate}
-
-\begin{itemize}
-\item recursão + memorização das soluções dos sub-problemas
-\end{itemize}
-
-\end{frame}
-
-\begin{frame}
-
-\frametitle{Exemplo 1}
-\framesubtitle{Resolução computational}
-
-\begin{itemize}
-\item abordagem ascendente
-\begin{itemize}
-\item iniciar dos sub-problemas mais simples possíveis
-\item calcular sub-problemas cada vez maiores
-\item $\id{fib}(0), \id{fib}(1), \id{fib}(2), \ldots , \id{fib}(n)$.
-\end{itemize}
-\item abordagem descendente
-\begin{itemize}
-\item quebrar o problema em sub-problemas mais simples
-\item solucionar os sub-problemas gerados
-\item $\id{fib}(n), \id{fib}(n-1), \id{fib}(n-2), \id{fib}(n-3) \ldots , \id{fib}(0)$.
-\item \alert{memorizar} as soluções já calculadas
-\end{itemize}
-\end{itemize}
-
-\end{frame}
-
-\begin{frame}
-
-\frametitle{Exercício}
-
-\begin{itemize}
-\item Escrever um algoritmo para calcular $\id{fib}(n)$ utilizando a abordagem
-ascendente
-\item Escrever um algoritmo para calcular $\id{fib}(n)$ utilizando a abordagem
-descendente
-\end{itemize}
-
-\end{frame}
-
-\section{Exemplo intermediário}
-
-\begin{frame}
-\frametitle{Exemplo: um problema de tabuleiro}
-
-\begin{itemize}
-\item É dado um tabuleiro $N \times M$ tal que há um custo $C_{i, j}$ associado
-  à sub-divisão da linha $i$ e da coluna $j$.
-
-\item Projetar um algoritmo que determina o menor custo para atravessar o
-  tabuleiro da primeira até a última linha?
-
-\end{itemize}
-
-\end{frame}
-
-\begin{frame}
-\frametitle{Análise do problema}
-
-\begin{itemize}
-
-\item Se $M=1$, há um único caminho possível
-
-\item Se $M \ge 2$, quantos caminhos são possíveis?
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
-\hline
-1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
-\hline
-2 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 2 \\
-\hline
-5 & 8 & 9 & 9 & 9 & 9 & 9 & 8 & 2 \\
-\hline
-13 & 22 & 26 & 27 & 27 & 27 & 26 & 22 & 13 \\
-\hline
-\end{tabular}
-
-\item para cada sub-divisão: $\Omega(2^{N-1})$ e $O(3^{N-1})$ caminhos
-
-\item total: $\Omega(M \cdot 2^{N-1})$ e $O(M \cdot 3^{N-1})$ caminhos
-
-\item exponencial
-
-\item muitos caminhos possuem trechos comuns 
-
-\begin{itemize}
-
-\item \alert{sub-problemas sobrepostos}
-
-\end{itemize}
-
-\end{itemize}
-
-\end{frame}
-
-\begin{frame}
-\frametitle{Análise do problema}
-
-\begin{itemize}
-\item Como calcular o menor custo para uma sub-divisão?
-
-\item $P_{i, j}$: custo da sub-divisão $(i, j)$
-
-\item $C_{i, j}$: menor custo para chegar à divisão $(i, j)$
-
-\item $i > 1$, sub-divisão fora da borda:
-\begin{center}
-\begin{tabular}{|c|c|c|}
-\hline
-$C_{i-1, j-1}$ & $C_{i-1, j}$ & $C_{i-1, j+1}$ \\
-\hline
-              & $P_{i, j}$ &  \\
-\hline
-\end{tabular}
-\end{center}
-\item $C_{i, j} = P_{i, j} + \min \{ C_{i-1, j-1}, C_{i-1, j}, C_{i-1, j+1} \}$
-
-\item $i > 1$, sub-divisão na borda:
-\begin{center}
-\begin{tabular}{ccc}
-\begin{tabular}{|c|c|}
-\hline
-$C_{i-1, 1}$ & $C_{i-1, 2}$ \\
-\hline
-$P_{i, 1}$ &  \\
-\hline
-\end{tabular}
-& ou &
-\begin{tabular}{|c|c|}
-\hline
-$C_{i-1, M-1}$ & $C_{i-1, M}$ \\
-\hline
-              & $P_{i, M}$ \\
-\hline
-\end{tabular}
-\end{tabular}
-\end{center}
-\item $C_{i, 1} = P_{i, 1} + \min \{ C_{i-1, 1}, C_{i-1, 2}$
-ou $C_{i, M} = P_{i, M-1} + \min \{ C_{i-1, 1}, C_{i-1, M}$
-
-\begin{itemize}
-
-\item \alert{sub-estrutura ótima}
-
-\end{itemize}
-
-\end{itemize}
-
-\end{frame}
-
-\begin{frame}
-
-\frametitle{Algoritmo}
-
-\begin{itemize}
-\item Queremos calcular $C[i, j]$ para cada $i, j$.
-\item Concluído este cálculo, basta determinar o menor valor 
-entre os $C[N, j]$.
-\end{itemize}
-\begin{small}
-\begin{codebox}
-\li \For $j = 1 \To M$
-\li \Do $C[1, j] \gets P[1, j]$
-    \End
-\li \For $i = 2 \To N$
-\li \Do $C[i, 1] \gets P[i, 1] + \min \{ C[i-1, 1], C[i-1, 2] \}$
-\li   $C[i, M] \gets P[i, M] + \min \{ C[i-1, M-1], C[i-1, M] \}$
-\li   \For $j = 2 \To M-1$
-\li   \Do $C[i, j] \gets P[i, j] + \min \{ C[i-1, j-1], C[i-1, j], C[i-1, j+1] \}$
-      \End
-    \End
-\li $\id{res} \gets C[N, 1]$
-\li \For $j = 2 \To N$
-\li \Do \If $C[N, j] < \id{res}$
-\li    \Then $\id{res} \gets C[N, j]$
-       \End
-    \End
-\li \Return $\id{res}$
-\end{codebox}
-\end{small}
-\end{frame}
-
-\begin{frame}
-
-\frametitle{Algoritmo}
-
-\begin{small}
-\begin{codebox}
-\li \For $j = 1 \To M$ \only<2>{\assert{\Comment $\Theta(M)$}}
-\li \Do $C[1, j] \gets P[1, j]$
-    \End
-\li \For $i = 2 \To N$  \only<2>{\assert{\Comment $\Theta(N)$ repetições}}
-\li \Do $C[i, 1] \gets P[i, 1] + \min \{ C[i-1, 1], C[i-1, 2] \}$
-\li   $C[i, M] \gets P[i, M] + \min \{ C[i-1, M-1], C[i-1, M] \}$
-\li   \For $j = 2 \To M-1$  \only<2>{\assert{\Comment $\Theta(M)$ repetições}}
-\li   \Do $C[i, j] \gets P[i, j] + \min \{ C[i-1, j-1], C[i-1, j], C[i-1, j+1] \}$
-      \End
-    \End
-\li $\id{res} \gets C[N, 1]$
-\li \For $j = 2 \To N$
-\li \Do \If $C[N, j] < \id{res}$
-\li    \Then $\id{res} \gets C[N, j]$
-       \End
-    \End
-\li \Return $\id{res}$
-\end{codebox}
-\end{small}
-
-Complexidade? \pause \alert{$\Theta(N M)$}
-\end{frame}
-
-\begin{frame}
-\frametitle{Exercício}
-
-\begin{enumerate}
-\item Adapte o algoritmo anterior para imprimir o caminho menos custoso
-para atravessar o tabuleiro.
+\pause 
+\item Em geral, se $(u, v)$ é uma aresta, qual relação podemos estabelecer
+entre $\delta(s, u)$, $\delta(s, v)$ e $W(u, v)$?
 \end{enumerate}
 \end{frame}
 
-\section{Exemplo avançado}
+\begin{frame}
+\frametitle{Trecho de caminho de custo mínimo}
+\framesubtitle{Propriedade}
+
+\begin{lemma}[trecho de um caminho de custo mínimo]
+Seja $\pi = (v_0, v_1, \ldots v_k)$ um caminho de custo mínimo de $v_0$ até
+$v_k$, e $0 \le i \le j \le v_k$, então o trecho $(v_i, v_{i+1}, \ldots, v_j)$
+de $\pi$ é um caminho de custo mínimo de $v_i$ até $v_j$.
+\end{lemma}
+\pause
+\begin{proof}
+\begin{itemize}
+\item $\pi = v_0 \overset{\pi_1}{\leadsto} v_i \overset{\pi_2}{\leadsto} v_j \overset{\pi_3}{\leadsto} v_k$
+\item \alert{(por contradição)} $\pi : v_0 \overset{\pi}{\leadsto} v_k$ caminho de custo mínimo de $v_0$ até $v_k$
+\item $\pi_2$ é um caminho de custo não mínimo de $v_i$ até $v_j$
+\item seja $\pi'$ um caminho de custo mínimo entre $v_i$ e $v_j$.
+\item temos $\pi_1, \pi', \pi_3$ um caminho de $v_0$ até $v_k$ de custo menor que $\pi$
+\item \alert{contradizendo} a hipótese inicial
+\end{itemize}
+\end{proof}
+\end{frame}
 
 \begin{frame}
-\frametitle{Exemplo: o problema da multiplicação de matrizes}
+\frametitle{Decomposição do custo mínimo}
+\framesubtitle{Propriedade}
 
-\begin{itemize}
-\item É dada uma sequência de matrizes de tamanho $L_1 \times C_1$, $L_2 \times
-  C_2, \ldots L_n \times C_n$, tal que $L_i = C_{i+1}$, para $1 \le i < n$.
+\begin{corollary}[decomposição de custo mínimo]
+Seja $\pi$ um caminho de custo mínimo de $s$ até $v$ tal que 
+$\pi$ pode ser decomposto em $s \overset{\pi'}{\leadsto} u \rightarrow v$
+para algum caminho $\pi'$ e aresta $(u, v)$.
 
+Então $\delta(s, v) = \delta(s, u) + W(u, v)$.
+\end{corollary}
+\pause
+\begin{proof}
 \begin{itemize}
-\item exemplo: $A_1: 10 \times 100, A_2: 100 \times 5, A_3: 5 \times 50$
-\item $(A_1 \cdot A_2) \cdot A_3$: $10 \cdot 100 \cdot 5 + 10 \cdot 5 \cdot 50 = 7.500$
-\item $A_1 \cdot (A_2 \cdot A_3)$: $100 \cdot 5 \cdot 50 + 10 \cdot 100 \cdot 50 = 75.000$
+\item aplicação do lema do trecho de caminho de custo mínimo
+\item $\pi$ tem custo mínimo
+\item $\pi'$ é um trecho de $\pi$
+\item logo, $\pi'$ tem custo mínimo
+\item $\delta(s, v) = W(\pi) = W(\pi')+W(u,v) = \delta(s, u) + W(u, v)$
 \end{itemize}
-\item Projetar um algoritmo que determina a ordem ótima de realizar as
-  multiplicações (aquela que minimiza o número de operações entre elementos de
-  matrizes).
-\item Notação: $A_i$ tem dimensão $p_{i-1} \times p_i$.
+\end{proof}
+\end{frame}
+
+\begin{frame}
+\frametitle{Relação entre custos mínimos e pesos}
+\framesubtitle{Propriedade}
+
+\begin{lemma}[relação entre custos mínimos e pesos]
+Para qualquer aresta $(u, v)$, temos
+$$\delta(s, v) \le \delta(s, u) + W(u, v).$$
+\end{lemma}
+\pause
+\begin{proof}
+?
+\end{proof}
+\end{frame}
+
+\section{Relaxação}
+
+\begin{frame}
+\frametitle{Relaxação}
+
+\begin{itemize}
+\item relaxação: reduz o limite superior (\alert{estimativa conservadora})
+  do custo de um caminho
+\item relaxação é aplicada repetidas vezes até chegar à solução
+\item o que é \alert{relaxação}?
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{Análise do problema}
+\frametitle{Algoritmo de relaxação}
 
 \begin{itemize}
-\item Para $n$ matrizes: quantas maneiras existem de calcular o produto delas?
-\item $N$ matrizes podem ser divididas de $n-1$ formas diferentes:
-$A_1$ e $(A_2 \ldots A_n)$, $(A_1, A_2)$ e $(A_3 \ldots A_n)$, etc.
-\item Seja $\pi(n)$ o número de maneiras que podemos calcular o produto de $N$ matrizes.
-$$
-  \begin{array}[t]{rcl}
-    \pi(1) & = & 1 \\
-    \pi(n) & = & \pi(1) \cdot \pi(n-1) + \pi(2) \cdot \pi(n-2) + \cdots + \pi(n-1) \cdot \pi(1) \\
-    & = & \sum_{k=1}^{n-1} \pi(k) \cdot \pi(n-k) \\
-    & = & \frac{1}{n}\left( \begin{array}{c} 2n-2 \\ n-1 \end{array} \right) \\
-    & \in & \Omega(4^n / n^{3/2})
-  \end{array}
-$$
-\item crescimento \alert{exponencial}
+\item $s$: um nó origem dado
+\item $\attrib{v}{d}$: limite superior do custo de $s$ até $v$
+\item $W(u, v)$: peso da aresta $(u, v)$
 \end{itemize}
-
+\begin{codebox}
+\Procname{\proc{Relax}(u, v, W)}
+\li \If $\attrib{v}{d} > \attrib{u}{d} + W(u, v)$
+\li \Then $\attrib{v}{d} \gets \attrib{u}{d} + W(u, v)$
+\li   $\attrib{v}{up} \gets u$
+    \End
+\end{codebox}
+\pause
+Justificativa:
+\begin{itemize}
+\item se a estimativa do custo de $s$ até $v$ é maior que a estimativa
+  do custo de $s$ até $u$ somado ao peso de $(u, v)$;
+\item existe um caminho de $s$ até $v$ com custo menor que os caminhos
+  já calculados;
+\item este caminho termina pela aresta $(u, v)$.
+\end{itemize}
 \end{frame}
 
 \begin{frame}
-
-\frametitle{Análise da estrutura do problema}
-
-\begin{itemize}
-\item Seja $A_1, \ldots A_n$ as matrizes a multiplicar.
-\item Seja $A_{i \twodots j}$ o resultado da multiplicação de $A_i \ldots A_j$
-\item Um agrupamento ótimo para $A_1 \ldots A_n$ divide em dois grupos
-$A_1 \ldots A_k$ e $A_{k+1} \ldots A_n$.
-\item O custo do agrupamento ótimo é o custo de calcular de forma ótima
-$A_{1 \twodots k}$ e $A_{k+1 \twodots n}$, mais o custo de multiplicar essas
-duas matrizes.
-\item Um agrupamento ótimo para calcular $A_{1 \twodots n}$ deve incluir 
-agrupamentos ótimos para calcular $A_{1 \twodots k}$ e $A_{k+1 \twodots n}$.
-\item e \alert{sub-estrutura ótima}
-\end{itemize}
-
-\end{frame}
-
-
-\begin{frame}
-
-\frametitle{Análise dos sub-problemas}
+\frametitle{Relaxação: ponto de partida}
 
 \begin{itemize}
-\item sub-problemas: qual o custo mínimo para calcular $A_i \ldots A_j$, onde $1 \le i \le j \le n$?
-\item seja $m[i, j]$ este custo
-\item queremos calcular $m[1, n]$
-\item caso de base: $i = j$
-\begin{itemize}
-\item nenhuma operação: $m[i, i] = 0$, para $1 \le i \le n$
+\item procedimento para iniciar com um estado compatível com a relaxação
+\item $\id{d}$ é inicializado com uma estimativa conservadora: $\infty$
+\item $s$: vértice origem, logo $\attrib{s}{d} = 0 = \delta(s, s)$
 \end{itemize}
-\item caso geral:
-\begin{itemize}
-\item se dividir em $k$: $m[i, j] = m[i, k] + m[k, j] + p_{i-1}p_kp_j$.
-\item logo $m[i, j] = \min \{ m[i, j] = m[i, k] + m[k, j] + p_{i-1}p_kp_j \cdot i \le k < j \}$ se $i < j$
-\end{itemize}
-\end{itemize}
-
-\end{frame}
-
-\begin{frame}
-
-\frametitle{Análise dos sub-problemas}
-
-\begin{itemize}
-\item sub-problemas: qual índice $k$, tal que $i \le k < $, dividir $A_i \ldots A_j$, em $A_{i \twodots k}$ e $A_{k+1 \twodots j}$, onde $1 \le i \le j \le n$?
-\item seja $s[i, j]$ este índice
-\item $s[i, j]$ é o índice que minimiza $m[i, k] + m[k, j] + p_{i-1}p_kp_j$.
-\item há $\Theta(n^2)$ sub-problemas no total
-\item um cálculo recursivo descendente necessita solucionar
-repetidas vezes o mesmo problema
-\item \alert{sub-problemas sobrepostos}
-\item abordagem ascendente: cálculo de $m[i, j]$, $s[i, j]$ após ter
-  calculado os sub-problemas contidos
-\end{itemize}
-
-\end{frame}
-
-\begin{frame}
-
-\frametitle{Algoritmo}
 
 \begin{codebox}
-\li $n \gets \attrib{p}{length} - 1$
-\li \For $i = 1$ \To $n$
-\li   \Do $m[i, i] \gets 0$
+\Procname{$\proc{Init-Relax}(G, s)$}
+\li \For $v \in \attrib{G}{V}$
+\li \Do $\attrib{v}{d} \gets \infty$
+\li   $\attrib{v}{up} \gets \const{Nil}$
     \End
-\li \For $l \gets 2$ \To $n$
-\li \Do \For $i \gets 1$ \To $n-l+1$
-\li   \Do $j \gets i+l-1$
-\li     $m[i, j] \gets \infty$
-\li     \For $k \gets 1$ \To $j-1$
-\li     \Do $q \gets m[i, k]+m[k+1, j]+p_{i-1}p_kp_j$
-\li       \If $q < m[i, j]$
-\li       \Then $m[i, j] \gets q$
-\li         $s[i, j] \gets k$
-          \End
-        \End
-      \End
-    \End
-\li \Return $m$ and $s$
+\li $\attrib{s}{d} \gets 0$
 \end{codebox}
 
 \end{frame}
 
 \begin{frame}
+\frametitle{Propriedades}
+\framesubtitle{Algoritmo de relaxação}
 
-\frametitle{Algoritmo}
+\begin{codebox}
+\Procname{\proc{Relax}(u, v, W)}
+\li \If $\attrib{v}{d} > \attrib{u}{d} + W(u, v)$
+\li \Then $\attrib{v}{d} \gets \attrib{u}{d} + W(u, v)$
+\li   $\attrib{v}{up} \gets u$
+    \End
+\end{codebox}
+
+\begin{lemma}[Pós-condição de $\proc{Relax}(u, v, W)$]
+Após executar $\proc{Relax}(u, v, W)$, temos a seguinte relação:
+$$
+\attrib{v}{d} \le \attrib{u}{d} + W(u, v)
+$$
+\end{lemma}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Invariante}
+\framesubtitle{Algoritmo de relaxação}
+
+\begin{lemma}[Invariante]
+O invariante $\delta(s, v) \le \attrib{v}{d}$ é 
+\begin{enumerate}
+\item satisfeito após executar $\proc{Init-Relax}(G, s)$.
+\item preservado pela execução de $\proc{Relax}(u, v, W)$
+\end{enumerate}
+\end{lemma}
+\pause
+\begin{proof}
+\only<2>{
+inicialização:
+\begin{itemize}
+\item $\delta(s, s) = 0$ ou $\delta(s, s) = -\infty$ (se $s$ estiver em um ciclo de peso negativo)
+\item em todo caso $\attrib{s}{d} \ge \delta(s, s)$.
+\item para $v \neq s$, $\attrib{s}{d} = \infty \ge \delta(s, v)$.
+\end{itemize}
+}
+\only<3>{
+preservação por $\proc{Relax}(u, v, W)$ (\alert{por contradição})
+\begin{itemize}
+\item seja $v$ o primeiro vértice tal que $\attrib{v}{d} < \delta(s, v)$
+\item então, após $\proc{Relax}(u, v, W)$ temos 
+$$
+\begin{array}{rcl}
+\attrib{u}{d} + W(u, v) & = & \attrib{v}{d} \\
+  & < & \delta(s, v) \le \delta(s, u) + W(u, v)
+\end{array}
+$$
+\item logo $\attrib{u}{d} < \delta(s, v)$
+\item contradiz que $v$ foi o $1^{o}$ vértice t.q. $\attrib{v}{d} < \delta(s, v)$.
+\end{itemize}
+}
+\end{proof}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Vértices não alcançáveis}
+\framesubtitle{Propriedades}
+
+\begin{corollary}[Vértices não alcançáveis]
+Depois de executar $\proc{Init-Relax}(G,s)$, para qualquer vértice $v$ não alcançável, temos que $\attrib{v}{d} = \delta(s, v)$.
+
+A execução de $\proc{Relax}(u, v, W)$ mantem $\attrib{v}{d} = \delta(s, v)$.
+\end{corollary}
+
+\begin{proof}
+Pelo lema do invariante, temos que $\attrib{v}{d} \ge \delta(s, v)$ sempre.
+Como $\delta(s, v) = \infty$, então teremos $\attrib{v}{d}$ conserva seu
+valor inicial $\infty$ sempre.
+\end{proof}
+\end{frame}
+
+\begin{frame}
+\frametitle{Extensão de caminho de custo mínimo}
+
+\begin{lemma}[Extensão de caminho de custo mínimo]
+Seja $s \leadsto u \rightarrow v$ um caminho de custo mínimo de $s$ até os
+vértices $u$ e $v$. Se $\attrib{u}{d} = \delta(s, u)$ antes de executar
+$\proc{Relax}(u, v, W)$, então $\attrib{v}{d} = \delta(s, v)$.
+\end{lemma}
+
+\begin{proof}
+\begin{itemize}
+\item lema do invariante: 
+\begin{enumerate}
+\item $\delta(s, v) \le \attrib{v}{d}$ sempre
+\item se $\delta(s, u) = \attrib{u}{d}$ antes de executar $\proc{Relax}(u, v, W)$, também
+$\delta(s, u) = \attrib{u}{d}$ depois
+\end{enumerate}
+\item Depois executar $\proc{Relax}(u, v, W)$,
+$$
+\begin{array}{rcll}
+\attrib{v}{d} & \le & \attrib{u}{d} + W(u, v)  & \text{\footnotesize lema da pós-condição} \\
+& = & \delta(s, u) + W(u, v) & \text{\footnotesize hipótese vigente} \\
+& = & \delta(s, v) & \text{\footnotesize corolário decomposição de custo mínimo}
+\end{array}
+$$
+\end{itemize}
+\end{proof}
+\end{frame}
+
+\section{O algoritmo de Dijkstra}
+
+\begin{frame}
+\frametitle{Algoritmo de Dijkstra}
+\framesubtitle{Princípios}
+
+\begin{itemize}
+\item Mantem um conjunto de vértices $S = \{ v \cdot \attrib{v}{d} = \delta(s, v)\}$.
+\item Escolhe um vértice $u$ a inserir em $S$
+\begin{itemize}
+\item custo mínimo de $S$ para $u$
+\end{itemize}
+\item Relaxa com as arestas adjacentes a $u$
+\item abordagem \alert{gulosa}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Algoritmo de Dijkstra}
+
+\begin{codebox}
+\Procname{$\proc{Single-Source-Shortest-Path}(G, s)$}
+\li $\proc{Init-Relax}(G, s)$
+\li $S \gets \emptyset$
+\li $Q \gets \attrib{G}{V}$
+\li \While $Q \neq \emptyset$
+\li \Do $u \gets \proc{Extract-Min}(Q)$
+\li   $S \gets S \cup \{ u \}$
+\li   \For $(u, v) \in \attrib{G}{E}$
+\li   \Do $\proc{Relax}(u, v, \attrib{G}{W})$
+      \End
+    \End
+\end{codebox}
+$Q$: fila de prioridade com chave $\id{d}$
+
+\end{frame}
+
+\begin{frame}
 \frametitle{Ilustração}
+\framesubtitle{Algoritmo de Dijkstra}
 
-\begin{tabular}{c|c}
-matriz & dimensão \\
-\hline
-$A_1$ & $ 30 \times 35$ \\
-$A_2$ & $ 35 \times 15$ \\
-$A_3$ & $ 15 \times 5$ \\
-$A_4$ & $ 5 \times 10$ \\
-$A_5$ & $ 10 \times 20$ \\
-$A_6$ & $ 20 \times 25$
-\end{tabular}
+Quadro
 
 \end{frame}
 
 \begin{frame}
+\frametitle{Complexidade}
+\framesubtitle{Algoritmo de Dijkstra}
 
-\frametitle{Algoritmo}
-
-{ \center \alert{Complexidade?}}
+Assumindo que $Q$ é um \textit{heap\/} binário...
 
 \begin{codebox}
-\li $n \gets \attrib{p}{length} - 1$
-\li \For $i = 1$ \To $n$
-\li   \Do $m[i, i] \gets 0$
-    \End
-\li \For $l \gets 2$ \To $n$
-\li \Do \For $i \gets 1$ \To $n-l+1$
-\li   \Do $j \gets i+l-1$
-\li     $m[i, j] \gets \infty$
-\li     \For $k \gets 1$ \To $j-1$
-\li     \Do $q \gets m[i, k]+m[k+1, j]+p_{i-1}p_kp_j$
-\li       \If $q < m[i, j]$
-\li       \Then $m[i, j] \gets q$
-\li         $s[i, j] \gets k$
-          \End
-        \End
+\Procname{$\proc{Single-Source-Shortest-Path}(G, s)$}
+\li $\proc{Init-Relax}(G, s)$ \assert{\Comment $\Theta(V)$}
+\li $S \gets \emptyset$
+\li $Q \gets \attrib{G}{V}$ \assert{\Comment $O(V)$}
+\li \While $Q \neq \emptyset$  \assert{\Comment $\Theta(V)$ repetições}
+\li \Do $u \gets \proc{Extract-Min}(Q)$  \assert{\Comment $O(\lg V)$}
+\li   $S \gets S \cup \{ u \}$
+\li   \For $(u, v) \in \attrib{G}{E}$ \assert{\Comment total: $\Theta(E)$}
+\li   \Do $\proc{Relax}(u, v, \attrib{G}{W})$ \assert{\Comment $O(\lg V)$}
       \End
     \End
-\li \Return $m$ and $s$
 \end{codebox}
 \pause
-\alert{$\Theta(n^3)$}
+\begin{center}
+Total: \alert{$O(V \lg V + E \lg V)$}
+\end{center}
 \end{frame}
 
 \begin{frame}
-\frametitle{Concluindo: multiplicando matrizes de forma ótima}
+\frametitle{Correção}
+
+Cada vez que $u$ é inserido em $S$, $\attrib{u}{d} = \delta(s, u)$
+\pause
+(\alert{contradição}).
+\begin{itemize}
+\item $v$: primeiro vértice inserido em $S$ t.q. $\attrib{v}{d} \neq \delta(v, s)$
+\only<3>{\item certamente $v \neq s$, pois
+\begin{itemize}
+\item $s$ é o primeiro vértice inserido em $S$
+\item $\attrib{s}{d}$ é 0 quando é inserido, e $\delta(s, s) = 0$.
+\end{itemize}
+}
+\only<4->{\item $v \neq s$}
+\only<6->{, $S \neq \emptyset$}
+\only<8->{, $s \leadsto v$}
+\only<9->{, $p = p_1 (x, y) p_2$, $s \overset{p_1}{\leadsto} x \rightarrow y \overset{p_2} \leadsto v$, $p_1 \subseteq S$, $W(p) = \delta(s, v)$}
+\only<11->{, $\attrib{y}{d} = \delta(s, y)$}
+\only<13->{, $\delta(s, y) \le \delta(s, v)$}
+\only<5>{\item logo $S \neq \emptyset$ quand $v$ é inserido em $S$.}
+\only<7>{\item necessariamente há um caminho de $s$ até $v$
+\begin{enumerate}
+\item senão, pelo corolário dos vértices não alcançáveis, $\attrib{v}{d} = \delta(s, v)$,
+\item contradizendo hipótese vigente  $\attrib{v}{d} \neq \delta(v, s)$.
+\end{enumerate}
+}
+\only<8>{
+\item logo existe um caminho de custo mínimo entre $s$ e $v$, digamos $p$ (não necessariamente todo em $S$).
+\item seja $y$ o primeiro vértice de $p$ em $V-S$ e e $x$ o predecessor de $y$ em $p$
+}
+\only<10>{
+\item necessariamente $\attrib{x}{d} = \delta(s, x)$,
+\item $x \in S$, então foi aplicado $\proc{Relax}(x, y, W)$
+\item pelo lema da extensão de caminho de custo mínimo, $\attrib{y}{d} = \delta(s, y)$
+}
+\only<12>{
+\item $y$ ocorre antes de $v$ em um caminho de custo mínimo
+\item os pesos não são negativos
+\item logo $\delta(s, y) \le \delta(s, v)$
+\item pelo lema do invariante $\delta(s, v) \le \attrib{v}{d}$, 
+\item por transitividade de $\le$, deduzimos que $\delta(s, y) \le \delta(s, v)$
+}
+\only<14>{
+\item $v \gets \proc{Extract-Min}(Q)$
+\item logo $\attrib{v}{d} \le \attrib{y}{d}$
+\item temos $\attrib{v}{d} \ge \delta(s, v) \ge \delta(s, y) = \attrib{y}{d} \ge \attrib{v}{d}$
+\item logo $\attrib{v}{d} = \delta(s, v)$ \alert{entramos em contradição}
+}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Teorema}
+
+\begin{theorem}[Correção do algoritmo de Dijkstra]
+O algoritmo $\proc{Single-Source-Shortest-Path}(G, s)$ calcular corretamente o 
+custo dos caminhos de custo mínimo de $s$ até cada vértice de $G$.
+\end{theorem}
+\pause
+\begin{proof}
+\begin{itemize}
+\item o lema do invariante garante que $\attrib{v}{d} \ge \delta(s, v)$ ao longo da execução
+\item mostramos que quando um vértice é inserido em $S$, $\attrib{v}{d} = \delta(s, v)$
+\item todos os vértices são inseridos em $S$.
+\end{itemize}
+\end{proof}
+\pause
+Omitimos a prova que os caminhos de custo mínimo são calculados corretamente (atributo $\id{up}$).
+\end{frame}
+
+\section{O algoritmo de Bellman-Ford}
+\begin{frame}
+\frametitle{Algoritmo de Bellman-Ford}
+\framesubtitle{Princípios}
+
+\begin{itemize}
+\item leva em conta arestas negativas
+\item detecta e reporta se existe ciclos de custo mínimo
+\item também baseado na relaxação
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Algoritmo de Bellman-Ford}
 
 \begin{codebox}
-\Procname{$\proc{Matrix-Product+}(A, s, i, j)$}
-\li \If $j > i$
-\li \Then $X \gets \proc{Matrix-Product+}(A, s, i, s[i, j])$
-\li    $Y \gets \proc{Matrix-Product+}(A, s, s[i, j]+1, j)$
-\li    \Return $\proc{Matrix-Multiply}(X, Y)$
-\li \Else \Return $A_i$
+\Procname{$\proc{Single-Source-Shortest-Paths}(G, s)$}
+\li $\proc{Init-Relax}(G, s)$
+\li \For $i \gets 1 to |\attrib{G}{V}| - 1$
+\li \Do \For $(u, v) \in \attrib{G}{E}$
+\li   \Do $\proc{Relax}(u, v, \attrib{G}{W})$
+      \End
     \End
+\li \For $(u, v) \in \attrib{G}{E}$
+\li \Do \If $\attrib{v}{d} > \attrib{u}{d} + \attrib{G}{W}(u, v)$
+\li   \Then \Return $\const{False}$
+      \End
+    \End
+\li \Return $\const{True}$
 \end{codebox}
 
 \end{frame}
 
-\section{Exercícios}
-
 \begin{frame}
+\frametitle{Ilustração}
+\framesubtitle{Algoritmo de Bellman-Ford}
 
-\frametitle{Menor caminho entre duas arestas}
-
-\begin{center}
-\includegraphics{img/Shortest-path-optimal-substructure.png}
-\end{center}
-
-\begin{enumerate}
-\item sub-estrutura ótima: em um grafo conectado com pesos, a menor distância de
-  $u$ até $v$ pode ser calculada a partir da menor distância dos vértices
-  adjacentes a $u$ até $v$.
-\item sub-problemas sobrepostos: não calcular duas vezes o mesmo resultado
-\end{enumerate}
-\begin{itemize}
-\item recursão + memorização das soluções dos sub-problemas
-\end{itemize}
+No quadro
 
 \end{frame}
 
 \begin{frame}
+\frametitle{Complexidade}
+\framesubtitle{Algoritmo de Bellman-Ford}
 
-\frametitle{Exercício}
-
-\begin{enumerate}
-\item Escrever um algoritmo para calcular o menor caminho de $u$ até $v$
-  utilizando a abordagem ascendente
-\item Escrever um algoritmo para calcular o menor caminho de $u$ até $v$
-  utilizando a abordagem descendente
-\end{enumerate}
-
-\end{frame}
-
-\begin{frame}
-\frametitle{Sub-conjunto de soma nula}
-
-\begin{itemize}
-\item É dada um conjunto de inteiros $\{v_1, v_2, \ldots v_n\}$.
-
-\item Projetar um algoritmo que determina se existe um sub-conjunto tal que a
-  soma dos elementos é nula.
-\end{itemize}
-
-\end{frame}
-
-\begin{frame}
-\frametitle{Elementos de resposta}
-
-\begin{itemize}
-\item Quantos sub-conjuntos de $S = \{v_1, v_2, \ldots v_n\}$?
-\item Seja $N$ a soma dos números negativos de $S$
-\item Seja $P$ a soma dos números positivos de $S$
-\item Seja $Q(i, s)$ verdadeiro sse existe um sub-conjunto de 
-$\{v_1, v_2, \ldots v_i\}$ de soma $s$.
-\item Representar $Q$ por uma matriz $N+P+1 \times n$
-\item Calcular $Q(n, 0)$ soluciona o problema desejado
-\item Temos que 
-\begin{itemize}
-\item $Q(1, s) \leftrightarrow v_1 = s$
-\item para $i > 1$: $Q(i, s) \Leftrightarrow 
-  \begin{array}[t]{rlr}
-         & Q(i-1, s) & \text{$v_i$ não é somado} \\
-    \lor & Q(i-1, s-v_i) & \text{$v_i$ é somado} \\
-    \lor & s = x_i & \text{a soma é apenas $v_i$}
-  \end{array}$
-\end{itemize}
-\end{itemize}
-
-\end{frame}
-
-\begin{frame}
-\frametitle{Exercício}
-
-\begin{itemize}
-\item Projetar um algoritmo para solucionar este problema usando
-programação dinâmica.
-\end{itemize}
-
-\end{frame}
-
-\begin{frame}
-\frametitle{O problema da mochila 0-1}
-
-\begin{itemize}
-\item É dada um conjunto de $N$ itens, cada um com seu valor $v_i$ e seu peso
-  $w_i$, e uma mochila, que tem uma capacidade máxima $K$.
-
-\item Projetar um algoritmo que determinar o valor máximo que pode ser
-  transportado na mochila.
-\end{itemize}
-
-\end{frame}
-
-\begin{frame}
-\frametitle{Elementos de resposta}
-
-\begin{itemize}
-\item Quantas possibilidades temos?
-
-\item Porque o problema tem uma sub-estrutura ótima?
-
-\item Porque este problema tem sub-problemas sobrepostos?
-
+\begin{codebox}
+\Procname{$\proc{Single-Source-Shortest-Paths}(G, s)$}
+\li $\proc{Init-Relax}(G, s)$ \assert{\Comment $\Theta(V)$} 
+\li \For $i \gets 1 to |\attrib{G}{V}| - 1$ \assert{\Comment $\Theta(V)$ repetições} 
+\li \Do \For $(u, v) \in \attrib{G}{E}$ \assert{\Comment $\Theta(E)$ repetições}
+\li   \Do $\proc{Relax}(u, v, \attrib{G}{W})$ \assert{\Comment $\Theta(1)$}
+      \End
+    \End
+\li \For $(u, v) \in \attrib{G}{E}$ \assert{\Comment $O(E)$ repetições}
+\li \Do \If $\attrib{v}{d} > \attrib{u}{d} + \attrib{G}{W}(u, v)$
+\li   \Then \Return $\const{False}$
+      \End
+    \End
+\li \Return $\const{True}$
+\end{codebox}
 \pause
-\item Seja $C(i, m)$ o valor máximo carregável considerando 
-  \begin{enumerate}
-    \item apenas os $i$ primeiros itens
-    \item uma capacidade máxima de $m$
-  \end{enumerate}
+\alert{Total: $\Theta(V \, E)$}
+\end{frame}
 
-\item Casos de base: $C(0, m) = \only<3>{0}$, $C(i, 0) = \only<3>{0}$
-\item Caso geral: se $w_i > m$, então $C(i, m) = \only<4>{C(i-1, m)}$
-\item Caso geral: se $w_i \le m$, então $C(i, m) = \only<5>{
-\max \{ C(i-1, m), v_i + C(i-1, m-w_i) \}}$
+\begin{frame}
+\frametitle{Correção}
+\framesubtitle{Algoritmo de Bellman-Ford}
 
-\end{itemize}
+\begin{enumerate}
+\item caso $G$ não contem ciclos de custo negativo
+\item caso geral
+\end{enumerate}
 
 \end{frame}
 
 \begin{frame}
-\frametitle{Exercício}
+\frametitle{Correção}
+\framesubtitle{Algoritmo de Bellman-Ford}
 
+\begin{lemma}[Bellman-Ford sem ciclos de custo negativo]
+Se $G$ não possui ciclos de custo negativo, então, após executar o algoritmo de Bellman-Ford
+a $G$ e $s$, temos que $\attrib{v}{d} = \delta(s, v)$ para todas as arestas alcançáveis de $s$.
+\end{lemma}
+\pause
+\begin{proof}
 \begin{itemize}
-
-\item Utilizando programação dinâmica, projetar um algoritmo que soluciona o
-  problema da mochila 0,1.
-
-\item Adapte o algoritmo para imprimir os itens selecionados para compor a
-  solução ótima.
+\item Seja $p = (v_0, v_1, \ldots v_k)$ um caminho de custo mínimo entre $v_0 = s$ e $v_k = v$
+\only<3>{, $k \le |V|-1$}
+\only<2>{\item Não há ciclos de custo negativo, logo $p$ não contem ciclo e $k \le |V|-1$.
+\item Abordagem de prova:
+\begin{itemize}
+\item indução
+\item após a iteração $i$, $\attrib{v_i}{d} = \delta(s, v_i)$
+\item como há $|V|-1$ iterações, provar esta propriedade é suficiente.
 \end{itemize}
+}
+\only<4>{
+\item No \alert{caso de base}, $i = 0$,
+\begin{itemize}
+\item $\delta(s, v_0) = \attrib{v_0}{d} = 0$ após a inicialização;
+\item mantido pelas etapas de relaxação
+\end{itemize}
+}
+\only<5>{
+\item No \alert{caso geral}, a hipótese de indução é $\attrib{v_{i-1}}{d} = \delta(s, v_{i-1})$ após
+a iteração $i-1$.
+\item A relaxação é aplicada a $(v_{i-1}, v_i)$ na iteração $i$, 
+\item pelo lema da extensão de caminhos de custo mínimo, $\attrib{v_i}{d} = \delta(s, v_i)$ após a iteração $i$.
+}
+\end{itemize}
+\end{proof}
 
 \end{frame}
+
+\begin{frame}
+\frametitle{Correção}
+\framesubtitle{Algoritmo de Bellman-Ford}
+
+\begin{corollary}[Alcançabilidade e Bellman-Ford sem ciclos de custo negativo]
+Se $G$ não possui ciclos de custo negativo, então, existe um caminho de $s$ até $v$ se e somente
+se, após executar o algoritmo de Bellman-Ford a $G$ e $s$, temos que $\attrib{v}{d} \neq \infty$.
+\end{corollary}
+\end{frame}
+
+\begin{frame}
+\frametitle{Correção}
+\framesubtitle{Algoritmo de Bellman-Ford}
+
+\begin{theorem}[Correção do algoritmo de Bellman-Ford]
+Se $G$ não possui ciclos de custo negativo, então o algoritmo retorna $\const{True}$ e
+$\attrib{v}{d} = \delta(s, v)$ para todo $v \in V$.
+
+Se $G$ possui um ciclo de custo negativo, então o algoritmo retorna $\const{False}$.
+\end{theorem}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Correção}
+\framesubtitle{Algoritmo de Bellman-Ford}
+
+\begin{proof}
+\only<1>{
+\begin{itemize}
+\item Se $G$ \alert{não possui} ciclos de custo negativo
+\begin{itemize}
+\item Se $v$ é alcançável, temos $\attrib{v}{d} = \delta(s, v)$ (aplicação do lema)
+\item Se $v$ não é alcançável, também $\attrib{v}{d} = \delta(s, v)$ (corolário dos vértices inalcançáveis)
+\end{itemize}
+\item Quando o laço das relaxações termina:
+
+$\attrib{v}{d} = \delta(s, v) \le \delta(s, u) + W(u, v) = \attrib{u}{d} + W(u, v)$
+\item o teste $\attrib{v}{d} > \attrib{u}{d} + W(u, v)$ nunca é verdadeiro
+\item o algoritmo retorna $\const{True}$
+\end{itemize}
+}
+\only<2>{
+\begin{itemize}
+\item Se $G$ \alert{possui} um ciclo de custo negativo $c = (v_0, v_1, \ldots v_k)$, com $v_0 = v_k$, alcançável a partir de $s$.
+\item $\sum_{i=1}^{k} W(v_{i-1}, v_i) < 0$
+\item (\alert{por contradição}) hipótese: algoritmo retorna $\const{True}$
+\item logo $\attrib{v_i}{d} \le \attrib{v_{i-1}}{d} + W(v_{i-1}, v_i)$ para todo $i = 1, \ldots k$
+\item $\sum_{i=1}^{k} \attrib{v_i}{d} \le \sum_{i=1}^{k} (\,\attrib{v_{i-1}}{d} + W(v_{i-1}, v_i)\,)$
+\item como é um ciclo: $\sum_{i=1}^{k} \attrib{v_i}{d} = \sum_{i=1}^{k} \attrib{v_{i-1}}{d}$
+\item conclusão $0 \le \sum_{i=1}^{k} W(v_{i-1}, v_i)$, \alert{contradizendo $\sum_{i=1}^{k} W(v_{i-1}, v_i) < 0$}.
+\end{itemize}
+}
+\end{proof}
+\end{frame}
+
+
 
 \end{document}

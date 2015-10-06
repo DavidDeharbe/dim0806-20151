@@ -10,14 +10,14 @@
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
   Departamento de Informática e Matemática Aplicada}
-\date{15 de abril de 2015}
+\date{}
 
 
 \begin{document}
 \selectlanguage{brazil}
 \begin{frame}
   \titlepage
-  Download me from \url{http://ufrn.academia.edu/DavidDeharbe}.
+  Download me from \url{http://DavidDeharbe.github.io}.
 \end{frame}
 
 \begin{frame}
@@ -288,10 +288,9 @@ x = \const{Nil} \lor
     k$, $\attrib{x}{left} = l$, $\attrib{x}{right} = r$,
     $\attrib{x}{up} = u$.
 
-    Projete um algoritmo utilize esta sub-rotina e ordenação em
-    arranjo para construir uma árvore binária de busca a partir
-    de uma coleção inicialmente em um arranjo. O algoritmo deverá
-    ter complexidade $\Theta(n \lg n)$.
+    Projete um algoritmo que utilize esta sub-rotina e ordenação em arranjo para
+    construir uma árvore binária de busca a partir de uma coleção inicialmente
+    em um arranjo. O algoritmo deverá ter complexidade $\Theta(n \lg n)$.
 
   \item Projete um algoritmo não recursivo para processar os valores
     de uma árvore binária de busca em ordem, e em tempo $\Theta(n)$.
@@ -414,6 +413,7 @@ Exercício: escrever o algoritmo que encontra o nó predecessor (se existir).
   \li    \Then $\attrib{x}{left} \gets \proc{Insert-Aux}(p, \attrib{x}{left}, x)$
   \li    \Else $\attrib{x}{right} \gets \proc{Insert-Aux}(p, \attrib{x}{right}, x)$
          \End
+  \li    \Return $x$
        \End
 \end{codebox}
 

@@ -1,22 +1,24 @@
-%% TODO: illustrations
+%% TODO
+%% 1. illustrating figures
+%% 2. add section on MST in DAGs
+%%
 \documentclass{beamer}
 \setbeamertemplate{footline}[frame number]
 
 \input{preamble}
 
-\title{Aula 28: Algoritmos gulosos}
-\subtitle{\textit{Greedy}}
+\title{Aula 27: Programação dinâmica}
 \author{David Déharbe \\
   Programa de Pós-graduação em Sistemas e Computação \\
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
   Departamento de Informática e Matemática Aplicada}
-\date{27 de maio de 2015}
+\date{25 de maio de 2015}
 
 \begin{document}
 \selectlanguage{brazil}
 
-%%%%% SLIDE 01 %%%%%
+%%%%% SLIDE %%%%%
 
 \begin{frame}
   \titlepage
@@ -26,682 +28,628 @@
   \frametitle{Plano}
 
   \tableofcontents
-Referência: Cormen, cap 17.
+Referência: Cormen, cap 16.
 \end{frame}
 
 \section{Introdução}
 
-%%%%% SLIDE 02 %%%%%
+%%%%% SLIDE %%%%%
 
 \begin{frame}
 \frametitle{Introdução}
 
 \begin{itemize}
+\item qual forma ótima de escolher $N$ objetos, cada um com peso $w_1, \ldots,
+  w_n$, e valores $v_1, \ldots v_n$, para levar em uma mala de até $K$
+  kilogramas?
+\item qual a maior subsequência comum a duas sequências?
+\item qual a quantidade mínima de edições (adição/remoção/troca) para passar de uma palavra à outra?
+\item qual a ordem ótima para multiplicar $N$ matrizes $A_1, \ldots A_N$?
+\item como escolher valores dentre de um conjunto de tal forma que a soma deles seja nula?
+\end{itemize}
+\pause
+\alert{programação dinâmica!}
 
-\item Otimização
+\end{frame}
 
-\item Alternativa à programação dinâmica
+%%%%% SLIDE %%%%%
 
-\item Em geral, mais simples
-
-\item Nem sempre possível
-
-\item Exemplos:
+\begin{frame}
+\frametitle{Origem}
 
 \begin{itemize}
-
-\item algoritmo de menor caminho (Dijkstra)
-
-\item árvore geradora mínima
-
+\item 1940--1950 Richard Bellman
+\begin{itemize}
+\item o mesmo do algoritmo de Bellman-Ford
 \end{itemize}
-
+\item contexto: resolução de problemas envolvendo tomadas de decisões sucessivas
+\item \textit{dynamic programming}: construção dinâmica de uma programação.
 \end{itemize}
 
 \end{frame}
 
-%%%%% SLIDE 03 %%%%%
+\section{Princípios gerais}
+
+%%%%% SLIDE %%%%%
 
 \begin{frame}
 \frametitle{Princípios}
 
 \begin{itemize}
-\item a solução é calculada de forma incremental
-\item cada incremento é realizado com a melhor escolha naquele momento
-\item a sequência de decisões localmente ótimas é globalmente ótima
-\item adequado para problemas exibindo certas propriedades
-\begin{itemize}
-\item sub-estrutura ótima
-\item propriedade da escolha gulosa
-\end{itemize}
-
+\item decomposição: a solução para uma instância $I$ pode ser expressa a partir
+  das soluções para instâncias menores $I_1, \ldots I_n$ derivadas de $I$
+\item aplicar sucessivamente esta decomposição leva a ter que solucionar várias
+  vezes o mesmo sub-problema. \alert{sub-problemas sobrepostos}
+\item a melhor solução para $I$ pode ser obtida a partir das melhores
+  soluções para $I_1, \ldots I_n$. \alert{sub-estrutura ótima}
 \end{itemize}
 
 \end{frame}
 
-
-\section{Um exemplo simples}
-
-%%%%% SLIDE 04 %%%%%
+\section{Exemplo introdutório}
 
 \begin{frame}
-\frametitle{Problema de escalonamento de atividades}
-\framesubtitle{Exemplo introdutório}
 
-\begin{itemize}
-\item Temos $n$ atividades
-\item As atividades necessitam de um recurso compartilhado
-\item Cada atividade $i$ tem uma hora de início $s_i$
-e uma hora de término $f_i$
-\item A cada $t$, $s_i \le t < f_i$, a atividade $i$ precisa
-do acesso exclusivo ao recurso para funcionar.
-\item Problema:
-\begin{itemize}
-\item Escalonar a maior quantidade possível de atividades.
-\end{itemize}
-\end{itemize}
+\frametitle{Exemplo 1}
 
-\end{frame}
+\begin{eqnarray*}
+\id{fib}(0) & = & 0 \\
+\id{fib}(1) & = & 1 \\
+\id{fib}(n) & = & \id{fib}(n-1) + \id{fib}(n-2) \text{para $n \ge 2$}
+\end{eqnarray*}
 
-%%%%% SLIDE 05 %%%%%
-
-\begin{frame}
-\frametitle{Algoritmo}
-\framesubtitle{Escalonamento de atividades}
-
-\begin{codebox}
-\Procname{\proc{Greedy-Scheduler}(s, f)}
-\zi \Comment{$f_1 \le f_2 \le \ldots f_n$}
-\li $n \gets \attrib{s}{length}$
-\zi \Comment{$A$: atividades escalonadas}
-\li $A \gets \{ 1 \}$  \Comment{atividade terminando mais cedo é escalonada}
-\zi \Comment{$j$: última atividade escalonada}
-\li $j \gets 1$
-\li \For $i \gets 2 \To n$ \Comment{escolhe se a atividade $i$ é escalonada}
-\li \Do \If $s_i \ge f_j$
-\li   \Then $A \gets A \cup \{ i \}$
-\li     $j \gets i$
-      \End
-    \End
-\li \Return $A$
-\end{codebox}
-
-\end{frame}
-
-%%%%% SLIDE 06-07 %%%%%
-
-\begin{frame}
-\frametitle{Ilustração}
-
-$$
-\begin{array}{|c|c|c|c|c|c|c|c|c|c|c|c|}
-i & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 \\
-\hline
-\hline
-s & 1 & 3 & 0 & 5 & 3 & 5 & 6 & 8 & 8 & 2 & 12 \\
-\hline
-f & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 & 14
-\end{array}
-$$
-
-\pause
-Por qual razão este algoritmo é qualificado de \alert{guloso}?
-
-\end{frame}
-
-
-%%%%% SLIDE 08-09 %%%%%
-
-\begin{frame}
-\frametitle{Complexidade}
-\framesubtitle{Escalonamento de atividades}
-
-\begin{codebox}
-\Procname{\proc{Greedy-Scheduler}(s, f)}
-\li $n \gets \attrib{s}{length}$
-\li $A \gets \{ 1 \}$
-\li $j \gets 1$
-\li \For $i \gets 2 \To n$ \Comment{\assert{$\Theta(n)$ repetições}}
-\li \Do \If $s_i \ge f_i$ \Comment{\assert{$O(1)$ por repetição}}
-\li   \Then $A \gets A \cup \{ i \}$
-\li     $j \gets i$
-      \End
-    \End
-\li \Return $A$
-\end{codebox}
-\pause
-\alert{$$\Theta(n)$$}
-\end{frame}
-
-%%%%% SLIDE %%%%%
-
-\begin{frame}
-\frametitle{Correção}
-\framesubtitle{Escalonamento de atividades}
-
-\begin{itemize}
-\item O algoritmo sempre tenta maximizar o tempo que o recurso ficará disponível
-\item Será que é correto? Justifique.
-\end{itemize}
-
-\begin{theorem}
-O algoritmo $\proc{Greedy-Scheduler}$ produz soluções de tamanho máximo para o
-problema do escalonamento de atividades.
-\end{theorem}
-
-\end{frame}
-
-%%%%% SLIDE %%%%%
-
-\begin{frame}
-\frametitle{Correção}
-\framesubtitle{Escalonamento de atividades}
-
-\begin{proof}[Por indução]
-\begin{itemize}
-\item Seja $A = \{ A_1, \ldots A_k \} $ uma solução ótima, ordenada por 
-tempo de término crescente.
-\item Queremos mostrar que existe um escalonamento ótimo com $1$
-\item Se $A_1 \neq 1$, seja $B = A - \{ A_1 \} \cup \{ 1 \}$
-\item $B$ é um escalonamento correto das atividades, pois $f_1 \le f_{A_1}$
-\item Logo $B$ é um escalonamento ótimo que começa com $1$.
-\item Sempre existe um escalonamento ótimo começando por $1$.
-\item Uma vez $1$ escolhido, deve-se escalonar a maior quantidade possível
-de tarefas a partir de $f_1$.
-\begin{itemize}
-\item Instância menor do mesmo problema!
-\item Podemos repetir a escolha gulosa.
-\item Por indução a solução é correta.
-\end{itemize}
-\end{itemize}
-\end{proof}
-
-\end{frame}
-
-%%%%% SLIDE %%%%%
-
-\begin{frame}
-\frametitle{Exercícios}
 \begin{enumerate}
-\item Desenvolver um algoritmo para o problema do escalonamento da atividades utilizando \alert{programação dinâmica}.
-\begin{itemize}
-\item Dica: o algoritmo deve calcular $m_i$, para $1 \le i \le n$, onde $m_i$ é 
-a solução para as atividades $\{1, 2, \ldots i\}$.
-\item Compare a complexidade do algoritmo obtido com a de $\proc{Greedy-Schedule}$
-\end{itemize}
-\item A abordagem gulosa nem sempre funciona:
-\begin{itemize}
-\item Encontre um exemplo que mostra por que não funciona se for escolhida a atividade de menor duração no problema do escalonamento de atividades.
-\item Encontre um exemplo que mostra por que não funciona se for escolhida a atividade com menos conflitos no problema do escalonamento de atividades.
-\end{itemize}
+\item sub-estrutura ótima: não há otimização
+\item sub-problemas sobrepostos: não calcular duas vezes o mesmo resultado
 \end{enumerate}
-\end{frame}
-
-\section{Considerações sobre algoritmos gulosos}
-
-%%%%% SLIDE %%%%%
-
-\begin{frame}
-\frametitle{Estratégias gulosas}
 
 \begin{itemize}
-\item Como determinar se uma estratégia gulosa é correta?
-\item Deve-se demonstrar que uma solução globalmente ótima pode ser
-calculada a partir de soluções localmente ótimas
-\begin{itemize}
-\item Exemplo: o teorema sobre $\proc{Greedy-Scheduler}$
-\item Considera uma solução globalmente ótima ($A$).
-\item Mostra que pode se construir uma solução globalmente ótima a partir
-da escolha gulosa ($A - \{ A_1 \} \cup \{ 1 \}$).
-\item Mostrar por indução que a escolha gulosa pode ser repetida.
-\item uma escolha localmente ótima produz uma instância menor do
-mesmo problema de otimização.
-\item \alert{sub-estrutura ótima}
-\end{itemize}
+\item recursão + memorização das soluções dos sub-problemas
 \end{itemize}
 
 \end{frame}
 
-%%%%% SLIDE %%%%%
-
 \begin{frame}
-\frametitle{Programação dinâmica e algoritmos gulosos}
-\framesubtitle{Comparação}
+
+\frametitle{Exemplo 1}
+\framesubtitle{Resolução computational}
 
 \begin{itemize}
-\item Compartilham a propriedade de sub-estrutura ótima
-\item Porém não são equivalentes!
-\item Exemplos:
-\begin{itemize}
-\item problema da mochila 0-1 (ver aula 27)
-\item problema da mochila: itens tem pesos e valores, mas é possível fracionar
-  cada item.
-\end{itemize}
-\item Uma instância: \item $K = 50$, $v_1 = 60$, $w_1 = 10$, $v_2 = 100$, $w_2 = 20$, $v_3 = 120$, $w_1 = 30$, 
-\begin{itemize}
-\item Qual a solução ótima no caso da mochila $0-1$?
-\item Qual a solução ótima no caso da mochila?
-\end{itemize}
-\item Qual pode ser resolvido apenas com programação dinâmica, por que?
-\pause
-\item Como resolver o problema da mochila com um algoritmo guloso?
-\end{itemize}
-\end{frame}
-
-%%%%% SLIDE %%%%%
-
-\begin{frame}
-\frametitle{Exercícios}
-\begin{enumerate}
-\item Demonstrar que o problema da mochila pode ser resolvido de forma gulosa.
-\item Projetar um algoritmo guloso para solucionar o problema da mochila.
-\end{enumerate}
-\end{frame}
-
-%%%%% SLIDE %%%%%
-\section{Exemplo avançado: códigos de Huffman}
-\begin{frame}
-\frametitle{Códigos de Huffman}
-\framesubtitle{Um exemplo avançado}
-
-\begin{itemize}
-\item Utilizado para compactar dados
-\item Dados: sequências de símbolos
-\item Necessita conhecer a frequência de cada símbolo
-\item Atribui código de tamanho menor para símbolos mais frequentes
-\item Alocação de código: algoritmo guloso
-\end{itemize}
-
-\end{frame}
-
-%%%%% SLIDE %%%%%
-\begin{frame}
-\frametitle{Ilustração}
-\framesubtitle{Um exemplo avançado}
-
-\begin{itemize}
-\item arquivo de tamanho 100.000 símbolos
-\item seis símbolos diferentes
-\item hipótese: codificação binária
-\item 3 bits por símbolo
-\item custo total (sem compactação): 300 kbits
-\end{itemize}
-\pause
-\begin{center}
-\begin{tabular}{r|c|c|c|c|c|c|}
-& a & b & c & d & e & f \\
-\hline
-frequência & 45 & 13 & 12 & 16 & 9 & 5 \\
-código de tamanho fixo & 000 & 001 & 010 & 011 & 100 & 101 \\
-código de tamanho variável & 0 & 101 & 100 & 111 & 1101 & 1100
-\end{tabular}
-Custo com código de tamanho variável: 224 kbits ($\approx 25\%$)
-\end{center}
-\end{frame}
-
-%%%%% SLIDE %%%%%
-
-\begin{frame}
-\frametitle{Códigos livres de prefixo}
-
-\begin{center}
-\begin{tabular}{r|c|c|c|c|c|c|}
-& a & b & c & d & e & f \\
-\hline
-código de tamanho variável & 0 & 101 & 100 & 111 & 1101 & 1100
-\end{tabular}
-\end{center}
-
-\begin{definition}[Código livre de prefixo]
-Um código é livre de préfixo se, para qualquer par de símbolos $s_1, s_2$
-a codificação de $s_1$ não é prefixo da codificação de $s_2$.
-\end{definition}
-
-\begin{itemize}
-\item O código na tabela é livre de prefixo
-\item Qual texto representa $0101100$? e $101001101$?
-\item Por que é possível decodificar?
-\end{itemize}
-\end{frame}
-
-%%%%% SLIDE %%%%%
-
-\begin{frame}
-\frametitle{Códigos livres de prefixo}
-
-\begin{itemize}
-\item Decodificação é simples
-\item Qual estrutura de dados utilizar para uma decodificação eficiente?
-\pause
-\item Árvore binária
-\begin{itemize}
-\item sem sub-árvore: símbolo decodificado no vértice
-\item 0: selecionar sub-árvore esquerda
-\item 1: selecionar sub-árvore direita
-\item Exemplo:
-\begin{center}
-\begin{tabular}{r|c|c|c|c|c|c|}
-& a & b & c & d & e & f \\
-\hline
-frequência & 45 & 13 & 12 & 16 & 9 & 5 \\
-código de tamanho fixo & 000 & 001 & 010 & 011 & 100 & 101 \\
-código de tamanho variável & 0 & 101 & 100 & 111 & 1101 & 1100
-\end{tabular}
-\end{center}
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-%%%%% SLIDE %%%%%
-
-\begin{frame}
-\frametitle{Códigos livres de prefixo}
-\framesubtitle{}
-\begin{itemize}
-\item codificação ótima: árvore binária cheia
-\begin{itemize}
-\item cada vértice ou é uma folha, ou tem duas sub-árvores não vazias
-\end{itemize}
-\item Seja $T$ uma árvore de codificação ótima. Dada a frequência $f(A, c)$ de cada
-  caractere $c$ em um arquivo $A$, qual o tamanho da representação de $A$ com
-  $T$?  \pause
-$$ B(A, T) = \sum_{c} f(A, c) d_T(c) \text{ onde $d_T(c)$ é a profundidade de
-    $c$ em $T$} $$
-é o \alert{custo} de $T$.
-\pause
-\item Dada $f(A, c)$ para cada $c$, como construir uma árvore de codificação ótima? \pause \alert{Códificação de Huffman}
-
-\end{itemize}
-\end{frame}
-
-%%%%% SLIDE %%%%%
-
-\begin{frame}
-\frametitle{Codificação de Huffman}
-\framesubtitle{Um pouco de história}
-
-\begin{itemize}
-\item David Huffman inventou a codificação de Huffman em 1952
-\item doutorando no M.I.T.
-\item avaliação da disciplina \emph{Teoria da Informação}: 
-\begin{itemize}
-\item exame escrito, ou
-\item escrever um artigo original sobre o tema ``codificação binária ótima''
-\end{itemize}
-\item desenvolveu a ideia, que era melhor que as existentes (inclusive do
-  docente da disciplina)
-\end{itemize}
-\end{frame}
-
-%%%%% SLIDE %%%%%
-
-\begin{frame}
-\frametitle{Construção do código de Huffman}
-\framesubtitle{Princípios}
-\begin{itemize}
-\item construção incremental da árvore
 \item abordagem ascendente
-\item inicia com uma floresta de $|C|$ folhas
-\item realiza $|C|-1$ etapas de ``junção'' para criar a árvore final:
 \begin{itemize}
-\item \alert<2>{escolher} duas árvores $T_i$, $T_j$ da floresta
-\item criar uma nova sub-árvore que tem $T_i$ e $T_j$ como sub-árvores.
+\item iniciar dos sub-problemas mais simples possíveis
+\item calcular sub-problemas cada vez maiores
+\item $\id{fib}(0), \id{fib}(1), \id{fib}(2), \ldots , \id{fib}(n)$.
 \end{itemize}
-\pause
-\item \alert{como escolher?}
+\item abordagem descendente
+\begin{itemize}
+\item quebrar o problema em sub-problemas mais simples
+\item solucionar os sub-problemas gerados
+\item $\id{fib}(n), \id{fib}(n-1), \id{fib}(n-2), \id{fib}(n-3) \ldots , \id{fib}(0)$.
+\item \alert{memorizar} as soluções já calculadas
 \end{itemize}
+\end{itemize}
+
 \end{frame}
 
-%%%%% SLIDE %%%%%
-
 \begin{frame}
-\frametitle{Construção do código de Huffman}
-\framesubtitle{Algoritmo}
+
+\frametitle{Exercício}
 
 \begin{itemize}
-\item $\attrib{v}{f}$ frequência dos caracteres da sub-árvore enraizada em $v$
-\item $\attrib{v}{c}$ caractere no vértice-folha $v$.
+\item Escrever um algoritmo para calcular $\id{fib}(n)$ utilizando a abordagem
+ascendente
+\item Escrever um algoritmo para calcular $\id{fib}(n)$ utilizando a abordagem
+descendente
+\end{itemize}
+
+\end{frame}
+
+\section{Exemplo intermediário}
+
+\begin{frame}
+\frametitle{Exemplo: um problema de tabuleiro}
+
+\begin{itemize}
+\item É dado um tabuleiro $N \times M$ tal que há um custo $C_{i, j}$ associado
+  à sub-divisão da linha $i$ e da coluna $j$.
+
+\item Projetar um algoritmo que determina o menor custo para atravessar o
+  tabuleiro da primeira até a última linha?
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Análise do problema}
+
+\begin{itemize}
+
+\item Se $M=1$, há um único caminho possível
+
+\item Se $M \ge 2$, quantos caminhos são possíveis?
+
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+\hline
+1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+\hline
+2 & 3 & 3 & 3 & 3 & 3 & 3 & 3 & 2 \\
+\hline
+5 & 8 & 9 & 9 & 9 & 9 & 9 & 8 & 2 \\
+\hline
+13 & 22 & 26 & 27 & 27 & 27 & 26 & 22 & 13 \\
+\hline
+\end{tabular}
+
+\item para cada sub-divisão: $\Omega(2^{N-1})$ e $O(3^{N-1})$ caminhos
+
+\item total: $\Omega(M \cdot 2^{N-1})$ e $O(M \cdot 3^{N-1})$ caminhos
+
+\item exponencial
+
+\item muitos caminhos possuem trechos comuns 
+
+\begin{itemize}
+
+\item \alert{sub-problemas sobrepostos}
+
+\end{itemize}
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Análise do problema}
+
+\begin{itemize}
+\item Como calcular o menor custo para uma sub-divisão?
+
+\item $P_{i, j}$: custo da sub-divisão $(i, j)$
+
+\item $C_{i, j}$: menor custo para chegar à divisão $(i, j)$
+
+\item $i > 1$, sub-divisão fora da borda:
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+$C_{i-1, j-1}$ & $C_{i-1, j}$ & $C_{i-1, j+1}$ \\
+\hline
+              & $P_{i, j}$ &  \\
+\hline
+\end{tabular}
+\end{center}
+\item $C_{i, j} = P_{i, j} + \min \{ C_{i-1, j-1}, C_{i-1, j}, C_{i-1, j+1} \}$
+
+\item $i > 1$, sub-divisão na borda:
+\begin{center}
+\begin{tabular}{ccc}
+\begin{tabular}{|c|c|}
+\hline
+$C_{i-1, 1}$ & $C_{i-1, 2}$ \\
+\hline
+$P_{i, 1}$ &  \\
+\hline
+\end{tabular}
+& ou &
+\begin{tabular}{|c|c|}
+\hline
+$C_{i-1, M-1}$ & $C_{i-1, M}$ \\
+\hline
+              & $P_{i, M}$ \\
+\hline
+\end{tabular}
+\end{tabular}
+\end{center}
+\item $C_{i, 1} = P_{i, 1} + \min \{ C_{i-1, 1}, C_{i-1, 2}$
+ou $C_{i, M} = P_{i, M-1} + \min \{ C_{i-1, 1}, C_{i-1, M}$
+
+\begin{itemize}
+
+\item \alert{sub-estrutura ótima}
+
+\end{itemize}
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Algoritmo}
+
+\begin{itemize}
+\item Queremos calcular $C[i, j]$ para cada $i, j$.
+\item Concluído este cálculo, basta determinar o menor valor 
+entre os $C[N, j]$.
 \end{itemize}
 \begin{small}
 \begin{codebox}
-\Procname{$\proc{Huffman-Code}(C)$}
-\zi \assert{\Comment $Q$: fila de prioridade com chave $\attrib{v}{f}$}
-\li \For $c \in C$
-\li \Do $v \gets \proc{Alloc-Vertex}()$
-\li   $\attrib{v}{f} \gets \attrib{c}{f}$
-\li   $\attrib{v}{val} \gets c$
-\li   $\proc{Push-Back}(Q, v)$
+\li \For $j = 1 \To M$
+\li \Do $C[1, j] \gets P[1, j]$
     \End
-\li $\proc{Make-Heap}(Q, v)$
-\li \For $i \gets 1 \To |C|-1$
-\li \Do $v \gets \proc{Alloc-Vertex}()$
-\li   $l \gets \attrib{v}{left} \gets \proc{Extract-Min}(Q)$
-\li   $r \gets \attrib{v}{right} \gets \proc{Extract-Min}(Q)$
-\li   $\attrib{v}{f} \gets \attrib{l}{f} + \attrib{r}{f}$
-\li   $\proc{Insert}(Q, v)$
+\li \For $i = 2 \To N$
+\li \Do $C[i, 1] \gets P[i, 1] + \min \{ C[i-1, 1], C[i-1, 2] \}$
+\li   $C[i, M] \gets P[i, M] + \min \{ C[i-1, M-1], C[i-1, M] \}$
+\li   \For $j = 2 \To M-1$
+\li   \Do $C[i, j] \gets P[i, j] + \min \{ C[i-1, j-1], C[i-1, j], C[i-1, j+1] \}$
+      \End
     \End
-\li \Return $\proc{Extract-Min}(Q)$
+\li $\id{res} \gets C[N, 1]$
+\li \For $j = 2 \To N$
+\li \Do \If $C[N, j] < \id{res}$
+\li    \Then $\id{res} \gets C[N, j]$
+       \End
+    \End
+\li \Return $\id{res}$
 \end{codebox}
 \end{small}
 \end{frame}
 
-%%%%% SLIDE %%%%%
-
 \begin{frame}
-\frametitle{Ilustração}
 
-\begin{center}
-\begin{tabular}{r|c|c|c|c|c|c|}
-& a & b & c & d & e & f \\
-\hline
-frequência & 45 & 13 & 12 & 16 & 9 & 5
-\end{tabular}
-\end{center}
+\frametitle{Algoritmo}
 
-\begin{center}
-quadro
-\end{center}
-\end{frame}
-%%%%% SLIDE %%%%%
-
-\begin{frame}
-\frametitle{Complexidade}
-\framesubtitle{Construção do código de Huffman}
-
-\only<1>{
+\begin{small}
 \begin{codebox}
-\Procname{$\proc{Huffman-Code}(C)$}
-\zi \assert{\Comment{$Q$: fila de prioridade com chave $\attrib{v}{f}$}}
-\li \For $c \in C$ \assert{\Comment{$\Theta(|C|)$ iterações}}
-\li \Do $v \gets \proc{Alloc-Vertex}()$
-\li   $\attrib{v}{f} \gets \attrib{c}{f}$
-\li   $\attrib{v}{val} \gets c$
-\li   $\proc{Push-Back}(Q, v)$
+\li \For $j = 1 \To M$ \only<2>{\assert{\Comment $\Theta(M)$}}
+\li \Do $C[1, j] \gets P[1, j]$
     \End
-\li $\proc{Make-Heap}(Q, v)$  \assert{\Comment{\textit{heap\/} binário $\Theta(|C|)$}}
-\li \For $i \gets 1 \To |C|-1$ \assert{\Comment{$|C|$ iterações}}
-\li \Do $v \gets \proc{Alloc-Vertex}()$
-\li   $l \gets \attrib{v}{left} \gets \proc{Extract-Min}(Q)$ \assert{\Comment{$\Theta(\lg |C|)$}}
-\li   $r \gets \attrib{v}{right} \gets \proc{Extract-Min}(Q)$ \assert{\Comment{$\Theta(\lg |C|)$}}
-\li   $\attrib{v}{f} \gets \attrib{l}{f} + \attrib{r}{f}$
-\li   $\proc{Insert}(Q, v)$ \assert{\Comment  $\Theta(\lg |C|)$}
+\li \For $i = 2 \To N$  \only<2>{\assert{\Comment $\Theta(N)$ repetições}}
+\li \Do $C[i, 1] \gets P[i, 1] + \min \{ C[i-1, 1], C[i-1, 2] \}$
+\li   $C[i, M] \gets P[i, M] + \min \{ C[i-1, M-1], C[i-1, M] \}$
+\li   \For $j = 2 \To M-1$  \only<2>{\assert{\Comment $\Theta(M)$ repetições}}
+\li   \Do $C[i, j] \gets P[i, j] + \min \{ C[i-1, j-1], C[i-1, j], C[i-1, j+1] \}$
+      \End
     \End
-\li \Return $\proc{Extract-Min}(Q)$ \assert{\Comment{$\Theta(\lg |C|)$}}
+\li $\id{res} \gets C[N, 1]$
+\li \For $j = 2 \To N$
+\li \Do \If $C[N, j] < \id{res}$
+\li    \Then $\id{res} \gets C[N, j]$
+       \End
+    \End
+\li \Return $\id{res}$
 \end{codebox}
-}
-\only<2>{
-\begin{center}
-\alert{$\Theta |C| \lg |C|$}
-\end{center}
-}
-\end{frame}
-%%%%% SLIDE %%%%%
+\end{small}
 
-\begin{frame}
-\frametitle{Construção do código de Huffman}
-\framesubtitle{Correção}
-
-\begin{lemma}
-Seja $C$ um alfabeto, e $\attrib{c}{f}$ a frequência de cada caractere em
-$C$.  Se $x$ e $y$ são os caracteres com a menor frequência em $C$, então existe
-um código livre de prefixo ótimo para $C$, onde a códificação de $x$ e a de $y$
-tem mesmo comprimento e diferem apenas no último bit.
-\end{lemma}
-
-Roteiro da prova
-\begin{itemize}
-\item Considerar uma árvore $T$ representando um código livre de prefixo ótimo
-  \alert{qualquer}
-\item Construir uma árvore $T'$ a partir de $T$ onde as codificações de $x$ e $y$ têm
-  as propriedades enunciadas.
-\item $x$ e $y$ devem ser irmãos de profundidade máxima em $T'$.
-\end{itemize}
-
+Complexidade? \pause \alert{$\Theta(N M)$}
 \end{frame}
 
-%%%%% SLIDE %%%%%
-
 \begin{frame}
-\frametitle{Construção do código de Huffman}
-\framesubtitle{Correção}
-
-\begin{proof}
-\begin{itemize}
-\only<1>{\item Seja uma árvore $T$ representando um código livre de prefixo ótimo qualquer.}
-\item Seja $b$ e $c$ dois vizinhos na profundidade máxima, $\attrib{b}{f} \le \attrib{c}{f}$
-
-\item Seja $x$ e $y$ os dois caracteres com a menor frequência, $\attrib{x}{f} \le \attrib{y}{f}$
-
-\item Temos $\attrib{x}{f} \le \attrib{b}{f}$ e $\attrib{y}{f} \le \attrib{c}{f}$
-
-\item $T'$ é obtido a partir de $T$ trocando $x$ e $b$.
-\pause
-\only<2>{
-{\small
-$
-\begin{array}{l}
-B(T) - B(T') \\
-\begin{array}{rcl}
-\quad & = & \sum_c \attrib{c}{f} \cdot d_T(c) - \sum_c \attrib{c}{f} \cdot d_{T'}(c) \\
-& = & \attrib{x}{f} \cdot d_T(x) + \attrib{b}{f} \cdot d_T(b) - \attrib{x}{f}\cdot d_{T'}(x) + \attrib{b}{f} \cdot d_{T'}(b) \\
-& = & \attrib{x}{f} \cdot d_T(x) + \attrib{b}{f} \cdot d_T(b) - \attrib{x}{f} \cdot d_{T}(b) + \attrib{b}{f} \cdot d_{T}(x) \\
-& = & (\attrib{b}{f} - \attrib{x}{f})\cdot(d_T(b) - d_{T}(x)) \\
-& = & \underbrace{(\attrib{b}{f} - \attrib{x}{f})}{\ge 0}\cdot\underbrace{(d_T(b) - d_{T}(x))}{\ge 0} \\
-& \ge & 0
-\end{array}
-\end{array}
-$}
-}
-\only<3>{
-\item $T''$ é obtido a partir de $T'$ trocando $y$ e $c$.
-\item Similarmente, mostramos que $B(T'') \le B(T') \le B(T)$.
-\item Mas $B$ tem custo mínimo, logo $B(T) \le B(T'')$.
-\item Conclusão: $B(T'') = B(T)$ e $T''$, onde a códificação de $x$ e a
-  de $y$ tem mesmo comprimento e diferem apenas no último bit, representa um
-  código livre de prefixo ótimo.
-}
-\end{itemize}
-\end{proof}
-\end{frame}
-
-%%%%% SLIDE %%%%%
-
-\begin{frame}
-\frametitle{Construção do código de Huffman}
-\framesubtitle{Correção}
-
-\begin{lemma}
-Seja $T$ uma árvore binária cheia representando um código livre de prefixo ótimo
-para um alfabeto $C$, com frequência $\attrib{c}{f}$ para cada $c$ em $C$.  
-
-Se $x$ e $y$ são duas folhas vizinhas em $T$, e $z$ o ascendente imediato
-dessas folhas. Então, considerando $z$ como um caractere de frequência $\attrib{x}{f} + \attrib{y}{f}$,
-a árvore $T' = T - \{ x, y \}$ representa código livre de prefixo ótimo para
-o alfabeto $C'= C - \{ x, y \} \cup \{ z \}$.
-
-\end{lemma}
-
-Roteiro da prova
-\begin{itemize}
-\item Relacionar o custo de $T$ com o custo de $T'$
-\item Mostrar, por contradição, que $T'$ é representa um código livre de prefixo ótimo.
-\end{itemize}
-
-\end{frame}
-
-%%%%% SLIDE %%%%%
-
-\begin{frame}
-\frametitle{Construção do código de Huffman}
-\framesubtitle{Correção}
-
-\begin{proof}
-\begin{itemize}
-\item hipótese inicial: $T$ representa um código livre de prefixo ótimo;
-\item Relacionar o custo de $T$ com o custo de $T'$:
-$
-\begin{array}{rcl}
-B(T) & = & 
-\only<1>{
-\sum_{c \in T} \attrib{c}{f} \cdot d_T(c) \\
-  & = & \sum_{c \in T-\{x, y\}} \attrib{c}{f} \cdot d_T(c) + \attrib{x}{f} \cdot d_T(x) + \attrib{y}{f} \cdot d_T(y) \\
-  & = & (\sum \cdots) + \attrib{x}{f} \cdot (d_{T'}(z)+1) + \attrib{y}{f} \cdot (d_{T'}(z)+1) \\
-  & = & (\sum \cdots) + (\attrib{x}{f} + \attrib{y}{f}) \cdot d_{T'}(z) + \attrib{x}{f} + \attrib{y}{f} \\
-  & = & (\sum \cdots) + \attrib{x}{f} + \attrib{y}{f} \\
-  & = & \sum_{c \in T'} \attrib{c}{f} \cdot d_{T'}(c) + \attrib{x}{f} + \attrib{y}{f} \\
-  & = & 
-}
-B(T') + \attrib{x}{f} + \attrib{y}{f}
-\end{array}
-$
-\only<2>{
-\item hipótese adicional: $T'$ não representa um código livre de prefixo ótimo:
-\begin{itemize}
-\item Logo, existe $T''$ ótimo para $C'$, tal que $B(T'') < B(T')$.
-\item $z$ é uma folha em $T'$ e em $T''$.
-\item Substituindo $z$ por $x$ e $y$ em $T''$, obtemos uma nova árvore para $C$, que tem custo menor que $T$.
-\alert{Contradição}
-\end{itemize}
-}
-\end{itemize}
-\end{proof}
-\end{frame}
-
-%%%%% SLIDE %%%%%
-
-\begin{frame}
-\frametitle{Construção do código de Huffman}
-\framesubtitle{Correção}
-
-\begin{theorem}
-O algoritmo $\proc{Huffman-Code}$ produz uma árvore que representa um código livre de prefixo ótimo para $C$.
-\end{theorem}
-
-\begin{proof}
-A partir dos lemas anteriores.
-\end{proof}
-
-\end{frame}
-
-%%%%% SLIDE %%%%%
-
-\begin{frame}
-\frametitle{Exercícios}
+\frametitle{Exercício}
 
 \begin{enumerate}
-\item Explique por quais motivos $\proc{Huffman-Code}$ é um algoritmo guloso.
-\item Demonstrar que uma árvore binária não cheia não pode representar um código livre de prefixo ótimo.
-\item Construir um código livre de prefixo ótimo para o alfabeto e as frequências seguintes:
+\item Adapte o algoritmo anterior para imprimir o caminho menos custoso
+para atravessar o tabuleiro.
+\end{enumerate}
+\end{frame}
+
+\section{Exemplo avançado}
+
+\begin{frame}
+\frametitle{Exemplo: o problema da multiplicação de matrizes}
+
+\begin{itemize}
+\item É dada uma sequência de matrizes de tamanho $L_1 \times C_1$, $L_2 \times
+  C_2, \ldots L_n \times C_n$, tal que $L_i = C_{i+1}$, para $1 \le i < n$.
+
+\begin{itemize}
+\item exemplo: $A_1: 10 \times 100, A_2: 100 \times 5, A_3: 5 \times 50$
+\item $(A_1 \cdot A_2) \cdot A_3$: $10 \cdot 100 \cdot 5 + 10 \cdot 5 \cdot 50 = 7.500$
+\item $A_1 \cdot (A_2 \cdot A_3)$: $100 \cdot 5 \cdot 50 + 10 \cdot 100 \cdot 50 = 75.000$
+\end{itemize}
+\item Projetar um algoritmo que determina a ordem ótima de realizar as
+  multiplicações (aquela que minimiza o número de operações entre elementos de
+  matrizes).
+\item Notação: $A_i$ tem dimensão $p_{i-1} \times p_i$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Análise do problema}
+
+\begin{itemize}
+\item Para $n$ matrizes: quantas maneiras existem de calcular o produto delas?
+\item $N$ matrizes podem ser divididas de $n-1$ formas diferentes:
+$A_1$ e $(A_2 \ldots A_n)$, $(A_1, A_2)$ e $(A_3 \ldots A_n)$, etc.
+\item Seja $\pi(n)$ o número de maneiras que podemos calcular o produto de $N$ matrizes.
 $$
-a: 1, b: 1, c: 2, d: 3, e: 5, f: 8, g: 13, h: 21
+  \begin{array}[t]{rcl}
+    \pi(1) & = & 1 \\
+    \pi(n) & = & \pi(1) \cdot \pi(n-1) + \pi(2) \cdot \pi(n-2) + \cdots + \pi(n-1) \cdot \pi(1) \\
+    & = & \sum_{k=1}^{n-1} \pi(k) \cdot \pi(n-k) \\
+    & = & \frac{1}{n}\left( \begin{array}{c} 2n-2 \\ n-1 \end{array} \right) \\
+    & \in & \Omega(4^n / n^{3/2})
+  \end{array}
 $$
-\item Construir um código livre de prefixo ótimo para um alfabeto cujas
-  frequências correspondem à sequência de Fibonacci.
-\item Caracterizar instâncias do problema tal que todas as codificações do
-  código livre de prefixo ótimo tenham o mesmo comprimento.
+\item crescimento \alert{exponencial}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Análise da estrutura do problema}
+
+\begin{itemize}
+\item Seja $A_1, \ldots A_n$ as matrizes a multiplicar.
+\item Seja $A_{i \twodots j}$ o resultado da multiplicação de $A_i \ldots A_j$
+\item Um agrupamento ótimo para $A_1 \ldots A_n$ divide em dois grupos
+$A_1 \ldots A_k$ e $A_{k+1} \ldots A_n$.
+\item O custo do agrupamento ótimo é o custo de calcular de forma ótima
+$A_{1 \twodots k}$ e $A_{k+1 \twodots n}$, mais o custo de multiplicar essas
+duas matrizes.
+\item Um agrupamento ótimo para calcular $A_{1 \twodots n}$ deve incluir 
+agrupamentos ótimos para calcular $A_{1 \twodots k}$ e $A_{k+1 \twodots n}$.
+\item e \alert{sub-estrutura ótima}
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+
+\frametitle{Análise dos sub-problemas}
+
+\begin{itemize}
+\item sub-problemas: qual o custo mínimo para calcular $A_i \ldots A_j$, onde $1 \le i \le j \le n$?
+\item seja $m[i, j]$ este custo
+\item queremos calcular $m[1, n]$
+\item caso de base: $i = j$
+\begin{itemize}
+\item nenhuma operação: $m[i, i] = 0$, para $1 \le i \le n$
+\end{itemize}
+\item caso geral:
+\begin{itemize}
+\item se dividir em $k$: $m[i, j] = m[i, k] + m[k, j] + p_{i-1}p_kp_j$.
+\item logo $m[i, j] = \min \{ m[i, j] = m[i, k] + m[k, j] + p_{i-1}p_kp_j \cdot i \le k < j \}$ se $i < j$
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Análise dos sub-problemas}
+
+\begin{itemize}
+\item sub-problemas: qual índice $k$, tal que $i \le k < $, dividir $A_i \ldots A_j$, em $A_{i \twodots k}$ e $A_{k+1 \twodots j}$, onde $1 \le i \le j \le n$?
+\item seja $s[i, j]$ este índice
+\item $s[i, j]$ é o índice que minimiza $m[i, k] + m[k, j] + p_{i-1}p_kp_j$.
+\item há $\Theta(n^2)$ sub-problemas no total
+\item um cálculo recursivo descendente necessita solucionar
+repetidas vezes o mesmo problema
+\item \alert{sub-problemas sobrepostos}
+\item abordagem ascendente: cálculo de $m[i, j]$, $s[i, j]$ após ter
+  calculado os sub-problemas contidos
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Algoritmo}
+
+\begin{codebox}
+\li $n \gets \attrib{p}{length} - 1$
+\li \For $i = 1$ \To $n$
+\li   \Do $m[i, i] \gets 0$
+    \End
+\li \For $l \gets 2$ \To $n$
+\li \Do \For $i \gets 1$ \To $n-l+1$
+\li   \Do $j \gets i+l-1$
+\li     $m[i, j] \gets \infty$
+\li     \For $k \gets 1$ \To $j-1$
+\li     \Do $q \gets m[i, k]+m[k+1, j]+p_{i-1}p_kp_j$
+\li       \If $q < m[i, j]$
+\li       \Then $m[i, j] \gets q$
+\li         $s[i, j] \gets k$
+          \End
+        \End
+      \End
+    \End
+\li \Return $m$ and $s$
+\end{codebox}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Algoritmo}
+\frametitle{Ilustração}
+
+\begin{tabular}{c|c}
+matriz & dimensão \\
+\hline
+$A_1$ & $ 30 \times 35$ \\
+$A_2$ & $ 35 \times 15$ \\
+$A_3$ & $ 15 \times 5$ \\
+$A_4$ & $ 5 \times 10$ \\
+$A_5$ & $ 10 \times 20$ \\
+$A_6$ & $ 20 \times 25$
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Algoritmo}
+
+{ \center \alert{Complexidade?}}
+
+\begin{codebox}
+\li $n \gets \attrib{p}{length} - 1$
+\li \For $i = 1$ \To $n$
+\li   \Do $m[i, i] \gets 0$
+    \End
+\li \For $l \gets 2$ \To $n$
+\li \Do \For $i \gets 1$ \To $n-l+1$
+\li   \Do $j \gets i+l-1$
+\li     $m[i, j] \gets \infty$
+\li     \For $k \gets 1$ \To $j-1$
+\li     \Do $q \gets m[i, k]+m[k+1, j]+p_{i-1}p_kp_j$
+\li       \If $q < m[i, j]$
+\li       \Then $m[i, j] \gets q$
+\li         $s[i, j] \gets k$
+          \End
+        \End
+      \End
+    \End
+\li \Return $m$ and $s$
+\end{codebox}
+\pause
+\alert{$\Theta(n^3)$}
+\end{frame}
+
+\begin{frame}
+\frametitle{Concluindo: multiplicando matrizes de forma ótima}
+
+\begin{codebox}
+\Procname{$\proc{Matrix-Product+}(A, s, i, j)$}
+\li \If $j > i$
+\li \Then $X \gets \proc{Matrix-Product+}(A, s, i, s[i, j])$
+\li    $Y \gets \proc{Matrix-Product+}(A, s, s[i, j]+1, j)$
+\li    \Return $\proc{Matrix-Multiply}(X, Y)$
+\li \Else \Return $A_i$
+    \End
+\end{codebox}
+
+\end{frame}
+
+\section{Exercícios}
+
+\begin{frame}
+
+\frametitle{Menor caminho entre duas arestas}
+
+\begin{center}
+\includegraphics{img/Shortest-path-optimal-substructure.png}
+\end{center}
+
+\begin{enumerate}
+\item sub-estrutura ótima: em um grafo conectado com pesos, a menor distância de
+  $u$ até $v$ pode ser calculada a partir da menor distância dos vértices
+  adjacentes a $u$ até $v$.
+\item sub-problemas sobrepostos: não calcular duas vezes o mesmo resultado
+\end{enumerate}
+\begin{itemize}
+\item recursão + memorização das soluções dos sub-problemas
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Exercício}
+
+\begin{enumerate}
+\item Escrever um algoritmo para calcular o menor caminho de $u$ até $v$
+  utilizando a abordagem ascendente
+\item Escrever um algoritmo para calcular o menor caminho de $u$ até $v$
+  utilizando a abordagem descendente
 \end{enumerate}
 
 \end{frame}
 
-\end{document}
+\begin{frame}
+\frametitle{Sub-conjunto de soma nula}
 
+\begin{itemize}
+\item É dada um conjunto de inteiros $\{v_1, v_2, \ldots v_n\}$.
+
+\item Projetar um algoritmo que determina se existe um sub-conjunto tal que a
+  soma dos elementos é nula.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Elementos de resposta}
+
+\begin{itemize}
+\item Quantos sub-conjuntos de $S = \{v_1, v_2, \ldots v_n\}$?
+\item Seja $N$ a soma dos números negativos de $S$
+\item Seja $P$ a soma dos números positivos de $S$
+\item Seja $Q(i, s)$ verdadeiro sse existe um sub-conjunto de 
+$\{v_1, v_2, \ldots v_i\}$ de soma $s$.
+\item Representar $Q$ por uma matriz $N+P+1 \times n$
+\item Calcular $Q(n, 0)$ soluciona o problema desejado
+\item Temos que 
+\begin{itemize}
+\item $Q(1, s) \leftrightarrow v_1 = s$
+\item para $i > 1$: $Q(i, s) \Leftrightarrow 
+  \begin{array}[t]{rlr}
+         & Q(i-1, s) & \text{$v_i$ não é somado} \\
+    \lor & Q(i-1, s-v_i) & \text{$v_i$ é somado} \\
+    \lor & s = x_i & \text{a soma é apenas $v_i$}
+  \end{array}$
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Exercício}
+
+\begin{itemize}
+\item Projetar um algoritmo para solucionar este problema usando
+programação dinâmica.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{O problema da mochila 0-1}
+
+\begin{itemize}
+\item É dada um conjunto de $N$ itens, cada um com seu valor $v_i$ e seu peso
+  $w_i$, e uma mochila, que tem uma capacidade máxima $K$.
+
+\item Projetar um algoritmo que determinar o valor máximo que pode ser
+  transportado na mochila.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Elementos de resposta}
+
+\begin{itemize}
+\item Quantas possibilidades temos?
+
+\item Porque o problema tem uma sub-estrutura ótima?
+
+\item Porque este problema tem sub-problemas sobrepostos?
+
+\pause
+\item Seja $C(i, m)$ o valor máximo carregável considerando 
+  \begin{enumerate}
+    \item apenas os $i$ primeiros itens
+    \item uma capacidade máxima de $m$
+  \end{enumerate}
+
+\item Casos de base: $C(0, m) = \only<3>{0}$, $C(i, 0) = \only<3>{0}$
+\item Caso geral: se $w_i > m$, então $C(i, m) = \only<4>{C(i-1, m)}$
+\item Caso geral: se $w_i \le m$, então $C(i, m) = \only<5>{
+\max \{ C(i-1, m), v_i + C(i-1, m-w_i) \}}$
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Exercício}
+
+\begin{itemize}
+
+\item Utilizando programação dinâmica, projetar um algoritmo que soluciona o
+  problema da mochila 0,1.
+
+\item Adapte o algoritmo para imprimir os itens selecionados para compor a
+  solução ótima.
+\end{itemize}
+
+\end{frame}
+
+\end{document}

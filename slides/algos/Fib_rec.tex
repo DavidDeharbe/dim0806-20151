@@ -1,0 +1,10 @@
+\begin{codebox}
+\Procname{$\proc{Fib-Acc}(n, k, x, y)$}
+\li \If $n = k$ \kw{then} \Return $x+y$
+\li \Else \Return $\proc{Fib-Acc}(n, k+1, y, x+y)$
+\end{codebox}
+\begin{codebox}
+\Procname{$\proc{Fib-R}(n)$}
+\li \If $n \le 1$ \kw{then} \Return $n$
+\li \Else \Return $\proc{Fib-Acc}(n, 2, 0, 1)$
+\end{codebox}

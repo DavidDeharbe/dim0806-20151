@@ -1,0 +1,14 @@
+\begin{codebox}
+\Procname{$\proc{Mult-Matrix}(A, B, C)$}
+\li \For $i \gets 1$ \To $\id{NbLines}[A]$
+\li \Do
+      \For $j \gets 1$ \To $\id{NbCols}[B]$
+\li   \Do
+        $C[i,j] \gets 0$
+\li     \For $k \gets 1$ \To $\id{NbCols}[A]$
+\li     \Do
+        $C[i,j] \gets C[i,j] + A[i, k] \times B[k, j]$
+        \End    
+      \End    
+    \End    
+\end{codebox}

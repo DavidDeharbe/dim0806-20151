@@ -29,7 +29,7 @@
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
   Departamento de Informática e Matemática Aplicada}
-\date{23 de março de 2015}
+\date{}
 
 
 \begin{document}
@@ -387,7 +387,7 @@ $$A[l..u] = \langle 5, 3, 2, 6, 4, 1, 3, 7 \rangle$$
       elementos,
       \begin{itemize}
         \item a profundidade da recursão é $\Theta(\lg n)$, e
-        \item o custo em cada nível é $\Theta n$, logo
+        \item o custo em cada nível é $\Theta(n)$, logo
         \item o custo total é $\Theta(n \lg n)$.
       \end{itemize}
 
@@ -576,7 +576,7 @@ Prova:
       \lg n \sum_{m = \lceil n/2 \rceil}^{n-1} m} \\
     \only<4->{ & = & \lg n \sum_{m=1}^{n-1} m - \sum_{m = 1}^{\lceil n/2 \rceil-1} m}  \\
     \only<5->{ & \le & \frac{1}{2}n(n-1)\lg n - \frac{1}{2}(\frac{n}{2} - 1)\frac{n}{2} }\\
-    \only<6->{ & \le & \assert{\frac{1}{2}n^2\lg n - \frac{1}{8}N^2}}
+    \only<6->{ & \le & \assert{\frac{1}{2}n^2\lg n - \frac{1}{8}n^2}}
     \end{array}
   $$
   \only<2>{\begin{itemize}

@@ -13,13 +13,14 @@
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
   Departamento de Informática e Matemáica Aplicada}
-\date{04 de maio de 2015}
+\date{}
 
 \begin{document}
 \selectlanguage{brazil}
 
 \begin{frame}
   \titlepage
+  Download me from \url{http://DavidDeharbe.github.io}.
 \end{frame}
 
 \begin{frame}
@@ -81,13 +82,11 @@
     \zi \Comment $A$ é um arranjo de $k$ bits
     \li $i \gets 0$
     \li \While $i < \id{length}[A] \mbox{ and } A[i] = 1$
-    \li \Do 
-    \li   $A[i] \gets 0$
+    \li \Do $A[i] \gets 0$
     \li   $i \gets i + 1$
         \End
     \li \If $i < \id{length}[A]$
-    \li \Then
-    \li    $A[i] \gets 1$
+    \li \Then $A[i] \gets 1$
         \End
   \end{codebox}
 
@@ -213,13 +212,11 @@ Quanto pagar para executar $n$ operações?
     \zi \Comment $A$ é um arranjo de $k$ bits
     \li $i \gets 0$
     \li \While $i < \id{length}[A] \mbox{ and } A[i] = 1$
-    \li \Do 
-    \li   $A[i] \gets 0$
+    \li \Do $A[i] \gets 0$
     \li   $i \gets i + 1$
         \End
     \li \If $i < \id{length}[A]$
-    \li \Then
-    \li    $A[i] \gets 1$
+    \li \Then $A[i] \gets 1$
         \End
   \end{codebox}
 
@@ -687,342 +684,24 @@ O custo amortizado de uma remoção é \alert{2} no máximo.
 \end{itemize}
 \end{frame}
 
-\section{Árvores chanfradas}
-
 \begin{frame}
-\frametitle{Árvores chanfradas}
-\framesubtitle{\it splay trees}
+\frametitle{Arranjos dinâmicos}
+\framesubtitle{Exercício}
 
-\begin{itemize}
-\item árvores binárias de busca
-\item auto-ajustáveis
-\item não necessitam de atributos adicionais
-\item complexidade amortizada $O(\log n)$
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Árvores chanfradas}
-
-\begin{itemize}
-\item uma única operação básica: chanfrar
-\begin{itemize}
-\item $\proc{Splay}(T, k)$: chanfra a árvore $T$ com relação ao valor $k$
-\item no término da operação $k$ está na raiz (ou o maior valor $< k$,
-ou o menor valor $> k$
-\end{itemize}
-\item busca, inserção e remoção são todas realizadas após chanfrar a árvore
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Realização das operações e o chanframento}
-
-\begin{itemize}
-\item uma única operação básica: chanfrar
-\begin{itemize}
-\item $\proc{Splay}(T, k)$: chanfra a árvore $T$ com relação ao valor $k$
-\item busca a chave $k$
-\item remaneja $T$ tal que $k$ fica na raiz (ou o maior valor $< k$,
-ou o menor valor $> k$
-\end{itemize}
-\item busca, inserção e remoção são todas realizadas após chanfrar a árvore
-\begin{itemize}
-\item $\proc{Search}(T, k)$: $\proc{Splay}(T, k)$ e consulta a raiz
-\item $\proc{Insert}(T, k)$: $\proc{Splay}(T, k)$ e insere $k$ na raiz
-\item $\proc{Remove}(T, k)$: $\proc{Splay}(T, k)$, remove a raiz, $T_L$ e $T_R$ árvores resultantes, $\proc{Splay}(T_L, k)$, e torne $T_R$ a sub-árvore da nova raiz de $T_L$.
-\item $O(1)$ aplicações de $\proc{Splay}$ + $O(1)$ operações.
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Busca}
-
-\begin{itemize}
-\item $\proc{Search}(T, x)$: $\proc{Splay}(T, x)$ e consulta a raiz
-\end{itemize}
-
-\begin{tabular}{c}
-\includegraphics{fig/splay-remove-1.pdf} \pause \\
-$\proc{Splay}(T, x)$ \pause \\
-\includegraphics{fig/splay-remove-2.pdf}
-\end{tabular}
-
-\end{frame}
-
-\begin{frame}
-\frametitle{Inserção}
-
-\begin{itemize}
-\item $\proc{Insert}(T, k)$: $\proc{Splay}(T, k)$ e insere $k$ na raiz
-\end{itemize}
-
-\begin{tabular}{c}
-\only<1-3>{\includegraphics{fig/splay-insert-1.pdf} \\}
-\only<2-3>{$\proc{Splay}(T, x)$ \\}
-\only<3>{\includegraphics{fig/splay-insert-2.pdf} \\}
-\only<4>{\includegraphics[height=.2\textheight]{fig/splay-insert-2.pdf} \\}
-\only<5>{\includegraphics[height=.15\textheight]{fig/splay-insert-2.pdf} \\}
-\only<4-5>{$\attrib{n}{val} \gets x;$ \\}
-\only<4-5>{$\attrib{n}{left} \gets \attrib{\attrib{T}{root}}{left};$ \\}
-\only<4-5>{$\attrib{\attrib{T}{root}}{left} \gets \const{Nil};$ \\}
-\only<4-5>{$\attrib{n}{right} \gets \attrib{T}{root};$ \\}
-\only<4-5>{$\attrib{T}{root} \gets n$ \\}
-\only<5>{\includegraphics[height=.35\textheight]{fig/splay-insert-3.pdf}}
-\end{tabular}
-
-\end{frame}
-
-\begin{frame}
-\frametitle{Remoção}
-
-\begin{itemize}
-\item $\proc{Remove}(T, k)$: $\proc{Splay}(T, k)$, remove a raiz, $T_L$ e $T_R$ árvores resultantes, $\proc{Splay}(T_L, k)$, e torne $T_R$ a sub-árvore da nova raiz de $T_L$.
-\end{itemize}
-
-\begin{tabular}{c}
-\only<1-3>{\includegraphics{fig/splay-remove-1.pdf} \\}
-\only<2-3>{$\proc{Splay}(T, k)$ \\}
-\only<3-5>{\includegraphics{fig/splay-remove-2.pdf} \\}
-\only<4-5>{remove root: $n = \attrib{T}{root}; T_L = \attrib{n}{left}; T_R = \attrib{n}{right}; \proc{Free}(n)$ \\}
-\only<5-7>{\includegraphics{fig/splay-remove-3.pdf} \\}
-\only<6-7>{$\proc{Splay}(T_L, k)$ \\}
-\only<7-9>{\includegraphics{fig/splay-remove-4.pdf} \\}
-\only<8-9>{$\attrib{T_L}{right} \gets T_R$ \\}
-\only<9-10>{\includegraphics{fig/splay-remove-5.pdf}}
-\end{tabular}
-
-\end{frame}
-
-\begin{frame}
-\frametitle{Chanfrar um valor}
-
-\begin{itemize}
-\item aplicar rotações até chegar à raiz
-\item se $x$ for um filho da raiz: rotação simples (\alert{caso 1})
-\item $\attrib{x}{up} = y$ e $\attrib{y}{up} = z$
-\begin{itemize}
-\item se $x = \attrib{y}{left}$ e $y = \attrib{z}{left}$: rotação simples de $y$, rotação simples de $x$ (\alert{caso 2})
-\item se $x = \attrib{y}{right}$ e $y = \attrib{z}{right}$: rotação simples de $y$, rotação simples de $x$  (\alert{caso 2})
-\item se $x = \attrib{y}{right}$ e $y = \attrib{z}{left}$: rotação dupla de $x$  (\alert{caso 3})
-\item se $x = \attrib{y}{left}$ e $y = \attrib{z}{right}$: rotação dupla de $x$  (\alert{caso 3})
-\end{itemize}
-\item complexidade no pior caso $O(n)$
-\item análise amortizada mostra que todas as operações de chanframento tem
-custo amortizado $O(\log n)$
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Chanfrar um valor --- caso 1}
-\framesubtitle{se $x$ for um filho da raiz: rotação simples}
-
-\begin{tabular}{c}
-\includegraphics[height=.4\textheight]{fig/splay-1-1.pdf} \\
-$\proc{Rotate-Simple-Right}(x, y)$ \\
-\includegraphics[height=.4\textheight]{fig/splay-1-2.pdf}
-\end{tabular}
-
-\end{frame}
-
-\begin{frame}
-\frametitle{Chanfrar um valor --- caso 2}
-\framesubtitle{$x = \attrib{y}{left}$ e $y = \attrib{z}{left}$ (e simétrico)}
-
-\begin{tabular}{c}
-\includegraphics[height=.35\textheight]{fig/splay-2-1.pdf} \\
-$\proc{Rotate-Simple-Right}(y, z)$ \\
-$\proc{Rotate-Simple-Right}(x, y)$ \\
-\includegraphics[height=.35\textheight]{fig/splay-2-2.pdf}
-\end{tabular}
-
-\end{frame}
-
-\begin{frame}
-\frametitle{Chanfrar um valor --- caso 3}
-\framesubtitle{$x = \attrib{y}{right}$ e $y = \attrib{z}{left}$}
-
-\begin{tabular}{c}
-\includegraphics[height=.4\textheight]{fig/splay-3-1.pdf} \\
-$\proc{Rotate-Double-Right}(x, y, z)$ \\
-\includegraphics[height=.4\textheight]{fig/splay-3-2.pdf}
-\end{tabular}
-
-\end{frame}
-
-\begin{frame}
-\frametitle{Chanfrar um valor: exemplo}
-
-\begin{tabular}[t]{ccc}
-\includegraphics[height=.8\textheight]{fig/splay-do-1.pdf} &
-Caso 3 &
-\includegraphics[height=.7\textheight]{fig/splay-do-2.pdf}
-\end{tabular}
-
-\end{frame}
-
-\begin{frame}
-\frametitle{Chanfrar um valor: exemplo}
-
-\begin{tabular}[t]{ccc}
-\includegraphics[height=.7\textheight]{fig/splay-do-2.pdf} &
-Caso 2 &
-\includegraphics[height=.6\textheight]{fig/splay-do-3.pdf}
-\end{tabular}
-
-\end{frame}
-
-\begin{frame}
-\frametitle{Chanfrar um valor: exemplo}
-
-\begin{tabular}[t]{ccc}
-\includegraphics[height=.6\textheight]{fig/splay-do-3.pdf} &
-Caso 1 &
-\includegraphics[height=.5\textheight]{fig/splay-do-4.pdf}
-\end{tabular}
-
-\end{frame}
-
-\begin{frame}
-\frametitle{Análise amortizada: método do contador}
-\begin{itemize}
-\item os nós guardam créditos ($\gamma(x)$)
-\item créditos pagam para efetuar rotações
-\item o preço de $\proc{Splay}$ é $O(\log n)$
-\item invariante: $\gamma(x) = \lfloor \log | T(x) | \rfloor$
-
-  $T(x)$: sub-árvore enraizada em $x$
-
-\item propriedade: $3 \times (\gamma(T) - \gamma(x) + O(1))$ créditos paga $\proc{Splay}(T, x)$ e mantem o invariante. (\alert{vamos mostrar isto depois})
-\item logo $\proc{Splay}$ custa no máximo $3 \lfloor \log n \rfloor + O(1) \in |\Theta(\log n)$.
-\item para pagar inserção, busca ou remoção, basta pagar $O(\log n)$.
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Análise amortizada: método do contador}
-\begin{itemize}
-\item $\gamma(x)$ e $\gamma'(x)$: quantidade de créditos em $x$ antes
-e depois das rotações nos casos 1, 2 e 3
-\item $\proc{Splay}$ cai $k \ge 0$ vezes nos casos 2 e 3 e
-  possivelmente uma vez no caso 1.
-\item vamos mostrar que o custo em cada caso é
-\begin{itemize}
-\item caso 1: $3 \times(\gamma'(x) - \gamma(x)) + O(1)$
-\item caso 2: $3 \times(\gamma'(x) - \gamma(x))$
-\item caso 3: $3 \times(\gamma'(x) - \gamma(x))$
-\end{itemize}
-\item somando, obtemos $3(\gamma(T) - \gamma(x)) + O(1)$
-
-$\gamma(x)$: número de créditos em $\gamma$ antes do $\proc{Splay}$
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Caso 1}
-\framesubtitle{$y = \attrib{x}{up}, \attrib{y}{up} = \const{Nil}$}
-
-\begin{itemize}
-\item $\gamma'(x) = \gamma(y)$, $\gamma'(y) \le \gamma'(x)$,
-\item logo 
-\begin{eqnarray*}
-\gamma'(x) + \gamma'(y) - \gamma(x) - \gamma(y) & = & \gamma'(y) - \gamma(x) \\
-& \le & \gamma'(x) - \gamma(x) \\
-& \le & 3 \times(\gamma'(x) - \gamma(x))
-\end{eqnarray*}
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Caso 2}
-\framesubtitle{$y = \attrib{x}{up}, x = \attrib{x}{left}, z = \attrib{y}{up}, y = \attrib{z}{left}$}
-
-\begin{itemize}
-\item temos: $\gamma'(x) = \gamma(z)$, $\gamma'(y) \le \gamma'(x)$,
-$\gamma'(z) \le \gamma'(x)$, $\gamma(y) \ge \gamma(x)$
-\item logo 
-\begin{eqnarray*}
-\lefteqn{\gamma'(x) + \gamma'(y) + \gamma'(z) - \gamma(x) - \gamma(y) - \gamma(z)} \\
- & = & 
-\gamma'(y) + \gamma'(z) - \gamma(x) - \gamma(y) \\
-& = & (\gamma'(y) - \gamma(x)) + (\gamma'(z) - \gamma(y)) \\
-& \le & (\gamma'(x) - \gamma(x)) + (\gamma'(x) - \gamma(x)) \\
-& \le & 2 \times(\gamma'(x) - \gamma(x))
-\end{eqnarray*}
-\item resta $\gamma'(x) - \gamma(x)$ créditos para efetuar a rotação.
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Caso 2 (continuação)}
-\framesubtitle{Mostramos que há créditos para a rotação}
-
-Resta $\gamma'(x) - \gamma(x)$:
-\begin{itemize}
-\item se $\gamma(x) \neq \gamma'(x)$, então resta $\gamma'(x) - \gamma(x) > 0$ créditos para efetuar a rotação
-\pause
-\item se $\gamma(x) = \gamma'(x)$, mostramos que
-$\gamma'(x) + \gamma'(y) + \gamma'(z) < \gamma(x) + \gamma(y) + \gamma(z)$.
-\item neste caso, é preciso menos créditos na árvore para manter o invariante
-\item este crédito é usado para efetuar a rotação
-\item roteiro da prova:
-\begin{itemize}
-\item supor que 
-$\gamma'(x) + \gamma'(y) + \gamma'(z) \ge \gamma(x) + \gamma(y) + \gamma(z)$.
-\item chegar a uma contradição
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-
-\frametitle{Caso 2 (continuação)}
-\framesubtitle{o caso 2 pode liberar créditos para a rotação}
-
-Supondo
-$\gamma'(x) + \gamma'(y) + \gamma'(z) \ge \gamma(x) + \gamma(y) + \gamma(z)$,
-temos
-\begin{itemize}
-\item $\gamma(x) \le \gamma(y) \le \gamma(z)$
-\item $\gamma'(z) \le \gamma'(y) \le \gamma'(x)$
-\item $\gamma'(x) = \gamma(z)$
-\item logo temos que $\gamma(x) = \gamma(z) = \gamma(y)$
-\item e $\gamma'(x) = \gamma'(y) = \gamma'(z)$
-\item pela definição de $\gamma$, temos
-$\lfloor \log_2 (a + b + 1) \rfloor = \lfloor \log_2 a \rfloor = \lfloor \log_2 b \rfloor$
-\begin{itemize}
-\item se $a \le b$ então $\lfloor \log_2 (a+b+1) \rfloor \ge \lfloor \log_2 2a \rfloor = 1 + \lfloor \log_2 a \rfloor > \lfloor \log_2 a \rfloor$
-\item se $a > b$ então $\lfloor \log_2 (a+b+1) \rfloor \ge \lfloor \log_2 2b \rfloor = 1 + \lfloor \log_2 b \rfloor > \lfloor \log_2 b \rfloor$
-\end{itemize}
-\item em ambos casos chegamos a uma contradição.
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-
-\frametitle{Caso 3}
-
-\begin{itemize}
-\item Análogo ao caso 2
-\item deixado como exercício
-\end{itemize}
-
-\end{frame}
-
-\begin{frame}
-
-\frametitle{Conclusões}
-
-\begin{itemize}
-\item Análise amortizada pode fornecer resultados mais apurados
-\item outro exemplo: árvores rubro-negras
-\begin{itemize}
-\item inserção: $O(\log n)$
-\item mas o custo amortizado de $m$ inserções em uma árvore de $n$ nós
-  é $O(n+m)$
-\end{itemize}
-\end{itemize}
+\begin{enumerate}
+\item Projetar uma estrutura de dados para arranjos dinâmicos, que tem apenas
+  operação de inserção, tal que esta tenha complexidade constante, \emph{no pior
+    caso}.
+  \begin{itemize}
+  \item hipótese: supõe-se que o custo de uma alocação dinâmica é $\Theta(1)$.
+  \item dica: pode inspirar-se na aplicação do método do contador desta aula.
+  \item obs.: a estrutura deve oferecer o acesso a qualquer posição em
+    $\Theta(1)$.
+  \end{itemize}
+\item Estender a estrutura projetada com uma operação de remoção do último
+  elemento (\proc{Pop-Back}), tal que tanto a inserção quanto a remoção
+  tenham complexidade constante, no pior caso.
+\end{enumerate}
 
 \end{frame}
 

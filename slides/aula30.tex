@@ -1,0 +1,296 @@
+%% TODO: illustrations
+\documentclass{beamer}
+\setbeamertemplate{footline}[frame number]
+
+\input{preamble}
+
+\title{Aula 29: Problemas P, NP, NP-árduos, e NP-completos}
+\subtitle{Uma breve introdução}
+\author{David Déharbe \\
+  Programa de Pós-graduação em Sistemas e Computação \\
+  Universidade Federal do Rio Grande do Norte \\
+  Centro de Ciências Exatas e da Terra \\
+  Departamento de Informática e Matemática Aplicada}
+\date{1 de junho de 2015}
+
+\newcommand{\classP}[0]{\ensuremath{\mathcal{P}}\xspace}
+\newcommand{\classNP}[0]{\ensuremath{\mathcal{NP}}\xspace}
+\newcommand{\classcoNP}[0]{\ensuremath{\mbox{co-$\mathcal{NP}$}}\xspace}
+
+\begin{document}
+\selectlanguage{brazil}
+
+%%%%% SLIDE 01 %%%%%
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+  \frametitle{Plano}
+
+  \tableofcontents
+Referência: Cormen, cap 36.
+\end{frame}
+
+\section{Introdução}
+
+%%%%% SLIDE 02 %%%%%
+
+\begin{frame}
+\frametitle{Introdução}
+
+\begin{itemize}
+
+\item Considere os seguintes problemas:
+
+\begin{itemize}
+\item Determinar se um grafo $G=(V, E)$ é \alert{Hamiltoniano}:
+  $\exists$ uma sequência de arestas que visita cada vértice
+  exatamente uma vez, e volta ao vértice inicial
+
+\item Dado um circuito combinacional, formado por portas lógicas (\textit{and},
+  \textit{or}, \textit{not}), com $n$ entradas e uma única saída, determine se
+  existe uma combinação de valores na entrada tal que a saída é 1.
+
+\item Dado um conjunto de números $V_1, V_2, \ldots V_n$, e um valor $N$,
+  determine se existe um subconjunto cuja soma é $V$.
+
+\end{itemize}
+
+\item Para nenhum desses problemas conhece-se um algoritmo de complexidade
+  polinomial
+
+\item Se existe um algoritmo de complexidade polinomial para um,
+  então existe um algoritmo polinomial para os demais.
+
+\item Qual é a teoria envolvida nesses resultados surpreendentes?
+
+\item Classes de problemas \classP, \classNP; problemas
+  \classNP-completos; problemas \classNP-árduos.
+
+\end{itemize}
+
+\end{frame}
+
+%%%%% SLIDE 03 %%%%%
+
+\begin{frame}
+\frametitle{Princípios}
+
+\begin{itemize}
+\item É considerado \alert{tratável} um problema para o qual existe um
+  algoritmo com complexidade polinomial ($O(n^k)$)
+  \begin{itemize}
+  \item na prática $k$ é geralmente ``pequeno''
+  \end{itemize}
+\item É considerado \alert{intratável} um problema para o qual só são conhecidos
+  algoritmos com complexidade não polinomial ($O(k^n)$)
+\item Motivação
+  \begin{itemize}
+  \item abordagens heurísticas
+  \item consciência desta barreira teórical (provável)
+  \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\section{Arcabouço teórico}
+%%%%% SLIDE 04 %%%%%
+
+\begin{frame}
+\frametitle{Arcabouço teórico}
+
+\begin{itemize}
+\item problemas de \alert{decisão}
+  \begin{itemize}
+  \item saída: sim / não
+  \item exemplo (circuito combinacional): existe uma valoração das entradas tal
+    que a saída é 1.
+  \end{itemize}
+\item instâncias de problemas são \alert{codificadas}, digamos em binário
+  \begin{itemize}
+  \item (prática: entrada é uma sequência de bits)
+  \item complexidade é função do tamanho desta codificação
+  \end{itemize}
+\item um conjunto de instâncias
+  \begin{itemize}
+    \item $\equiv$ um conjunto de palavras binárias
+    \item $\equiv$ uma linguagem sobre $\{0, 1\}$
+  \end{itemize}
+\item a cada problema de decisão $P$ corresponde uma linguagem $L$
+\item decidir uma instância $I$ de $P$
+  \begin{itemize}
+  \item $\equiv$ decidir se uma palavra pertence à linguagem
+  \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\section{Arcabouço teórico}
+%%%%% SLIDE 04 %%%%%
+
+\begin{frame}
+\frametitle{Problemas de decisão}
+
+\begin{itemize}
+\item E se o problema não for de decisão?
+
+\item Geralmente existe um problema de decisão relacionado
+
+\item Exemplo
+  \begin{description}
+  \item[original] Qual o tamanho do menor caminho entre dois
+    vértices $u$ e $v$ de um grafo sem pesos?
+  \item[decisão] Existe um caminho de $u$ até $v$ passando por
+    exatamente $k$ arestas?
+  \end{description}
+
+\end{itemize}
+
+\end{frame}
+
+\section{A classe de problemas \classP}
+%%%%% SLIDE 04 %%%%%
+
+\begin{frame}
+\frametitle{Decisão e aceitação}
+
+\begin{definition}[Decisão]
+O algoritmo $A$ \emph{decide} $L$ quando, dado uma palavra $x$, ou $A$ aceita $x$, ou $A$ rejeita $x$: $A$ termina e retorna $1$ ou $0$.
+\end{definition}
+
+\begin{definition}[Decisão em tempo polinomial]
+O algoritmo $A$ \emph{decide} $L$ em tempo polinomial quando existe $k$ tal que,
+dado $x$ uma palavra de tamanho $n$, $A$ decide se $x \in L$ em $O(n^k)$.
+\end{definition}
+
+\begin{definition}[Aceitação]
+O algoritmo $A$ \emph{aceita} $L$ quando, dado uma palavra $x \in L$, $A$ aceita
+$x$. Se $x \not\in L$, ou $A$ rejeita $x$, ou $A$ não termina.
+\end{definition}
+
+\begin{definition}[Aceitação em tempo polinomial]
+O algoritmo $A$ \emph{aceita} $L$ em tempo polinomial quando existe $k$ tal que,
+dado $x \in L$ uma palavra de tamanho $n$, $A$ aceita $x$ em $O(n^k)$.
+\end{definition}
+
+\pause
+\begin{itemize}
+\item Decidir é mais ``difícil'' que aceitar?
+\end{itemize}
+
+\end{frame}
+
+%%%%% SLIDE 04 %%%%%
+
+\begin{frame}
+\frametitle{A classe de problemas \classP}
+
+\begin{definition}[A classe de problemas \classP]
+A classe de problemas de decisão polinomiais é $\classP = \{ L
+\subseteq \{0, 1\}^* \mbox{ existe um algoritmo que decide $L$ em
+  tempo polinomial} \}$.
+\end{definition}
+
+\begin{theorem}
+A classe de problemas $\classP$ é a classe de problemas que são aceitos em tempo
+polinomial.
+\end{theorem}
+
+\end{frame}
+
+\section{A classe de problemas \classNP}
+
+%%%%% SLIDE 04 %%%%%
+
+\begin{frame}
+\frametitle{Verificação}
+
+\begin{definition}[Verificação]
+O algoritmo $A$ \emph{verifica} $L$ quando, dado uma palavra $x \in L$, e um certificado $y$, $A(x,y) = 1$.
+\end{definition}
+O algoritmo de verificação confere se uma instância $x$ pertence à linguagem com
+base uma evidência $y$.
+
+\begin{definition}[A classe de problemas \classNP]
+A classe de problemas \classNP é a classe de problemas $L$ tais que existe um
+algoritmo de verificação polinomial.
+\end{definition}
+
+\begin{definition}[A classe de problemas \classcoNP]
+A classe de problemas \classcoNP é a classe de problemas $L$ tais que
+existe um algoritmo de verificação polinomial para $\bar{L}$.
+\end{definition}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Relação entre classes de problemas}
+
+\begin{itemize}
+\item $\classP \subseteq \classNP$, $\classP \subseteq \classcoNP$
+\item \alert{$\classP = \classNP$?}
+\item \alert{$\classNP = \classcoNP$?}
+\item \alert{$\classP = \classNP \cap \classcoNP$?}
+\end{itemize}
+
+\end{frame}
+
+\section{NP-completeza}
+
+\subsection{Redução}
+
+\begin{frame}
+\frametitle{Redução entre problemas}
+
+\begin{definition}[Redução entre problemas]
+Um problema (linguagem) $L_1$ é \alert{redutível polinomialmente} em um
+problema $L_2$ se existe uma função $f$ calculável em tempo polinomial
+tal que $\forall x \in \{0, 1\}^* \cdot x \in L_1 \iff f(x) \in L_2$.
+\end{definition}
+
+\begin{itemize}
+\item Solucionar $L_1$ não é mais difícil que solucionar $L_2$.
+\item Notação: $L_1 \le_P L_2$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Redução e $\classP$}
+
+\begin{lemma}
+Seja $L_1, L_2 \subseteq \{ 0, 1 \}^*$, tais que $L_1 \le_P L_2$. Então
+$L_2 \in \classP \Rightarrow L_1 \in \classP$.
+\end{lemma}
+
+\end{frame}
+
+\subsection{Definição e exemplo}
+
+\begin{frame}
+\frametitle{$\classNP$-completeza}
+
+\begin{definition}[\classNP-árduo]
+$L \subseteq \{ 0, 1 \}^*$ é $\classNP$-árduo se, para cada $L' \in \classNP$, $L' \le_P L$.
+\end{definition}
+
+\begin{definition}[$\classNP$-completo]
+$L \subseteq \{ 0, 1 \}^*$ é $\classNP$-completo se
+\begin{enumerate}
+\item $L \in \classNP$, e
+\item $L' \le_P L$, para cada $L' \in \classNP$ ($L$ é $NP$-árduo)
+\end{enumerate}
+\end{definition}
+
+\begin{itemize}
+\item O problema \textsc{Sat} de determinar se um dado circuito lógico
+  pode ter a sua saída setada a um é um problema \classNP-completo.
+\item Há centenas de outros problemas computacionais que foram
+  mostrados como send \classNP-completos.
+\end{itemize}
+
+\end{frame}
+
+\end{document}
+

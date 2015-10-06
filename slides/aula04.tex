@@ -6,13 +6,13 @@
 \usepackage{pgf}
 \usepackage{tikz}
 
-\title{Aula 04: Análise de algoritmos --- notações assintóticas e classes de complexidade}
+\title{Aula 04: Análise de algoritmos --- notações asintóticas e classes de complexidade}
 \author{David Déharbe \\
   Programa de Pós-graduação em Sistemas e Computação \\
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
-  Departamento de Informática e Matemáica Aplicada}
-\date{25 de fevereiro de 2015}
+  Departamento de Informática e Matemática Aplicada}
+\date{}
 
 \begin{document}
 \selectlanguage{brazil}
@@ -22,20 +22,32 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Plano da aula}
-  \tableofcontents
-\end{frame}
-
-\begin{frame}
 
   \frametitle{Bibliografia usada}
 
   \begin{center}
-    \includegraphics[height=.8\textheight]{../img/capa-levitin.jpg}
+    \includegraphics[height=.8\textheight]{img/capa-levitin.jpg}
   \end{center}
   (seção 2.2)
 \end{frame}
 
+\begin{frame}
+
+  \frametitle{Estrutura da apresentação}
+
+  \begin{enumerate}
+  \item arcabouço teórico;
+  \item melhor caso, pior caso, caso médio;
+  \item \alert{notações asintóticas; $O$, $\Omega$, $\Theta$};
+  \item análise de algoritmos não recursivos;
+  \item análise de algoritmos recursivos.
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Plano da aula}
+  \tableofcontents
+\end{frame}
 
 \section{Introdução informal}
 
@@ -45,13 +57,16 @@
   \begin{block}{Notações}
     Para um determinado algoritmo, $t(n)$ denota o tempo de execução (geralmente o contador de operações básicas $C(n)$).
 
-    $g(n)$ denota uma função, que é comparada com $t(n)$
+    $g(n)$ denota uma função, que é comparada com $t(n)$.
+
+    O objeto da comparação é o crescimento asintótico das funções.
+
   \end{block}
 \pause
 \begin{itemize}
 \item 
 \only<2>{
-$O(g(n))$ é o conjunto das funções com um crescimento assintótico 
+$O(g(n))$ é o conjunto das funções com um crescimento asintótico 
   \alert{menor ou igual} ao de $g(n)$.
 
     $n \in O(n^2), \quad 100n+5 \in O(n^2), \quad \frac{1}{2}n(n-1) \in O(n^2).$
@@ -60,7 +75,7 @@ $O(g(n))$ é o conjunto das funções com um crescimento assintótico
 }
 \pause
 \only<3>{
-$\Omega(g(n))$ é o conjunto das funções com um crescimento assintótico
+$\Omega(g(n))$ é o conjunto das funções com um crescimento asintótico
   \alert{maior ou igual} ao de $g(n)$.
 
   $n^3 \in \Omega(n^2), \quad \frac{1}{2}n(n-1) \in \Omega(n^2), \quad 100n+5 \not\in \Omega(n^2).$
@@ -68,7 +83,7 @@ $\Omega(g(n))$ é o conjunto das funções com um crescimento assintótico
 \pause
 \only<4>{
 $\Theta(g(n))$ é o conjunto das funções com um crescimento
-  assintótico \alert{igual} a (um múltiplo positivo constante) de
+  asintótico \alert{igual} a (um múltiplo positivo constante) de
   $g(n)$: $\Theta(n) = O(n) \cap \Omega(n)$.
 
   $an^2 + bn + c \in \Theta (n^2) \mbox{ se } a > 0, \quad n^2 + \log n \in \Theta(n^2).$
@@ -190,7 +205,7 @@ Mostrar que $0,00001 n^3 \in \Omega(n^2)$.
 \end{example}
 
 \begin{proof}
-  Neste caso, basta selecionar $n_0 = 0$ e $k = \frac{1}{0,00001} = 10000$.
+  Neste caso, basta selecionar $n_0 = 0$ e $k = 0,00001$.
 \end{proof}
 \end{frame}
 
@@ -254,7 +269,7 @@ Mostrar que $\frac{1}{2} n (n-1) \in \Theta(n^2)$.
 \item $t(n) \not\in \Theta(g(n))$.
 \end{itemize}
 
-$t(n)$ tem crescimento assintótico estritamente menor que $g(n)$.
+$t(n)$ tem crescimento asintótico estritamente menor que $g(n)$.
 }
 \pause
 \only<2>{
@@ -264,22 +279,22 @@ $t(n) \in \omega(g(n))$ (``\textit{little omega}'') se
 \item $t(n) \not\in \Theta(g(n))$.
 \end{itemize}
 
-$t(n)$ tem crescimento assintótico estritamente maior que $g(n)$.
+$t(n)$ tem crescimento asintótico estritamente maior que $g(n)$.
 }
 \pause
 \only<3>{
 $t(n) \sim g(n)$ quando $t(n)$ e $g(n)$ tem o mesmo 
-crescimento assintótico.
+crescimento asintótico.
 }
 \end{itemize}
 
 \end{frame}
 
-\section{Propriedades das notações assintóticas}
+\section{Propriedades das notações asintóticas}
 
 \begin{frame}
 \frametitle{Propriedades}
-\begin{theorem}[Soma de limites assintóticos superiores]
+\begin{theorem}[Soma de limites asintóticos superiores]
 \label{teo:soma-sup}
 Se $t_1(n) \in O(g_1(n))$ e $t_2(n) \in O(g_2(n))$, então
 $t_1(n) + t_2(n) \in O(\max\{g_1(n), g_2(n)\})$.
@@ -329,10 +344,10 @@ $t_1(n) + t_2(n) \in O(\max\{g_1(n), g_2(n)\})$.
 
 \end{frame}
 
-\section{Usando limites para comparar crescimentos assintóticos}
+\section{Usando limites para comparar crescimentos asintóticos}
 
 \begin{frame}
-\frametitle{Usando limites na comparação de crescimentos assintóticos}
+\frametitle{Usando limites na comparação de crescimentos asintóticos}
 
 \begin{itemize}
 \item As definições de $O$, $\Theta$ e $\Omega$ são usadas para 
@@ -350,16 +365,16 @@ $t_1(n) + t_2(n) \in O(\max\{g_1(n), g_2(n)\})$.
 \frametitle{Comparações possíveis}
 Os resultados possíveis são:
 \begin{enumerate}
-\item $\lim_{n \to \infty} \frac{t(n)}{g(n)} = 0$ quando $t(n)$ cresce assintóticamente menos que $g(n)$;
+\item $\lim_{n \to \infty} \frac{t(n)}{g(n)} = 0$ quando $t(n)$ cresce asintóticamente menos que $g(n)$;
 
   \only<2->{\alert{$t(n) \in o(g(n))$, $t(n) \in O(g(n))$}}
 
 \item $\lim_{n \to \infty} \frac{t(n)}{g(n)} = c$, onde $c > 0$, quando $t(n)$ e
-$g(n)$ cresce assintóticamente da mesma forma;
+$g(n)$ cresce asintóticamente da mesma forma;
 
   \only<3->{\alert{$t(n) \in O(g(n)), t(n) \in \Theta(g(n)), t(n) \in \Omega(g(n))$}}
 
-\item $\lim_{n \to \infty} \frac{t(n)}{g(n)} = \infty$ quando $t(n)$ cresce assintóticamente mais que $g(n)$.
+\item $\lim_{n \to \infty} \frac{t(n)}{g(n)} = \infty$ quando $t(n)$ cresce asintóticamente mais que $g(n)$.
 
   \only<4>{\alert{$t(n) \in \omega(g(n)), t \in \Omega(g(n))$}}
 \end{enumerate}
@@ -369,7 +384,7 @@ $g(n)$ cresce assintóticamente da mesma forma;
 \begin{frame}
 \frametitle{Exemplo 1}
 \begin{problem}
-Compare o crescimento assintótico de $\frac{1}{2} n (n-1)$ e $n^2$.
+Compare o crescimento asintótico de $\frac{1}{2} n (n-1)$ e $n^2$.
 \end{problem}
 \pause
 \begin{solution}
@@ -403,7 +418,7 @@ da razão das derivadas destas funções.
 \begin{frame}
 \frametitle{Exemplo 2}
 \begin{problem}
-Compare o crescimento assintótico de $\log_2 n$ e $\sqrt{n}$.
+Compare o crescimento asintótico de $\log_2 n$ e $\sqrt{n}$.
 \end{problem}
 \pause
 \begin{solution}
@@ -417,7 +432,7 @@ Compare o crescimento assintótico de $\log_2 n$ e $\sqrt{n}$.
 \lim_{n \to \infty} \frac{\frac{1}{n \ln 2}}{\frac{1}{2 \sqrt{n}}} \\
 & = & \frac{2}{\ln 2} \lim_{n \to \infty} \frac{1}{\sqrt{n}} = 0.
 \end{eqnarray*}
-$\log_2 n$ cresce assintoticamente menos que $\sqrt{n}$.
+$\log_2 n$ cresce asintoticamente menos que $\sqrt{n}$.
 \end{solution}
 \pause
 Pode se dizer que $\log_2 n \in o(\sqrt{n})$.
@@ -426,7 +441,7 @@ Pode se dizer que $\log_2 n \in o(\sqrt{n})$.
 \begin{frame}
 \frametitle{Exemplo 3}
 \begin{problem}
-Compare o crescimento assintótico de $n!$ e $2^n$.
+Compare o crescimento asintótico de $n!$ e $2^n$.
 \end{problem}
 Use o resultado seguinte (fórmula de Stirling): $n! \approx \sqrt{2 \pi n} \left( \frac{n}{e} \right)^n$.
 \pause
@@ -454,7 +469,7 @@ Prove suas asserções.
 \end{problem}
 \pause
 \begin{problem}
-  Liste as funções seguintes por ordem crescente de crescimento assintótico:
+  Liste as funções seguintes por ordem crescente de crescimento asintótico:
 $$
 (n-2)! \quad 5 \lg(n+100)^{10} \quad 2^{2n} \quad 0,001 n^4 + 3 n^3 + 1 \quad \ln^2 n \quad \sqrt{n}_3 \quad n^3
 $$

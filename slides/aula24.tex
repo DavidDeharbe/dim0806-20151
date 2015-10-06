@@ -3,13 +3,27 @@
 
 \input{preamble}
 
-\title{Aula 24: Grafos: algoritmos elementares (II)}
+\usepackage{pgf}
+\usepackage{tikz}
+\usetikzlibrary{shapes.multipart}
+\usetikzlibrary{decorations.pathmorphing}
+
+\title{Aula 23: Grafos: algoritmos elementares (I)}
 \author{David Déharbe \\
   Programa de Pós-graduação em Sistemas e Computação \\
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
   Departamento de Informática e Matemática Aplicada}
-\date{18 de maio de 2015}
+\date{15 de maio de 2015}
+
+\tikzstyle{vertex}=[circle,fill=black!25,minimum size=15pt,inner sep=0pt]
+\tikzstyle{selected vertex} = [vertex, fill=red!24]
+\tikzstyle{path} = [draw,thin,decorate,decoration={snake,amplitude=.5mm,segment length=2mm}]
+\tikzstyle{edge} = [draw,thick,-]
+\tikzstyle{arrow} = [draw,thick,->]
+\tikzstyle{weight} = [font=\small]
+\tikzstyle{selected edge} = [draw,line width=3pt,-,red!50]
+\tikzstyle{ignored edge} = [draw,line width=3pt,-,black!20]
 
 \begin{document}
 \selectlanguage{brazil}
@@ -25,687 +39,1569 @@
 Referência: Cormen, cap 23.
 \end{frame}
 
-\section{Ordenação topológica}
+\section{Introdução}
 
 \begin{frame}
-\frametitle{Ordenação topológica}
+\frametitle{Motivação}
 
 \begin{itemize}
-\item Grafos dirigidos acíclicos indicam uma relação de precedência
+\item Grafos: modelagem de dados e relacionamentos 
+\item Aplicações em todos os domínios da computação
+\item Problemas clássicos: 
 \begin{itemize}
-\item $u \prec v$: $u$ vem antes de $v$, aresta $(u, v)$
-\item relação parcial
-\item exemplos: pré-requisitos entre componentes curriculares, entre tarefas, etc.
+\item ordenação topológica
+\item componentes conexos
+\item árvore de espalhamento máximo
+\item caminhos de custo mínimo 
+\item fluxo máximo
 \end{itemize}
-\item Ordenação topológica:
-\begin{itemize}
-\item entrada: uma relação de precedência
-\item saída: um ``escalonamento'' dos vértices que respeita a precedência
-\end{itemize}
-\item exemplo: grade curricular
 \end{itemize}
 \end{frame}
 
-\begin{frame}
-\frametitle{Definição}
+\section{Definições}
 
-\begin{definition}[Grafo dirigido acíclico, DAG]
-Um \emph{grafo dirígido acíclico}, ou \emph{DAG}\footnote{Do inglês \textit{Directed Acyclic Graph}.}  é um grafo dirigido $G$ tal que se existe uma aresta dirigda de $(u, v)$, então não existe caminho de $v$ até $u$.
+\begin{frame}
+\frametitle{Grafo não dirigido}
+
+\begin{definition}[Grafo não dirigido, vértice, aresta]
+Um \emph{grafo não dirigido} $G$ é um par $(V, E)$, onde $V$ é o conjunto dos
+\emph{vértices}, e $E \subseteq V \times V$, é uma relação binária sobre $V$, é
+o conjunto das \emph{arestas}\footnote{Existe uma aresta $e$ entre $v$ e $v'$
+  sse $(v, v') \in E$ ou $(v', v) \in E$.}.
 \end{definition}
 
-Não há cíclo em DAGs.
-
 \begin{center}
-\includegraphics[height=.5\textheight]{fig/dag-1.pdf}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% Draw a 7,11 network
+% First we draw the vertices
+\foreach \pos/\name in {{(2,3)/0}, {(0,1.5)/1}, {(4,1.5)/2},
+{(2,0)/3}}
+\node[vertex] (\name) at \pos {$\name$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest in {0/1, 0/2, 0/3, 1/3, 2/3}
+\path[edge] (\source) -- (\dest);
+\end{tikzpicture}
+$$
+\begin{array}{rcl}
+V & = & {0, 1, 2, 3}, \\
+E & = &\{ (0,1), (0,2), (0,3), (1, 3), (2,3) \}
+\end{array}
+$$ %
 \end{center}
 
 \end{frame}
 
 \begin{frame}
-\frametitle{Exemplo}
-\framesubtitle{Ordenação topológica}
-\begin{center}
-\includegraphics[height=.5\textheight]{fig/dag-1.pdf}
-\end{center}
+\frametitle{Grafo não dirigido, com pesos}
+
+\begin{definition}[Grafo não dirigido com pesos]
+Um \emph{grafo não dirigido com pesos} $G$ é um par $(V, E, w)$, onde $(V, E)$ é
+um grafo não dirigido e $w: E \rightarrow \mathbb{R}$ é o \emph{peso} das
+arestas.
+\end{definition}
 
 \begin{center}
-\includegraphics[height=.1\textheight]{fig/dag-2.pdf}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% Draw a 7,11 network
+% First we draw the vertices
+\foreach \pos/\name in {{(2,3)/0}, {(0,1.5)/1}, {(4,1.5)/2},
+{(2,0)/3}}
+\node[vertex] (\name) at \pos {$\name$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest/ \weight in {0/1/1, 2/0/3, 0/3/9, 1/3/2, 3/2/2}
+\path[edge] (\source) -- node[weight]{$\weight$} (\dest);
+\end{tikzpicture}
+\end{center}
+$$w = \{ (0, 1) \mapsto
+1, (0, 2) \mapsto 3, (0,3) \mapsto 9, (1,3) \mapsto 2, (2, 3) \mapsto 2 \}
+$$
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Grafo dirigido}
+
+\begin{definition}[Grafo, vértice, seta]
+Um \emph{grafo dirigido} $G$ é um par $(V, E)$, onde $V$ é o conjunto dos \emph{vértices}, e
+$E \subseteq V \times V$, é uma relação binária sobre $V$, é o conjunto das \emph{setas}\footnote{Existe uma seta $e$ de $v$ para $v'$ sse $(v, v') \in E$.}.
+\end{definition}
+
+\begin{center}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% Draw a 7,11 network
+% First we draw the vertices
+\foreach \pos/\name in {{(2,3)/0}, {(0,1.5)/1}, {(4,1.5)/2},
+{(2,0)/3}}
+\node[vertex] (\name) at \pos {$\name$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest in {0/1, 0/2, 3/0, 1/3, 2/3}
+\path[arrow] (\source) -- (\dest);
+\end{tikzpicture}
+$$
+\begin{array}{rcl}
+V & = & {0, 1, 2, 3}, \\
+E & = &\{ (0,1), (0,2), (3,0), (1, 3), (2,3) \}
+\end{array}
+$$ %
 \end{center}
 
 \end{frame}
 
 \begin{frame}
-\frametitle{Algoritmo}
-\framesubtitle{Ordenação topológica}
+\frametitle{Grafo dirigido, com pesos}
+
+\begin{definition}[Grafo dirigido com pesos, vértice, seta]
+Um \emph{grafo dirigido com pesos} $G$ é uma tripla $(V, E, w)$, onde $(V, E)$ é um grafo dirigdo e $w: V \rightarrow \mathbb{R}$ é o peso de cada seta.
+\end{definition}
+
+\begin{center}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% Draw a 7,11 network
+% First we draw the vertices
+\foreach \pos/\name in {{(2,3)/0}, {(0,1.5)/1}, {(4,1.5)/2},
+{(2,0)/3}}
+\node[vertex] (\name) at \pos {$\name$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest/ \weight in {0/1/1, 2/0/3, 3/0/9, 1/3/2, 3/2/2}
+\path[arrow] (\source) -- node[weight]{$\weight$} (\dest);
+\end{tikzpicture}
+\end{center}
+$$w = \{ (0, 1) \mapsto
+1, (0, 2) \mapsto 3, (3,0) \mapsto 9, (1,3) \mapsto 2, (2, 3) \mapsto 2 \}
+$$
+
+\end{frame}
+
+\section{Representação}
+
+\begin{frame}
+
+\frametitle{Representação computacional}
+
+\begin{enumerate}
+
+\item lista de adjacência (matriz esparsa) $\Theta(V+E)$
+
+  (listas encadeadas)
+
+\item matriz de adjacência (matriz densa, ou pequena suficiente) $\Theta(V^2)$
+
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Grafo não dirigido sem pesos}
+
+\begin{center}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% Draw a 7,11 network
+% First we draw the vertices
+\foreach \pos/\name in {{(2,3)/0}, {(0,1.5)/1}, {(4,1.5)/2},
+{(2,0)/3}}
+\node[vertex] (\name) at \pos {$\name$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest in {0/1, 0/2, 0/3, 1/3, 2/3}
+\path[edge] (\source) -- (\dest);
+\end{tikzpicture}
+\end{center}
+
+\begin{description}
+
+\item[listas de adjacência] $0 \mapsto \langle 1, 2, 3 \rangle; 1 \mapsto \langle 0, 3 \rangle;
+2 \mapsto \langle 0, 3 \rangle, 3 \mapsto \langle 0, 1, 2\rangle$
+
+\item[matriz de adjacência] $\left( 
+\begin{array}{cccc}
+0 & 1 & 1 & 1 \\
+1 & 0 & 0 & 1 \\
+1 & 0 & 0 & 1 \\
+1 & 1 & 1 & 0
+\end{array}
+\right)
+$
+\end{description}
+\end{frame}
+
+\begin{frame}
+\frametitle{Grafo não dirigido com pesos}
+
+\begin{center}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% Draw a 7,11 network
+% First we draw the vertices
+\foreach \pos/\name in {{(2,3)/0}, {(0,1.5)/1}, {(4,1.5)/2},
+{(2,0)/3}}
+\node[vertex] (\name) at \pos {$\name$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest/ \weight in {0/1/1, 2/0/3, 0/3/9, 1/3/2, 3/2/2}
+\path[edge] (\source) -- node[weight]{$\weight$} (\dest);
+\end{tikzpicture}
+\end{center}
+
+\begin{description}
+
+\item[listas de adjacência] $0 \mapsto \langle 1, 2, 3 \rangle; 1 \mapsto \langle 0, 3 \rangle;
+2 \mapsto \langle 0, 3 \rangle, 3 \mapsto \langle 0, 1, 2\rangle$
+
+\item[matriz de adjacência] $\left( 
+\begin{array}{cccc}
+0 & 1 & 3 & 9 \\
+1 & 0 & \infty & 2 \\
+3 & \infty & 0 & 2 \\
+9 & 2 & 2 & 0
+\end{array}
+\right)
+$
+\end{description}
+\end{frame}
+
+\begin{frame}
+\frametitle{Grafo dirigido}
+
+\begin{center}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% Draw a 7,11 network
+% First we draw the vertices
+\foreach \pos/\name in {{(2,3)/0}, {(0,1.5)/1}, {(4,1.5)/2},
+{(2,0)/3}}
+\node[vertex] (\name) at \pos {$\name$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest in {0/1, 0/2, 3/0, 1/3, 2/3}
+\path[arrow] (\source) -- (\dest);
+\end{tikzpicture}
+\end{center}
+
+\begin{description}
+
+\item[listas de adjacência] $0 \mapsto \langle 1, 2 \rangle; 1 \mapsto \langle 3 \rangle;
+2 \mapsto \langle 3 \rangle, 3 \mapsto \langle 0\rangle$
+
+\item[matriz de adjacência] $\left( 
+\begin{array}{cccc}
+0 & 1 & 1 & 0 \\
+0 & 0 & 0 & 1 \\
+0 & 0 & 0 & 1 \\
+1 & 0 & 0 & 0
+\end{array}
+\right)
+$
+\end{description}
+\end{frame}
+
+\begin{frame}
+\frametitle{Grafo dirigido com pesos}
+
+\begin{center}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% Draw a 7,11 network
+% First we draw the vertices
+\foreach \pos/\name in {{(2,3)/0}, {(0,1.5)/1}, {(4,1.5)/2},
+{(2,0)/3}}
+\node[vertex] (\name) at \pos {$\name$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest/ \weight in {0/1/1, 2/0/3, 3/0/9, 1/3/2, 3/2/2}
+\path[arrow] (\source) -- node[weight]{$\weight$} (\dest);
+\end{tikzpicture}
+\end{center}
+
+\begin{description}
+
+\item[listas de adjacência] $\begin{array}{ll}
+  0 \mapsto \langle (1, 1) \rangle; & 1 \mapsto \langle (2, 3) \rangle; \\
+  2 \mapsto \langle (1, 3) \rangle, & 3 \mapsto \langle (0, 9), (2, 2) \rangle
+  \end{array}$
+
+\item[matriz de adjacência] $\left( 
+\begin{array}{cccc}
+0 & 1 & \infty & \infty \\
+\infty & 0 & \infty & 2 \\
+3 & \infty & 0 & \infty \\
+9 & \infty & 2 & 0
+\end{array}
+\right)
+$
+\end{description}
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Exercícios}
 
 \begin{itemize}
-\item Aplicar $\proc{DFS}$;
-\item Retornar a lista dos vértices em ordem decrescente do atributo $\id{f}$.
-\end{itemize}
+\item A matriz de adjacência de um grafo não dirigido é igual à sua
+  transposta.  A diagonal não carrega informação. Assim, mais da
+  metade da representação é redundante ou inútil. Para reduzir o
+  tamanho da representação, pode se utilizar um arranjo simples para
+  armazenar apenas as entradas abaixo da diagonal (ou apenas as
+  entradas acima da diagonal).
 
-\begin{codebox}
-\Procname{$\proc{Topological-Sort}(G)$}
-\zi aplique $\proc{DFS}$ a $G$
-\zi inserindo cada $v$ na cabeça de uma lista quando é finalizado
-\zi \Return a lista dos vértices
-\end{codebox}
+\item Ilustrando esta ideia com o nosso exemplo de grafo simple, a
+  matriz de adjacência pode ser compactada no arranjo seguinte:
+  \begin{center}
+  \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+    1 & 1 & 0 & 1 & 1 & 1 \\
+    \hline
+  \end{tabular}
+  \end{center}
+
+  A mesma coisa pode ser feita para grafos com pesos:
+  \begin{center}
+  \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+    1 & 3 & $\infty$ & 9 & 2 & 2 \\
+    \hline
+  \end{tabular}
+  \end{center}
+
+\item Dado dos vértices $u$ e $v$, tal que $u < v$, qual a posição
+  correspondente no arranjo de adjacência?
+\end{itemize}
 
 \end{frame}
 
 \begin{frame}
-\frametitle{Algoritmo detalhado}
-\framesubtitle{Ordenação topológica}
+
+\frametitle{Exercícios}
+
+\begin{enumerate}
+\item O grau de saída (de entrada) um vértice é o número de arestas que tem este vértice como fonte (destinho).
+\begin{itemize}
+\item Na representação com listas de adjacência, como calcular o grau de saída e de entrada de um vértice? Qual a complexidade destas operações?
+\item E com matrizes de adjacência?
+\end{itemize}
+\item Considere o problema de inverter as arestas de um grafo dirigido.
+\begin{itemize}
+\item Como fazer isto com a representação por listas de adjacência? Qual a complexidade?
+\item E com matrizes de adjacência?
+\item Relacione este problema com o de calcular a matriz transposta de uma matriz.
+\end{itemize}
+\item Dado um grafo $G = (V, E)$, o grafo $G^2$ é tal que $G^2 = (V, E')$, onde
+$E = \{ (u, w) \mid \exists v \cdot (u, v) \in E \land (v, w) \in E \}$.
+\begin{itemize}
+\item Como calcular $G^2$ com a representação por listas de adjacência? Qual a complexidade?
+\item E com matrizes de adjacência?
+\end{itemize}
+\end{enumerate}
+
+\end{frame}
+
+\section{Busca em largura}
+
+\begin{frame}
+\frametitle{Busca em largura}
+
+\begin{itemize}
+\item algoritmo elementar para visitar os vértices
+\item base para outros algoritmos importantes
+\begin{itemize}
+\item algoritmo de Dijkstra
+\item algoritmo de Prim
+\end{itemize}
+\item entrada: $G = (V, E)$ e $s \in V$
+\begin{itemize}
+\item dirigido ou não
+\end{itemize}
+\item resultado:
+\begin{itemize}
+\item distância (menor número de arestas) de $s$ para cada $v \in V$
+\item árvore ``em largura primeiro'' de raiz $s$ dos vértices alcançáveis
+\end{itemize}
+\item \alert{largura}: processa vértices de distância $k$ de $s$ antes dos
+vértices de distância $k+1$ de $s$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Princípios}
+
+\begin{enumerate}
+\item Coloração dos vértices: 
+\begin{itemize}
+\item branco: a visitar
+\item cinza: sendo visitado
+\item preto: visitado
+\item branco $\rightarrow$ cinza $\rightarrow$ preto
+\item chegada a um vértice: branco $\rightarrow$ cinza
+\item cinza: pode possuir vizinhos brancos
+\item preto: todos os vértices adjacentes são da cor cinza ou preto.
+\end{itemize}
+\item Árvore de processamento:
+\begin{itemize}
+\item se $v$ foi descoberto a partir de $u$: $u$ é \alert{predecessor} de $v$
+\end{itemize}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Implementação: dados}
+
+\begin{itemize}
+\item $\attrib{b}{color}$: cor do vértice $v$
+\begin{itemize}
+\item inicialmente: branco
+\end{itemize}
+\item $\attrib{v}{d}$: distância de $s$ a $v$ 
+\begin{itemize}
+\item inicialmente: $\infty$
+\end{itemize}
+\item $\attrib{v}{up}$: predecessor de $v$ 
+\begin{itemize}
+\item inicialmente: $\const{Nil}$
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Implementação: algoritmo}
+\framesubtitle{Parte 1: inicialização}
 
 \begin{codebox}
-\Procname{$\proc{Topological-Sort}(G)$}
-\zi \For $v \in \attrib{G}{V}$
-\zi \Do $\attrib{v}{visited} \gets \const{False}$
-    \End
-\zi $l \gets \const{Empty-List}$
-\zi \For $v \in \attrib{G}{V}$
-\zi \Do \If $\neg \attrib{v}{visited}$
-\zi   \Then $\proc{Topological-Sort-Visit}(v)$
-      \End
-    \End
-\zi \Return $l$
+\Procname{$\proc{BFS}(G, s)$}
+\zi \Comment{Inicialização}
+\zi \For $v \in V - \{ s \}$ 
+\zi \Do $\attrib{v}{color} \gets \const{White}$
+\zi   $\attrib{v}{up} \gets \const{Nil}$
+\zi   $\attrib{v}{d} \gets \infty$
+\zi \End
+\zi $\attrib{s}{color} \gets \const{Gray}$
+\zi $\attrib{s}{up} \gets \const{Nil}$
+\zi $\attrib{s}{d} \gets 0$
+\zi $\proc{Enqueue}(Q, s)$
 \end{codebox}
+\end{frame}
+
+\begin{frame}
+\frametitle{Implementação: algoritmo}
+\framesubtitle{Parte 2: processamento}
 
 \begin{codebox}
-\Procname{$\proc{Topological-Sort-Visit}(v, l)$}
-\zi $\attrib{v}{visited} \gets \const{True}$
-\zi \For $w \in \attrib{v}{adj}$
-\zi \Do \If $\neg \attrib{w}{visited}$
-\zi   \Then $\proc{Topological-Sort-Visit}(v, l)$
-      \End
-    \End
-\zi $l \gets \proc{Push-Front}(v, l)$
+\zi \Comment{Processamento}
+\zi \While $\neg \proc{Empty}(Q)$
+\zi \Do $u \gets \proc{Head}(Q)$
+\zi   \For $v \in \attrib{u}{adj}$
+\zi   \Do \If $\attrib{v}{color} \isequal \const{White}$
+\zi     \Then $\attrib{v}{color} \gets \const{Gray}$
+\zi       $\attrib{v}{d} \gets \attrib{u}{d}+1$
+\zi       $\attrib{v}{up} \gets u$
+\zi       $\proc{Enqueue}(Q, v)$
+     \End
+   \End
+\zi   $\proc{Dequeue}(Q)$
+\zi   $\attrib{u}{color} \gets \const{Black}$
+\zi \End
 \end{codebox}
-
 \end{frame}
 
 \begin{frame}
 \frametitle{Algoritmo}
-\framesubtitle{Exemplo}
+\framesubtitle{Ilustração}
 
+\tikzstyle{todo}=[circle solidus,fill=white,minimum size=30pt,inner sep=0pt,draw,thick]
+\tikzstyle{doing}=[circle solidus,fill=black!35,minimum size=30pt,inner sep=0pt]
 \begin{center}
-\includegraphics[height=.5\textheight]{fig/dag-1.pdf}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% Draw a 7,11 network
+% First we draw the white vertices
+\foreach \name/ \id/ \pos in {{0/v/(1,1)}, {1/w/(3,1)}, {2/x/(5,1)}, {3/y/(7,1)}, 
+  {4/r/(1, 3)}, {6/t/(5, 3)}, {7/u/(7, 3)}}
+\node[todo] (\name) at \pos {$\id$ \nodepart{lower} $\infty$};
+\foreach \name/ \id/ \pos in {{5/s/(3,3)}}
+\node[doing] (5) at \pos {$\id$ \nodepart{lower} $0$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest in {0/4, 1/2, 1/5, 1/6, 2/3, 3/7, 4/5, 6/7}
+\path[edge] (\source) -- (\dest);
+\node[rectangle, minimum size=20pt, draw] at (10,1) {$s$};
+\node[rectangle split, rectangle split parts=8, rectangle split horizontal=true, draw] at (1,-1) {
+$\mathsf{Nil}$
+\nodepart{two}$\mathsf{Nil}$
+\nodepart{three}$\mathsf{Nil}$
+\nodepart{four}$\mathsf{Nil}$
+\nodepart{five}$\mathsf{Nil}$
+\nodepart{six}$\mathsf{Nil}$
+\nodepart{seven}$\mathsf{Nil}$
+\nodepart{eight}$\mathsf{Nil}$
+};
+\end{tikzpicture}
 \end{center}
+\end{frame}
 
+\begin{frame}
+\frametitle{Algoritmo}
+\framesubtitle{Ilustração}
+
+\tikzstyle{todo}=[circle solidus,fill=white,minimum size=30pt,inner sep=0pt,draw,thick]
+\tikzstyle{doing}=[circle solidus,fill=black!35,minimum size=30pt,inner sep=0pt]
+\tikzstyle{done}=[circle solidus,text=white,fill=black!90,minimum size=30pt,inner sep=0pt,draw,thick]
+\begin{center}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% Draw a 7,11 network
+% First we draw the white vertices
+\foreach \name/ \id/ \pos in {{0/v/(1,1)}, {2/x/(5,1)}, {3/y/(7,1)}, 
+  {6/t/(5, 3)}, {7/u/(7, 3)}}
+\node[todo] (\name) at \pos {$\id$ \nodepart{lower} $\infty$};
+% Next we draw the gray vertices
+\foreach \name/ \id/ \pos/ \dist in {{1/w/(3,1)/1},{4/r/(1, 3)/1}}
+\node[doing] (\name) at \pos {$\id$ \nodepart{lower} $\dist$};
+% Next we draw the black vertices
+\foreach \name/ \id/ \pos/ \dist in {{5/s/(3,3)/0}}
+\node[done] (\name) at \pos {$\id$ \nodepart{lower} $\dist$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest in {0/4, 1/2, 1/5, 1/6, 2/3, 3/7, 4/5, 6/7}
+\path[edge] (\source) -- (\dest);
+\node[rectangle split, rectangle split parts=2, rectangle split horizontal=true, draw] at (10,1) {$w$ \nodepart{two} $r$};
+\node[rectangle split, rectangle split parts=8, rectangle split horizontal=true, draw] at (1,-1) {
+$\mathsf{s}$
+\nodepart{two}$\mathsf{Nil}$
+\nodepart{three}$\mathsf{Nil}$
+\nodepart{four}$\mathsf{Nil}$
+\nodepart{five}$\mathsf{Nil}$
+\nodepart{six}$\mathsf{s}$
+\nodepart{seven}$\mathsf{Nil}$
+\nodepart{eight}$\mathsf{Nil}$
+};
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Algoritmo}
+\framesubtitle{Ilustração}
+
+\tikzstyle{todo}=[circle solidus,fill=white,minimum size=30pt,inner sep=0pt,draw,thick]
+\tikzstyle{doing}=[circle solidus,fill=black!35,minimum size=30pt,inner sep=0pt]
+\tikzstyle{done}=[circle solidus,text=white,fill=black!90,minimum size=30pt,inner sep=0pt,draw,thick]
+\begin{center}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% Draw a 7,11 network
+% First we draw the white vertices
+\foreach \name/ \id/ \pos in {{0/v/(1,1)}, {3/y/(7,1)}, 
+  {7/u/(7, 3)}}
+\node[todo] (\name) at \pos {$\id$ \nodepart{lower} $\infty$};
+% Next we draw the gray vertices
+\foreach \name/ \id/ \pos/ \dist in {{4/r/(1, 3)/1},{2/x/(5,1)/2},{6/t/(5, 3)/2}}
+\node[doing] (\name) at \pos {$\id$ \nodepart{lower} $\dist$};
+% Next we draw the black vertices
+\foreach \name/ \id/ \pos/ \dist in {{1/w/(3,1)/1},{5/s/(3,3)/0}}
+\node[done] (\name) at \pos {$\id$ \nodepart{lower} $\dist$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest in {0/4, 1/2, 1/5, 1/6, 2/3, 3/7, 4/5, 6/7}
+\path[edge] (\source) -- (\dest);
+\node[rectangle split, rectangle split parts=3, rectangle split horizontal=true, draw] at (10,1) {$r$ \nodepart{two} $t$ \nodepart{three} $x$};
+\node[rectangle split, rectangle split parts=8, rectangle split horizontal=true, draw] at (1,-1) {
+$\mathsf{s}$
+\nodepart{two}$\mathsf{Nil}$
+\nodepart{three}$\mathsf{w}$
+\nodepart{four}$\mathsf{Nil}$
+\nodepart{five}$\mathsf{Nil}$
+\nodepart{six}$\mathsf{s}$
+\nodepart{seven}$\mathsf{w}$
+\nodepart{eight}$\mathsf{Nil}$
+};
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Algoritmo}
+\framesubtitle{Ilustração}
+
+\tikzstyle{todo}=[circle solidus,fill=white,minimum size=30pt,inner sep=0pt,draw,thick]
+\tikzstyle{doing}=[circle solidus,fill=black!35,minimum size=30pt,inner sep=0pt]
+\tikzstyle{done}=[circle solidus,text=white,fill=black!90,minimum size=30pt,inner sep=0pt,draw,thick]
+\begin{center}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% Draw a 7,11 network
+% First we draw the white vertices
+\foreach \name/ \id/ \pos in {{3/y/(7,1)},{7/u/(7, 3)}}
+\node[todo] (\name) at \pos {$\id$ \nodepart{lower} $\infty$};
+% Next we draw the gray vertices
+\foreach \name/ \id/ \pos/ \dist in {{2/x/(5,1)/2},{6/t/(5, 3)/2},{0/v/(1,1)/2}}
+\node[doing] (\name) at \pos {$\id$ \nodepart{lower} $\dist$};
+% Next we draw the black vertices
+\foreach \name/ \id/ \pos/ \dist in {{4/r/(1, 3)/1},{1/w/(3,1)/1},{5/s/(3,3)/0}}
+\node[done] (\name) at \pos {$\id$ \nodepart{lower} $\dist$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest in {0/4, 1/2, 1/5, 1/6, 2/3, 3/7, 4/5, 6/7}
+\path[edge] (\source) -- (\dest);
+\node[rectangle split, rectangle split parts=3, rectangle split horizontal=true, draw] at (10,1) {$t$ \nodepart{two} $x$ \nodepart{three} $v$};
+\node[rectangle split, rectangle split parts=8, rectangle split horizontal=true, draw] at (1,-1) {
+$\mathsf{s}$
+\nodepart{two}$\mathsf{Nil}$
+\nodepart{three}$\mathsf{w}$
+\nodepart{four}$\mathsf{Nil}$
+\nodepart{five}$\mathsf{r}$
+\nodepart{six}$\mathsf{s}$
+\nodepart{seven}$\mathsf{w}$
+\nodepart{eight}$\mathsf{Nil}$
+};
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Algoritmo}
+\framesubtitle{Ilustração}
+
+\tikzstyle{todo}=[circle solidus,fill=white,minimum size=30pt,inner sep=0pt,draw,thick]
+\tikzstyle{doing}=[circle solidus,fill=black!35,minimum size=30pt,inner sep=0pt]
+\tikzstyle{done}=[circle solidus,text=white,fill=black!90,minimum size=30pt,inner sep=0pt,draw,thick]
+\begin{center}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% Draw a 7,11 network
+% First we draw the white vertices
+\foreach \name/ \id/ \pos in {{3/y/(7,1)}}
+\node[todo] (\name) at \pos {$\id$ \nodepart{lower} $\infty$};
+% Next we draw the gray vertices
+\foreach \name/ \id/ \pos/ \dist in {{2/x/(5,1)/2},{0/v/(1,1)/2},{7/u/(7, 3)/3}}
+\node[doing] (\name) at \pos {$\id$ \nodepart{lower} $\dist$};
+% Next we draw the black vertices
+\foreach \name/ \id/ \pos/ \dist in {{6/t/(5, 3)/2},{4/r/(1, 3)/1},{1/w/(3,1)/1},{5/s/(3,3)/0}}
+\node[done] (\name) at \pos {$\id$ \nodepart{lower} $\dist$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest in {0/4, 1/2, 1/5, 1/6, 2/3, 3/7, 4/5, 6/7}
+\path[edge] (\source) -- (\dest);
+\node[rectangle split, rectangle split parts=3, rectangle split horizontal=true, draw] at (10,1) {$x$ \nodepart{two} $v$ \nodepart{three} $u$};
+\node[rectangle split, rectangle split parts=8, rectangle split horizontal=true, draw] at (1,-1) {
+$\mathsf{s}$
+\nodepart{two}$\mathsf{Nil}$
+\nodepart{three}$\mathsf{w}$
+\nodepart{four}$\mathsf{u}$
+\nodepart{five}$\mathsf{r}$
+\nodepart{six}$\mathsf{s}$
+\nodepart{seven}$\mathsf{w}$
+\nodepart{eight}$\mathsf{Nil}$
+};
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Algoritmo}
+\framesubtitle{Ilustração}
+
+\tikzstyle{todo}=[circle solidus,fill=white,minimum size=30pt,inner sep=0pt,draw,thick]
+\tikzstyle{doing}=[circle solidus,fill=black!35,minimum size=30pt,inner sep=0pt]
+\tikzstyle{done}=[circle solidus,text=white,fill=black!90,minimum size=30pt,inner sep=0pt,draw,thick]
+\begin{center}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% Draw a 7,11 network
+% No more white vertices
+% Next we draw the gray vertices
+\foreach \name/ \id/ \pos/ \dist in {{0/v/(1,1)/2},{7/u/(7, 3)/3},{3/y/(7,1)/3}}
+\node[doing] (\name) at \pos {$\id$ \nodepart{lower} $\dist$};
+% Next we draw the black vertices
+\foreach \name/ \id/ \pos/ \dist in {{2/x/(5,1)/2},{6/t/(5, 3)/2},{4/r/(1, 3)/1},{1/w/(3,1)/1},{5/s/(3,3)/0}}
+\node[done] (\name) at \pos {$\id$ \nodepart{lower} $\dist$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest in {0/4, 1/2, 1/5, 1/6, 2/3, 3/7, 4/5, 6/7}
+\path[edge] (\source) -- (\dest);
+\node[rectangle split, rectangle split parts=3, rectangle split horizontal=true, draw] at (10,1) {$v$ \nodepart{two} $u$ \nodepart{three} $y$};
+\node[rectangle split, rectangle split parts=8, rectangle split horizontal=true, draw] at (1,-1) {
+$\mathsf{s}$
+\nodepart{two}$\mathsf{Nil}$
+\nodepart{three}$\mathsf{w}$
+\nodepart{four}$\mathsf{u}$
+\nodepart{five}$\mathsf{r}$
+\nodepart{six}$\mathsf{s}$
+\nodepart{seven}$\mathsf{w}$
+\nodepart{eight}$\mathsf{x}$
+};
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Algoritmo}
+\framesubtitle{Ilustração}
+
+\tikzstyle{todo}=[circle solidus,fill=white,minimum size=30pt,inner sep=0pt,draw,thick]
+\tikzstyle{doing}=[circle solidus,fill=black!35,minimum size=30pt,inner sep=0pt]
+\tikzstyle{done}=[circle solidus,text=white,fill=black!90,minimum size=30pt,inner sep=0pt,draw,thick]
+\begin{center}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% Draw a 7,11 network
+% No more white vertices
+% Next we draw the gray vertices
+\foreach \name/ \id/ \pos/ \dist in {{7/u/(7, 3)/3},{3/y/(7,1)/3}}
+\node[doing] (\name) at \pos {$\id$ \nodepart{lower} $\dist$};
+% Next we draw the black vertices
+\foreach \name/ \id/ \pos/ \dist in {{0/v/(1,1)/2},{2/x/(5,1)/2},{6/t/(5, 3)/2},{4/r/(1, 3)/1},{1/w/(3,1)/1},{5/s/(3,3)/0}}
+\node[done] (\name) at \pos {$\id$ \nodepart{lower} $\dist$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest in {0/4, 1/2, 1/5, 1/6, 2/3, 3/7, 4/5, 6/7}
+\path[edge] (\source) -- (\dest);
+\node[rectangle split, rectangle split parts=2, rectangle split horizontal=true, draw] at (10,1) {$u$ \nodepart{two} $y$};
+\node[rectangle split, rectangle split parts=8, rectangle split horizontal=true, draw] at (1,-1) {
+$\mathsf{s}$
+\nodepart{two}$\mathsf{Nil}$
+\nodepart{three}$\mathsf{w}$
+\nodepart{four}$\mathsf{u}$
+\nodepart{five}$\mathsf{r}$
+\nodepart{six}$\mathsf{s}$
+\nodepart{seven}$\mathsf{w}$
+\nodepart{eight}$\mathsf{x}$
+};
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Algoritmo}
+\framesubtitle{Ilustração}
+
+\tikzstyle{todo}=[circle solidus,fill=white,minimum size=30pt,inner sep=0pt,draw,thick]
+\tikzstyle{doing}=[circle solidus,fill=black!35,minimum size=30pt,inner sep=0pt]
+\tikzstyle{done}=[circle solidus,text=white,fill=black!90,minimum size=30pt,inner sep=0pt,draw,thick]
+\begin{center}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% Draw a 7,11 network
+% No more white vertices
+% Next we draw the gray vertices
+\foreach \name/ \id/ \pos/ \dist in {{3/y/(7,1)/3}}
+\node[doing] (\name) at \pos {$\id$ \nodepart{lower} $\dist$};
+% Next we draw the black vertices
+\foreach \name/ \id/ \pos/ \dist in {{7/u/(7, 3)/3},{0/v/(1,1)/2},{2/x/(5,1)/2},{6/t/(5, 3)/2},{4/r/(1, 3)/1},{1/w/(3,1)/1},{5/s/(3,3)/0}}
+\node[done] (\name) at \pos {$\id$ \nodepart{lower} $\dist$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest in {0/4, 1/2, 1/5, 1/6, 2/3, 3/7, 4/5, 6/7}
+\path[edge] (\source) -- (\dest);
+\node[rectangle, draw] at (10,1) {$y$};
+\node[rectangle split, rectangle split parts=8, rectangle split horizontal=true, draw] at (1,-1) {
+$\mathsf{s}$
+\nodepart{two}$\mathsf{Nil}$
+\nodepart{three}$\mathsf{w}$
+\nodepart{four}$\mathsf{u}$
+\nodepart{five}$\mathsf{r}$
+\nodepart{six}$\mathsf{s}$
+\nodepart{seven}$\mathsf{w}$
+\nodepart{eight}$\mathsf{x}$
+};
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Algoritmo}
+\framesubtitle{Ilustração}
+
+\tikzstyle{todo}=[circle solidus,fill=white,minimum size=30pt,inner sep=0pt,draw,thick]
+\tikzstyle{doing}=[circle solidus,fill=black!35,minimum size=30pt,inner sep=0pt]
+\tikzstyle{done}=[circle solidus,text=white,fill=black!90,minimum size=30pt,inner sep=0pt,draw,thick]
+\begin{center}
+\begin{tikzpicture}[scale=.8, auto,swap]
+% Draw a 7,11 network
+% No more white vertices
+% No more gray vertices
+\foreach \name/ \id/ \pos/ \dist in {}
+\node[doing] (\name) at \pos {$\id$ \nodepart{lower} $\dist$};
+% Next we draw the black vertices
+\foreach \name/ \id/ \pos/ \dist in {{3/y/(7,1)/3},{7/u/(7, 3)/3},{0/v/(1,1)/2},{2/x/(5,1)/2},{6/t/(5, 3)/2},{4/r/(1, 3)/1},{1/w/(3,1)/1},{5/s/(3,3)/0}}
+\node[done] (\name) at \pos {$\id$ \nodepart{lower} $\dist$};
+% Connect vertices with edges and draw weights
+\foreach \source/ \dest in {0/4, 1/2, 1/5, 1/6, 2/3, 3/7, 4/5, 6/7}
+\path[edge] (\source) -- (\dest);
+\node[rectangle split, rectangle split parts=8, rectangle split horizontal=true, draw] at (1,-1) {
+$\mathsf{s}$
+\nodepart{two}$\mathsf{Nil}$
+\nodepart{three}$\mathsf{w}$
+\nodepart{four}$\mathsf{u}$
+\nodepart{five}$\mathsf{r}$
+\nodepart{six}$\mathsf{s}$
+\nodepart{seven}$\mathsf{w}$
+\nodepart{eight}$\mathsf{x}$
+};
+\end{tikzpicture}
+\end{center}
 \end{frame}
 
 \begin{frame}
 \frametitle{Complexidade}
-\framesubtitle{Ordenação topológica}
 
+\hspace*{-1cm}
+\begin{tabular}{ll}
+\begin{minipage}{.6\textwidth}
 \begin{itemize}
-\item $\proc{DFS}$: $\Theta(|V|+|E|)$
-\item + $\Theta(1)$ cada inserção de vértice $\equiv$ $\Theta(|V|)$
-\item = $\Theta(|V|+|E|)$
+\item dois laços aninhados
+\begin{itemize}
+\item um vértice entra em $Q$ quando é branco
+\item é imediatemente alterado para cinza
+\item logo entra no máximo uma vez em $Q$
 \end{itemize}
+\item a cada iteração do laço mais externo, um vértice é eliminado
+\item logo, o laço mais externo é executado no máximo $|V|$ vezes,
+\item o laço mais interno enumera as arestas de um nó
+\item cada aresta é enumerada no máximo duas vezes
+\item a complexidade é $O(|V|+|E|)$
+\end{itemize}
+\end{minipage}
+&
+\begin{minipage}{.35\textwidth}
+\small
+\begin{codebox}
+\zi \Comment{Processamento}
+\zi \While $\neg \proc{Empty}(Q)$
+\zi \Do $u \gets \proc{Head}(Q)$
+\zi   \For $v \in \attrib{u}{adj}$
+\zi   \Do \If $\attrib{v}{color} \isequal \const{White}$
+\zi     \Then $\attrib{v}{color} \gets \const{Gray}$
+\zi       $\attrib{v}{d} \gets \attrib{u}{d}+1$
+\zi       $\attrib{v}{up} \gets u$
+\zi       $\proc{Enqueue}(Q, v)$
+     \End
+   \End
+\zi   \proc{Dequeue}(Q)
+\zi   $\attrib{u}{color} \gets \const{Black}$
+\zi \End
+\end{codebox}
+\end{minipage}
+\end{tabular}
 \end{frame}
 
 \begin{frame}
 \frametitle{Correção}
-\framesubtitle{Ordenação topológica}
 
+\begin{quote}
+É correto o algoritmo $\proc{BFS}$?
+\end{quote}
+\pause
+Roteiro da demonstração:
 \begin{enumerate}
-\item Lema: caracterização de DAG por arestas
-\item Teorema: correção do algoritmo proposto
+\item Definições: distância de menor caminho, menor caminho.
+\item Propriedade da distância de menor caminho.
+\item Propriedade sobre a fila $\id{Q}$ no algoritmo $\proc{BFS}$
+\item Propriedade sobre o atributo $\id{d}$ do algoritmo $\proc{BFS}$
+\begin{itemize}
+\item maior ou igual à distância de menor caminho
+\item igual à distância de menor caminho
+\end{itemize}
+\item Teorema: correção de $\proc{BFS}$
 \end{enumerate}
 
 \end{frame}
 
 \begin{frame}
-\frametitle{Aciclicidade e arestas}
+\frametitle{Distância de menor caminho, menor caminho}
+\framesubtitle{Correção}
 
-\begin{lemma}[Arestas e DAG]
-Um grafo dirigido $G = (V, E)$ é acíclico (um DAG) se e somente se qualquer aplicação de $\proc{DFS}(G)$ encontra nenhuma aresta de volta.
+\begin{definition}[Distância de menor caminho]
+A distância de menor caminho $\delta(s, v)$ entre dois vértices $s$ e $v$
+é o menor número de arestas entre todos os caminhos de $s$ até $v$, se 
+existir algum caminho. Caso contrário é $\infty$.
+\end{definition}
+
+\begin{definition}[Menor caminho]
+Um caminho entre $s$ e $v$ é um menor caminho se tem $\delta(s, v)$ arestas.
+\end{definition}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Propriedade da distância de menor caminho}
+\framesubtitle{Correção}
+
+\begin{lemma}[Lema da distância de menor caminho]
+\label{lemma:dist-menor-caminho}
+Seja $G = (V, E)$ um grafo (dirigido ou não) e $s \in V$. 
+Para qualquer aresta $(u, v) \in E$, temos: \alert{$\delta(s, v) \le \delta(s, u)+1$}.
 \end{lemma}
 \pause
-Plano de prova
-\begin{itemize}
-\item ($\Leftarrow$) nenhuma aresta de volta $\Rightarrow$ nenhum ciclo
-\item ($\Rightarrow$) nenhum ciclo $\Rightarrow$ nenhuma aresta de volta
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Aciclicidade e arestas}
-\framesubtitle{Demonstração}
-
+\begin{center}
+\begin{tikzpicture}[scale=.7, auto,swap]
+\node[vertex] (s) at (1,2) {$s$};
+\node[vertex] (u) at (0,0) {$u$};
+\node[vertex] (v) at (2,0) {$v$};
+\path[edge] (u) -- (v);
+\path[path] (s) -- (u) node [left,align=right,midway] {$\delta(s, u)$};
+\path[path] (s) -- (v) node [right,align=left,midway] {$\delta(s, v)$};
+\end{tikzpicture}
+\end{center}
 \begin{proof}
-\only<1>{
-\begin{tabular}{c}
-($\Leftarrow$) nenhuma aresta de volta $\Rightarrow$ nenhum ciclo \\
-$\equiv$
-ciclo $\Rightarrow$ aresta de volta
-\end{tabular}
-\begin{itemize}
-\item $G$ possui um ciclo $c$
-\item seja $v$ o primeiro vértice de $c$ encontrado em uma busca em profundidade
-\item seja $(u, v)$ a aresta de $c$ chegando em $v$
-\item pelo teorema do caminho branco: na etapa $\attrib{v}{d}$, há um caminho branco até $u$ 
-\item $u$ torna-se um descendente de $v$ na floresta em profundidade
-\item logo, $(u, v)$ é uma aresta de volta.
-\end{itemize}
-}
-\only<2>{
-\begin{tabular}{c}
-($\Rightarrow$) nenhum ciclo $\Rightarrow$ nenhuma aresta de volta \\
-$\equiv$ \\
-aresta de volta $\Rightarrow$ ciclo
-\end{tabular}
-\begin{itemize}
-\item seja $(u, v)$ uma aresta de volta.
-\item logo $v$ é um ancestro de $u$ na floresta de profundidade.
-\item então há um caminho de $v$ até $v$, passando por $u$: é um ciclo
-\end{itemize}
-}
+  Se há um caminho de $s$ até $u$, também há um até $v$. 
+  O menor caminho até $v$ não pode ser maior que o menor caminho até $u$ seguido de $(u, v)$.
+  
+  Se não existe caminho de $s$ até $u$, então $\delta(s, v) = \delta(s, u) = \infty$.
 \end{proof}
+
 \end{frame}
 
 \begin{frame}
-\frametitle{Correção de $\proc{Topological-Sort}$}
+\frametitle{Propriedade da fila no algoritmo $\proc{BFS}$}
+\framesubtitle{Correção}
 
-\begin{theorem}[Correção do algoritmo $\proc{Topological-Sort}$]
-$\proc{Topological-Sort}(G)$ produz uma ordenação topológica de um grafo dirigido acíclico $G$.
+Mostramos então uma propriedade sobre a fila $Q$
+
+\begin{lemma}[fila no algoritmo $\proc{BFS}$]
+Durante a execução de $\proc{BFS}(G, s)$, a fila $Q = \langle v_1, v_2, \ldots v_r \rangle$
+($v_1$ cabeça). Então $\attrib{v_r}{d} \le \attrib{v_1}{d}+1$ e $\attrib{v_i}{d} \le \attrib{v_{i+1}}{d}$, para $i \in 1 \twodots r-1$.
+\end{lemma}
+\pause
+\begin{proof}
+\begin{description}
+\item[] Indução sobre operações da fila.
+\only<2>{
+\item[base] $Q = \langle s \rangle$ e a propriedade é satisfeita.
+}
+\only<3>{
+\item[em geral] prova por caso ($\proc{Enqueue}$ e $\proc{Dequeue}$)
+}
+\only<4>{
+\item[$\proc{Dequeue}$] A nova cabeça é $v_2$. Por hipótese, temos $\attrib{v_r}{d} \le \attrib{v_1}+1 \le \attrib{v_2}+1$, pela hipótese de indução. As outras desigualdades permanecem.
+}
+\only<5>{
+\item[$\proc{Enqueue}$] Um vértice $v$ é inserido, tornando-se $v_{r+1}$. Neste caso, a variável $u$ tem
+como valor $v_1$. Logo $(v_1, v_{r+1})$ é uma aresta, e $\attrib{v_{r+1}}{d} = \attrib{v_1}{d} + 1$.
+Temos que $\attrib{v_r}{d} \le \attrib{v_1}{d}+1 = \attrib{v_{r+1}}{d}$. As outras desigualdades permanecem.
+}
+\end{description}
+\end{proof}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Propriedade do atributo $\id{d}$ no algoritmo $\proc{BFS}$}
+\framesubtitle{Correção}
+
+Prova que $\delta(s, v) \le \attrib{v}{d}$ \ldots
+\begin{lemma}[atributo $d$ no algoritmo $\proc{BFS}$]
+Seja $G = (V, E)$ um grafo (dirigido ou não), $s \in V$ um vértice
+qualquer. Aplicamos o algoritmo $\proc{BFS}(G, s)$. 
+
+Quando o algoritmo termina, para qualquer $v$: $\attrib{v}{d} \ge \delta(s, v)$.
+\end{lemma}
+\pause
+\begin{proof}
+  Por indução no número de aplicações de $\proc{Enqueue}$.
+
+  \begin{enumerate}
+  \item[base] (após $\proc{Enqueue}(s)$) $\attrib{v}{d} = 0 = \delta(s, s)$, e ,
+    se $v \neq s$, $\attrib{v}{d} = \infty \ge \delta(s, v)$.
+  \item[caso geral] seja $v$ um vértice branco alcançado na visita de $u$.
+    \begin{itemize}
+      \item por hipótese de indução, $\attrib{u}{d} \ge \delta(s, u)$
+      \item o algoritmo diz que $\attrib{v}{d} \gets \attrib{u}{d} + 1$
+      \item logo $\attrib{v}{d} \ge \delta(s, u)+1$
+      \item e, pelo lema da distância de menor caminho, $\attrib{v}{d} \ge \delta(s, v)$.
+    \end{itemize}
+  \item[] o valor de $\attrib{v}{d}$ não é mais alterado
+  \end{enumerate}
+\end{proof}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{O algoritmo $\proc{BFS}$ calcula as distâncias de menor caminho}
+\framesubtitle{Correção}
+
+Mostramos enfim que $\proc{BFS}$ calcula as distâncias de menor caminho.
+
+\begin{theorem}[Correção do algoritmo $\proc{BFS}$]
+Durante a execução de $\proc{BFS}(G, s)$, para cada vértice $v \in V$ alcançável a partir de $s$:
+\begin{itemize}
+\item $v$ é processado,
+\item no término, $\attrib{v}{d} = \delta(s, v)$.
+\item se $v \neq s$, um dos menores caminhos de $s$ até $v$ é composto por um dos menores caminhos de $s$ até
+$\attrib{v}{up}$ e pela aresta $(\attrib{v}{up}, v)$.
+\end{itemize}
 \end{theorem}
 \end{frame}
 
 \begin{frame}
-\frametitle{Correção de $\proc{Topological-Sort}$}
+\frametitle{Prova do teorema principal}
+\framesubtitle{Correção}
 
-\begin{proof}
+\begin{proof}[Por casos]
+
+\only<1>{
 \begin{itemize}
-\item Basta mostrar que: em um DAG, se há uma aresta $(u, v)$, então $\attrib{v}{f} < \attrib{u}{f}$.
-\item $(u, v)$ não é uma aresta de volta
-\item Quando encontrado, $v$ é branco ou preto
+\item $v$ não é alcançável a partir de $s$
+\item $v$ é alcançável a partir de $s$
+\end{itemize}
+}
+\only<2>{
+$v$ não é alcançável a partir de $s$:
+
 \begin{itemize}
-\item se $v$ for branco, é um descendente de $u$ e $\attrib{v}{f} < \attrib{u}{f}$
-\item se $v$ for preto, já foi finalizado e $\attrib{v}{f} < \attrib{u}{d} < \attrib{u}{f}$.
+
+\item $\delta(s, v) = \infty$.
+
+\item Pelo lema do atributo $\id{d}$, $\attrib{v}{d} \ge \delta(s, v)$,
+
+\item como não é possível atribuir $\infty$ a $\attrib{v}{d}$ no laço principal de $\proc{BFS}$,
+
+\item logo o laço só processa nós alcançáveis a partir de $s$.
+
+\item Então, no término do algoritmo $\attrib{v}{d} = \infty = \delta(s, v)$.
 \end{itemize}
+}
+\only<3>{
+$v$ é alcançável a partir de $s$:
+
+\begin{itemize}
+
+\item Seja $V_k = \{ v \in V \mid \delta(s, v) = k \}$
+
+\item prova por indução sobre $k$.
+
+\item propriedade sobre $k$: se $v \in V_k$, existe um ponto durante a execução tal que
+\begin{enumerate}
+\item $\attrib{v}{color} = \const{Gray}$
+\item $\attrib{v}{d}$ é atribuído $k$
+\item se $v \neq s$, então $\attrib{v}{up}$ é atribuído $u$, onde $u \in V_{k-1}$
+\item $v$ é inserido em $Q$
+\end{enumerate}
+\item obs.: se esse ponto existir, necessariamente é unico ($\id{color}$,
+$\id{d}$ e $\id{up}$ são atribuídos no máximo uma vez).
 \end{itemize}
+}
+
 \end{proof}
 \end{frame}
 
-\section{Componentes fortemente conectados}
-
 \begin{frame}
-\frametitle{Componentes fortemente conectados}
+\frametitle{Prova do teorema principal}
+\framesubtitle{Correção}
+
+Caso de base: $k = 0$
+
 \begin{itemize}
-\item \alert{SCC}: \textit{Strongly connected components}
-\item Decomposição de um grafo dirigido em grafos menores
-\item Permite, para alguns problemas de grafos, aplicar estratégia de
-  divisão e conquista.
+
+\item Por definição, $V_0 = \{ s \}$. 
+
+\item Na fase de inicialização do algoritmo:
+
+\begin{enumerate}
+\item $\attrib{s}{color}$ é atribuído $\const{Gray}$
+\item $\attrib{s}{d}$ é atribuído $0$
+\item $s$ é inserido em $Q$
+\end{enumerate}
+
 \end{itemize}
 \end{frame}
 
 \begin{frame}
+\frametitle{Prova do teorema principal}
+\framesubtitle{Correção}
 
-\frametitle{Definição}
+Em geral: $k > 0$
 
 \begin{itemize}
-\item Notação: $u \leadsto v$ existe um caminho de $u$ até $v$
+\item $Q \neq \langle \rangle$ antes do término.
+\item pelo lema da fila, se os vértices são inseridos em ordem $v_1, v_2, \ldots v_r$ então
+$\attrib{v_1}{d} \le \attrib{v_2}{d} \le \ldots \attrib{v_r}{d}$.
+\item seja $v \in V_k$, $k \ge 1$,
+\item $v$ só pode ser encontrado quando todos os vértices de $V_{k-1}$ tiverem entrados na fila.
+\item $v \in V_k \Rightarrow \delta(s, v) = k$, logo há um menor caminho de $k$ arestas entre $s$ e $v$, passando por $u \in V_{k-1}$, e $(u, v) \in E$.
+\item seja $u$ o primeiro desses vértices que foi encontrado: $u$ deve ter entrado em $Q$
+\item $u$ necessariamente torna-se a cabeça de $Q$ em um momento
+\item $v$ deve ser descoberto quando processa as arestas de $u$, e
+\begin{enumerate}
+\item $\attrib{v}{color}$ é atribuído $\const{Gray}$
+\item $\attrib{v}{d}$ é atribuído $\attrib{u}{d}+1 = \delta(s, u)+1 = (k-1)+1 =k$
+\item $\attrib{v}{up}$ é atribuído $u$
+\item $v$ é inserido em $Q$
+\end{enumerate}
 \end{itemize}
 
-\begin{definition}[Componente fortemente contectado]
-Um \emph{componente fortemente conectado} de um grafo $G = (V, E)$ é um
-conjunto máximo de vértices $U \subseteq V$ tal que para qualquer $(u, v) \in U^2$,
-então $u \leadsto v$ e $v \leadsto u$.
-\end{definition}
-
-\begin{center}
-\includegraphics[height=.4\textheight]{fig/scc-1.pdf}
-\end{center}
 \end{frame}
 
 \begin{frame}
+\frametitle{Prova do teorema principal}
+\framesubtitle{Correção}
 
-\frametitle{Matriz transposta}
+\begin{itemize}
+\item Isso conclui a prova por indução
+\item Além disto, quando $v \in V_k$, então $\attrib{v}{up} \in V_{k-1}$.
+\item podemos formar um menor caminho entre $s$ e $v$ com o menor
+caminho entre $s$ e $\attrib{v}{up}$, seguido da aresta $(\attrib{v}{up}, v)$.
+\end{itemize}
 
-O algoritmo para encontrar os SCC de $G$ utiliza o grafo transposto de $G$.
-
-\begin{definition}[Grafo transposto]
-O \emph{grafo transposto} de um grafo dirigido $G = (V, E)$ é 
-o grafo dirigido $G^T = (V, E^T)$, onde $E^T = \{ (u, v) | (v, u) \in E\}$.
-
-\end{definition}
-
-
-\begin{center}
-\includegraphics[height=.4\textheight]{fig/scc-4.pdf}
-\end{center}
-
-\only<2-3>{\alert{Complexidade?}}\only<3>{$Theta(|V|+|E|)$}
 \end{frame}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{$\proc{BFS}$ e árvore de processamento em largura}
+
+\begin{itemize}
+\item $\proc{BFS}$ calcula também uma árvore, formada pelas arestas
+$(\attrib{v}{up}, v)$.
+\item Esta árvore é uma árvore de processamento em largura.
+\end{itemize}
+\begin{definition}[Sub-grafo dos predecessores]
+Seja $G=(V, E)$ um grafo, o sub-grafo dos predecessores é o
+grafo $G_\pi = (V_\pi, E_\pi)$, onde
+\begin{itemize}
+\item $V_\pi = \{s\} \cup \{ v \in V \mid \attrib{v}{up} \neq \const{Nil} \}$, e
+\item $E_\pi = \{ (\attrib{v}{up}, v) \mid v \in V_\pi - \{ s \} \}$
+\end{itemize}
+\end{definition}
+
+\begin{definition}[Árvore de processamento em largura]
+Um sub-grafo dos predecessores é uma árvore de processamento em largura
+quando $V_\pi$ é composto por $s$ e por todos os vértices alcançáveis
+$v \in V_\pi$, existe um único caminho entre $s$ e $v$ em $G_\pi$. Este
+caminho é um menor caminho entre $s$ e $v$ em $G$.
+\end{definition}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Exercícios}
+\begin{enumerate}
+\item Escreva um algoritmo que, dado um grafo $G=(V, E)$, dois vértices $u$ e
+  $v$, imprime um menor caminho entre $u$ e $v$, se esse existir.
+\item Qual seria a complexidade de $\proc{BFS}$, caso seja adotada uma matriz de
+  adjacência, uma vez feitas as adaptações necessárias?
+\item Mostre que o valor atribuído a $\attrib{u}{d}$ é independente da ordem dos
+  vértices nas listas de adjacência.
+\item Um grafo é bipartido se o conjunto de vértices pode ser separado em dois
+  conjuntos, digamos $V_1$ e $V_2$, tal que todas as arestas relacionam um
+  vértice de $V_1$ com um vértice de $V_2$.
+
+  Forneça um algoritmo eficiente que testa se um grafo é bipartido.
+\end{enumerate}
+\end{frame}
+
+\section{Busca em profundidade}
+
+\begin{frame}
+\frametitle{Busca em profundidade}
+
+\begin{itemize}
+\item algoritmo elementar para visitar os vértices
+\item base para outros algoritmos importantes
+\item entrada: $G = (V, E)$
+\begin{itemize}
+\item dirigido ou não
+\end{itemize}
+\item resultado:
+\begin{itemize}
+\item floresta de árvores ``em profundidade primeiro'' dos vértices de $G$
+\end{itemize}
+\item \alert{profundidade}: prioriza vértices mais distantes do ponto de partida.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Princípios}
+
+\begin{itemize}
+\item inicia em um vértice
+\item visita os vértices alcançáveis, indo o mais ``profundo'' possível
+\item volte e explora outro caminho repetidamente
+\item recomeça a busca a partir de outro vértice não visitado
+\item gera uma floresta
+\item cada vértice $v$ tem atributo $\attrib{v}{up}$.
+\item Sub-grafo dos predecessores: $G_\pi = \{ (\attrib{v}{up}, v) \mid v \in V \land \attrib{v}{up} \neq \const{Nil} \}$.
+\item A mesma convenção de coloração é utilizada
+\item Cada vértice tem dois marcadores: 
+\begin{itemize}
+\item $\attrib{v}{d}$: quando $v$ é descoberto
+\item $\attrib{v}{f}$: quando $f$ é finalizado
+\item $\attrib{v}{color} = \const{Black} \Rightarrow \attrib{v}{d} < \attrib{v}{f}$
+\item variável global $\id{time}$ marca as etapas
+\end{itemize}
+\end{itemize}
+\end{frame}
 
 \begin{frame}
 \frametitle{Algoritmo}
-\framesubtitle{As etapas principais}
 
 \begin{codebox}
-\Procname{$\proc{Graph-SCC}(G)$}
-\li $\proc{DFS}(G)$
-\li $G^T \gets \proc{Graph-Transpose}(G)$
-\li $\proc{DFS}(G^T)$ t.~q. laço principal processa vértices por $\id{f}$ decrescente
-\li cada árvore da floresta de profundidade resultado é um SCC
+\Procname{$\proc{Tick}$}
+\zi $\id{time} \gets \id{time} + 1$
+\zi \Return $\id{time}$
+\end{codebox}
+
+\begin{codebox}
+\Procname{$\proc{DFS}(G)$}
+\zi \For $v \in \attrib{G}{V}$
+\zi \Do $\attrib{v}{color} \gets \const{White}$
+\zi   $\attrib{v}{up} \gets \const{Nil}$
+    \End
+\zi $\id{time} \gets 0$
+\zi \For $v \in \attrib{G}{V}$
+\zi \Do \If $\attrib{v}{color} \isequal \const{White}$
+\zi   \Then $\proc{DFS-visit}(v)$
+      \End
+    \End
 \end{codebox}
 
 \end{frame}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Algoritmo}
+
+\begin{codebox}
+\Procname{$\proc{DFS-visit}(v)$}
+\zi $\attrib{v}{color} \gets \const{Gray}$
+\zi $\attrib{v}{d} \gets \proc{Tick}$
+\zi \For $w \in \attrib{v}{adj}$
+\zi \Do \If $\attrib{w}{color} \isequal \const{White}$
+\zi   \Then $\attrib{w}{up} \gets v$
+\zi   $\proc{DFS-visit}(w)$
+      \End
+    \End
+\zi $\attrib{v}{color} \gets \const{Black}$
+\zi $\attrib{v}{f} \gets \proc{Tick}$
+\end{codebox}
+
+\end{frame}
 
 \begin{frame}
 \frametitle{Ilustração}
-\framesubtitle{Algoritmo}
 
-\only<1-2>{
+\only<1>{
 \begin{center}
-\includegraphics{fig/scc-1.pdf}
+\includegraphics[width=.8\textwidth]{fig/dfs-1.pdf}
 \end{center}
 }
 
-\only<2-4>{
+\only<2>{
 \begin{center}
-\includegraphics{fig/scc-3.pdf}
+\includegraphics[width=.8\textwidth]{fig/dfs-2.pdf}
 \end{center}
 }
 
 \only<3>{
 \begin{center}
-\includegraphics{fig/scc-4.pdf}
+\includegraphics[width=.8\textwidth]{fig/dfs-3.pdf}
 \end{center}
 }
 
 \only<4>{
 \begin{center}
-\includegraphics{fig/scc-5.pdf}
+\includegraphics[width=.8\textwidth]{fig/dfs-4.pdf}
+\end{center}
+}
+
+\only<5>{
+\begin{center}
+\includegraphics[width=.8\textwidth]{fig/dfs-5.pdf}
+\end{center}
+}
+
+\only<6>{
+\begin{center}
+\includegraphics[width=.8\textwidth]{fig/dfs-6.pdf}
+\end{center}
+}
+
+\only<7>{
+\begin{center}
+\includegraphics[width=.8\textwidth]{fig/dfs-7.pdf}
+\end{center}
+}
+
+\only<8>{
+\begin{center}
+\includegraphics[width=.8\textwidth]{fig/dfs-8.pdf}
+\end{center}
+}
+
+\only<9>{
+\begin{center}
+\includegraphics[width=.8\textwidth]{fig/dfs-9.pdf}
+\end{center}
+}
+
+\only<10>{
+\begin{center}
+\includegraphics[width=.8\textwidth]{fig/dfs-10.pdf}
+\end{center}
+}
+
+\only<11>{
+\begin{center}
+\includegraphics[width=.8\textwidth]{fig/dfs-11.pdf}
+\end{center}
+}
+
+\only<12>{
+\begin{center}
+\includegraphics[width=.8\textwidth]{fig/dfs-12.pdf}
+\end{center}
+}
+
+\only<13>{
+\begin{center}
+\includegraphics[width=.8\textwidth]{fig/dfs-13.pdf}
+\end{center}
+}
+
+\only<14>{
+\begin{center}
+\includegraphics[width=.8\textwidth]{fig/dfs-14.pdf}
+\end{center}
+}
+
+\only<15>{
+\begin{center}
+\includegraphics[width=.8\textwidth]{fig/dfs-15.pdf}
+\end{center}
+}
+
+\only<16>{
+\begin{center}
+\includegraphics[width=.8\textwidth]{fig/dfs-16.pdf}
+\end{center}
+}
+
+\only<17>{
+\begin{center}
+\includegraphics[width=.8\textwidth]{fig/dfs-17.pdf}
 \end{center}
 }
 
 \end{frame}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \begin{frame}
-\frametitle{Complexidade}
-\framesubtitle{Algoritmo}
 
+\frametitle{Complexidade do algoritmo}
+
+\only<1>{
 \begin{codebox}
-\Procname{$\proc{Graph-SCC}(G)$}
-\li $\proc{DFS}(G)$ \assert{\Comment $\Theta(|V|+|E|)$}
-\li $G^T \gets \proc{Graph-Transpose}(G)$ \assert{\Comment $\Theta(|V|+|E|)$}
-\li $\proc{DFS}(G^T)$ \assert{\Comment $\Theta(|V|+|E^T|) = \Theta(|V|+|E|)$}
+\Procname{$\proc{DFS}(G)$}
+\zi \For $v \in \attrib{G}{V}$ \assert{\Comment $\Theta(|V|)$}
+\zi \Do $\attrib{v}{color} \gets \const{White}$
+\zi   $\attrib{v}{up} \gets \const{Nil}$
+    \End
+\zi $\id{time} \gets 0$
+\zi \For $v \in \attrib{G}{V}$ \assert{\Comment $\Theta(|V|)$}
+\zi \Do \If $\attrib{v}{color} \isequal \const{White}$
+\zi   \Then $\proc{DFS-visit}(v)$
+    \End
+  \End
 \end{codebox}
-\pause
+}
+\only<2>{
+\begin{codebox}
+\Procname{$\proc{DFS-visit}(v)$}
+\zi \assert{\Comment{$\Theta(|V|)$ chamadas}}
+\zi $\attrib{v}{color} \gets \const{Gray}$
+\zi $\attrib{v}{d} \gets \proc{Tick}$
+\zi \For $w \in \attrib{v}{adj}$ \assert{\Comment{total: $\Theta(|E|)$}}
+\zi \Do \If $\attrib{w}{color} \isequal \const{White}$
+\zi   \Then $\attrib{w}{up} \gets v$
+\zi   $\proc{DFS-visit}(w)$
+      \End
+    \End
+\zi $\attrib{v}{color} \gets \const{Black}$
+\zi $\attrib{v}{f} \gets \proc{Tick}$
+\end{codebox}
+}
+\only<3>{
 $$
 \Theta(|V|+|E|)
 $$
+}
+
 \end{frame}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \begin{frame}
-\frametitle{Correção (roteiro)}
-\framesubtitle{Algoritmo}
+\frametitle{Propriedades}
 
 \begin{enumerate}
-\item propriedade dos caminhos entre vértices de um mesmo SCC
-\item propriedade sobre busca em profundidade e vértices de um SCC
-\item noção de \alert{antepassado} de um vértice em uma busca em profundidade
-\item relação entre antepassado na busca e ancestro no grafo
-\item propriedade sobre antepassado e SCC
-\item propriedade sobre antepassados dos vértices de um mesmo SCC
-\item correção do algoritmo
+\item a relação predecessor forma uma floresta de árvores
+\item estrutura de aninhamento da busca: teorema dos parênteses
+\item condição necessária e suficiente de alcançabilidade: teorema do caminho branco
+\item classificação das arestas na busca em profundidade
+\item busca em profundidade em grafos não dirigidos
 \end{enumerate}
+
 \end{frame}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \begin{frame}
-\frametitle{Caminhos entre vértices de um mesmo SCC}
-\framesubtitle{Correção}
+\frametitle{A relação predecessor}
 
-\begin{lemma}[Caminhos entre vértices de um mesmo SCC]
-Seja $u$ e $v$ dois vértices quaisqueres de um mesmo SCC. Então todos
-os vértices nos caminhos entre $u$ e $v$ estão neste mesmo SCC.
-\end{lemma}
-\pause
-\begin{proof}
-Seja $w$ um vértice no caminho de $u$ até $v$. Logo $u \leadsto w$. Precisamos verificar que $w \leadsto u$.
 \begin{itemize}
-\item Como $w$ está no camino de $u$ até $v$, então $w \leadsto v$.
-\item Como $u$ e $v$ estão no mesmo SCC, $v \leadsto u$.
+\item O grafo dos predecessores $G_\pi$ é uma floresta de árvores.
+
+\item as arestas correspondem às chamadas de $\proc{DFS-visit}$
+
 \end{itemize}
-Logo $w \leadsto u$.
-\end{proof}
+
 \end{frame}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Estrutura aninhada}
+
+\begin{itemize}
+
+\item Etapas de descoberta e finalização formam uma estrutura de parênteses.
+
+\begin{itemize}
+
+\item $\attrib{v}{d} \gets ...$ $\Longrightarrow$ $(v$
+
+\item $\attrib{v}{f} \gets ...$ $\Longrightarrow$ $v)$
+
+\item exemplo $(u (v (y (x x) y) v) u) (w (z z) w)$
+
+\includegraphics[width=.4\textwidth]{fig/dfs-1}
+
+\end{itemize}
+
+\end{itemize}
+
+\end{frame}
 
 \begin{frame}
-\frametitle{Busca em profundidade e vértices de um SCC}
-\framesubtitle{Correção}
+\frametitle{Teorema dos parênteses}
 
-\begin{theorem}[Busca em profundidade e vértices de um SCC]
-Em qualquer busca em profundidade, todos os vértices em um SCC
-encontram-se em uma mesma árvore da busca em profundidade.
+\begin{theorem}[Teorema dos parênteses]
+No percurso em profundidade de um grafo $G$, para qualquer par de vértices $u$ e $v$, uma
+das três condições seguintes é satisfeita:
+\begin{enumerate}
+\item os intervalos $[\attrib{u}{d}, \attrib{u}{f}]$ e $[\attrib{v}{d}, \attrib{v}{f}]$ não têm superposição;
+\item o intervalo $[\attrib{u}{d}, \attrib{u}{f}]$ é inteiramente contido em $[\attrib{v}{d}, \attrib{v}{f}]$;
+\item o intervalo $[\attrib{u}{d}, \attrib{u}{f}]$ contem inteiramente $[\attrib{v}{d}, \attrib{v}{f}]$.
+\end{enumerate}
 \end{theorem}
-\pause
-\begin{proof}
-Seja $u$ o primeiro vértice do SCC encontrado na busca em profundidade,
-e $v$ qualquer outro vértice do $SCC$.
-\begin{itemize}
-\item na etapa $\attrib{u}{d}$, todos os demais vértices do SCC estão brancos
-\item pelo teorema do caminho branco, $v$ é um descendente de $u$ na floresta
-de profundidade
-\end{itemize}
-Logo, $u$ e $v$ estão na mesma árvore de profundidade.
-\end{proof}
+
+\begin{corollary}[Aninhamento dos intervalos dos descendentes]
+Se $v$ é um descendente próprio de $u$ na floresta de busca em profundidade, então
+$$\attrib{u}{d} < \attrib{v}{d} < \attrib{v}{f} < \attrib{u}{f}$$
+\end{corollary}
+
 \end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
-\frametitle{Antepassado na busca em profundidade}
-\framesubtitle{Correção}
+\frametitle{Teorema dos parênteses}
+\framesubtitle{Demonstração}
 
+\begin{proof}
+Por casos:
+\begin{enumerate}
+\item se $\attrib{u}{d} < \attrib{v}{d}$
+\begin{enumerate}
+\item se $\attrib{v}{d} < \attrib{u}{f}$: 
 \begin{itemize}
-\item $\attrib{v}{d}$ e $\attrib{v}{f}$ são os valores obtidos em $\proc{DFS}(G)$
+\item $v$ é descoberto quando $u$ é cinza, logo $v$ é descendente de $u$.
+\item $v$ é mais recente que $u$ e as arestas saindo de $v$ são processadas 
+  antes de finalizar as de $u$, logo $\attrib{v}{f} < \attrib{u}{f}$. 
+\item O intervalo para $v$ é contido no intervalo para $u$.
 \end{itemize}
-
-\begin{definition}[Antepassado em uma busca em profundidade]
-Em uma busca em profundidade, para qualquer vértice $u$, o antepassado
-de $u$, denotado $\phi(u)$, é o vértice $v$ tal que $u \leadsto v$ com o
-maior valor de $\id{f}$.
-\end{definition}
-
-\only<2>{
+\item se $\attrib{u}{f} < \attrib{v}{d}$: 
 \begin{itemize}
-\item um antepassado por SCC ($\approx$ representante do componente)
-\item primeiro vértice do SCC descoberto na busca em profundidade de $G$
-\item último a ser finalizado
-\item é a raiz da árvore de profundidade na busca em profundidade de $G^T$
+\item $\attrib{v}{d} < \attrib{v}{f}$
+\item o intervalo para $u$ vem antes do intervalo para $v$. 
+\item não há sobreposição.
+\end{itemize}
+\end{enumerate}
+\item caso simétrico: raciocínio simétrico
+\end{enumerate}
+\end{proof}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Teorema do caminho branco}
+
+\begin{theorem}[Teorema do caminho branco]
+Na floresta de profundidade de um grafo, dirigido ou não, o vértice $v$ é descendente de $u$
+s e somente se na etapa $\attrib{u}{d}$, $v$ pode ser alcançado a partir de $u$ por um caminho
+composto apenas por vértices brancos.
+\end{theorem}
+
+\pause
+\begin{proof}
+\only<2>{
+$\Rightarrow$ 
+\begin{itemize}
+\item $v$ é um descendente de $u$, 
+\item $w$ é um vértice no caminho de $u$ até $v$,
+\item pelo corolário do aninhamento, $\attrib{u}{d} < \attrib{w}{d}$.
+\item logo, na etapa $\attrib{w}{d}$, $w$ é branco.
 \end{itemize}
 }
 \only<3>{
-Temos:
-\begin{enumerate}
-\item $\attrib{u}{f} \le \attrib{\phi(u)}{f}$
-\item $u \leadsto v \Rightarrow \attrib{\phi(v)}{f} \le \attrib{\phi(u)}{f}$
-\item $\phi(\phi(u)) = \phi(u)$
-\end{enumerate}
-}
-\end{frame}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}
-\frametitle{Antepassado na busca em profundidade}
-\framesubtitle{Correção}
-
-\alert{$\attrib{u}{f} \le \attrib{\phi(u)}{f}$}
-
+$\Leftarrow$
 \begin{itemize}
-\item Pois $u \leadsto u$, e $\forall v | u \leadsto v \cdot \attrib{v}{f} \le \attrib{\phi(u)}{f}$
-\end{itemize}
-
-\alert{$u \leadsto v \Rightarrow \attrib{\phi(v)}{f} \le \attrib{\phi(u)}{f}$}
-
-\begin{itemize}
-\item Pois $\{ w \cdot v \leadsto w\} \subseteq \{ w \cdot u \leadsto w\}$
-\end{itemize}
-
-\alert{$\phi(\phi(u)) = \phi(u)$}
-
-\begin{itemize}
-\item Pois $\attrib{\phi(u)}{f} \le \attrib{\phi(\phi(u))}{f}$,
-\item e, como $u \leadsto \phi(u)$, então $\attrib{\phi(\phi(u))}{f} \le \attrib{\phi(u)}{f}$,
-\item temos $\attrib{\phi(u)}{f} = \attrib{\phi(\phi(u))}{f}$, e
-\item cada vértice tem um valor de $\id{f}$ diferente.
-\end{itemize}
-
-\end{frame}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}
-\frametitle{Antepassados e ancestros}
-\framesubtitle{Correção}
-
-\begin{theorem}[Antepassado é ancestro]
-Em um grafo dirigido $G = (V, E)$, o antepassado $\phi(u)$ de qualquer
-$u \in V$ em qualquer busca em profundidadede $G$, sempre é um
-ancestro de $u$.
-\end{theorem}
-\pause
-\begin{proof}
-Por caso sobre a cor de $\phi(u)$ na etapa $\attrib{d}{u}$
-\only<3-5>{
-\begin{itemize}
-\item 
-\only<3>{Se for $\const{Gray}$, então $\phi(u)$ é ancestro de $u$.
-}
-\only<4>{Se for $\const{Black}$, então foi finalizado, e $\attrib{\phi(u)}{f} < \attrib{u}{f}$. \alert{Contradiz} $\attrib{u}{f} \le \attrib{\phi(u)}{f}$.
-}
-\only<5>{
-Se for $\const{White}$, consideramos a cor dos vértices no caminho
-de $u$ até $\phi(u)$
-\begin{itemize}
-\item todos são brancos, logo $\phi(u)$ é descendente de $u$, $\attrib{\phi(u)}{f} < \attrib{u}{f}$: \alert{contradição}
-\item senão, seja $t$ o último vértice não branco do caminho:
-\begin{itemize}
-\item $t$ não pode ser preto, pois tem um sucessor branco
-\item então há um caminho branco de $t$ até $\phi(u)$, e 
-\item $\phi(u)$ é descendente de $t$ (teorema do caminho branco)
-\item logo $\attrib{t}{f} > \attrib{\phi(u)}{f}$
-\item \alert{contradição} por definição de $\phi(u)$ e $u \leadsto t$.
-\end{itemize}
-\end{itemize}
-}
+\item na etapa $\attrib{u}{d}$, $v$ é alcançável por um caminho branco a partir de $u$
+\item supondo que $v$ não é descendente de $u$ na árvore em profundidade
+\item supondo que os demais vértices no caminho tornam-se descendentes na árvore em profundidade
+\item seja $w$ o predecessor de $v$
+\item temos que $\attrib{w}{f} < \attrib{u}{f}$
+\item $v$ deve ser processado após $u$, mas antes que $w$ seja finalizado
+\item logo $\attrib{u}{d} < \attrib{v}{d} < \attrib{w}{f} < \attrib{u}{f}$
+\item pelo teorema dos parênteses, o intervalo para $v$ é contido no intervalo para $f$
+\item pelo corolário do aninhamento, $v$ deve ser um descendente de $u$
 \end{itemize}
 }
 \end{proof}
 
 \end{frame}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \begin{frame}
-\frametitle{Antepassado e SCC}
-\framesubtitle{Correção}
+\frametitle{Classificação das arestas}
 
-\begin{corollary}[Antepassado e SCC]
-Em qualquer busca em profundidade de um grafo dirigido $G = (V, E)$, 
-para qualquer $u \in V$, ambos $u$ e $\phi(u)$ pertencem ao mesmo SCC.
-\end{corollary}
-\pause
-\begin{proof}
 \begin{itemize}
-\item Por definição de $\phi$, temos $u \leadsto \phi(u)$.
-\item Pelo teorema ``antepassado é ancestro'', $\phi(u) \leadsto u$.
+\item arestas de árvore: são as arestas $(u, v)$ processadas em $\proc{DFS-visit}$ tais que $v$ é encontrado pela primeira vez. \only<3>{\alert{$\attrib{v}{color} = \const{White}$}}
+\item arestas para trás: são as arestas processadas em $\proc{DFS-visit}$ que conectam $v$ a um ancestro de $v$
+\only<4>{\alert{$\attrib{v}{color} = \const{Gray}$}}
+\item arestas para frente: são as arestas processadas em $\proc{DFS-visit}$ que conectam $v$ a um descendente de $v$ já visitado \only<5>{\alert{$\attrib{v}{color} = \const{Black}$}} \only<5-6>{\alert{$\attrib{u}{d} < \attrib{v}{d}$}}
+\item arestas cruzadas: as demais arestas. \only<5-6>{\alert{$\attrib{v}{color} = \const{Black}$}} \only<6>{\alert{$\attrib{u}{d} > \attrib{v}{d}$}}
+\begin{itemize}
+\item entre vértices da mesma árvore, tais que nenhuma é ancestro de outra;
+\item entre vértices de árvores diferentes.
 \end{itemize}
-\end{proof}
+\end{itemize}
+\pause
+\alert{Como o algoritmo $\proc{DFS-visit}$ pode identificar o tipo de uma aresta?}
 \end{frame}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \begin{frame}
-\frametitle{Antepassados dos vértices de um SCC}
-\framesubtitle{Correção}
+\frametitle{Arestas em grafos não dirigidos}
 
-\begin{theorem}[Antepassados dos vértices de um SCC]
-Em um grafo dirigido $G = (V, E)$, os vértices $u$ e $v$ pertencem ao
-mesmo SCC se, e somente se, possuem o mesmo antepassado na busca em
-profundidade de $G$.
+\begin{theorem}
+Na busca em profundidade de um grafo não dirigido, todas as arestas são de árvore ou para trás.
 \end{theorem}
 
-\pause
 \begin{proof}
 \begin{itemize}
-\item $(\Rightarrow)$ \only<3>{$u$ e $v$ pertencem ao mesmo SCC:
+\item Seja $(u, v)$ uma aresta em um grafo não dirigido.
+\item Se $\attrib{u}{d} < \attrib{v}{d}$:
 \begin{itemize}
-\item logo $\{ w \cdot u \leadsto w \} = \{ w \cdot v \leadsto w\}$.
-\item por definição de $\phi$, $\phi(u) = \phi(v)$.
+\item Então $v$ deve ser finalizado antes de $u$, pois $(u, v)$ pertence à $\attrib{u}{adj}$. 
+\item Se $(u, v)$ é processada primeiro em $\proc{BFS-visit}(u)$, então é de árvore.
+\item Se $(u, v)$ é processada primeiro em $\proc{BFS-visit}(v)$, então é para trás.
 \end{itemize}
-}
-\item $(\Leftarrow)$ 
-\only<4>{$\phi(u) = \phi(v)$:
-\begin{itemize}
-\item pelo corolário ``Antepassado e SCC'' $u$ e $\phi(u)$ estão no mesmo SCC
-\item $v$ e $\phi(v)$ estão no mesmo SCC,
-\item logo $u$ e $v$ estão no mesmo SCC.
-\end{itemize}
-}
-\end{itemize}
-\end{proof}
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}
-\frametitle{Intuição do algoritmo}
-
-\begin{itemize}
-\item $\proc{DFS}(G)$ marca os antepassados com o maior valor de
-  $\id{f}$ (e o menor valor de $\id{d}$) de cada SCC.
-\item $\proc{DFS}(G^T)$ 
-\begin{itemize}
-\item começa com um vértice $v_1$ de maior $\id{f}$, que é um antepassado
-\item visita todos os vértices do SCC de $v_1$
-\item continua com um vértice $v_2$ de maior $\id{f}$ entre os não visitados,
-também é um antepassado
-\item visita todos os vértices do SCC de $v_2$
-\item e assim sucessivamente
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}
-\frametitle{Teorema da correção}
-\framesubtitle{Correção}
-
-\begin{theorem}[Correção de $\proc{Graph-SCC}$]
-Seja $G$ um grafo dirigido qualquer, $\proc{Graph-SCC}(G)$ calcula
-corretamente os componentes fortemente conectados de $G$.
-\end{theorem}
-
-\pause
-
-Roteiro da demonstração:
-\begin{itemize}
-\item indução 
-\item número de árvores de profundidade encontrados em $\proc{DFS}(G^T)$.
-\item mostramos que, assumindo que as árvores anteriores são SCC, 
-  cada nova árvore formada é um SCC
-\item trivial para a primeira árvore (não existe árvores anteriores)
-\end{itemize}
-
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}
-\frametitle{Prova do teorema da correção}
-\framesubtitle{Correção}
-
-\begin{proof}
-\begin{itemize}
-\item Seja $T$ uma árvore de profundidade de raiz $r$ produzida por $\proc{DFS}(G^T)$.
-\item Seja $C(r) = \{ w \cdot \phi(w) = r\}$ (é um SCC)
-\item Mostramos que $u$ é incluído em $T$ se e somente se $u \in C(r)$
-\begin{itemize}
-\item $(\Leftarrow)$ \only<2>{
-\begin{itemize}
-\item teorema ``busca em profundidade e vértices de um SCC''
-\item cada vértice em $C(r)$ termina em uma mesma árvore de profundidade
-\item como $r \in C(r)$, e $r$ é a raiz de $T$, então cada elemento de $C(r)$
-termina precisamente em $T$.
-\end{itemize}
-}
-\item $(\Rightarrow)$ \only<3-5>{Mostramos que, para um vértice $w$, se
-$\attrib{\phi(w)}{f} < \attrib{r}{f}$, ou 
-$\attrib{\phi(w)}{f} > \attrib{r}{f}$, $w$ não pertence a $T$
-\only<4>{
-\begin{itemize}
-\item $\attrib{\phi(w)}{f} < \attrib{r}{f}$
-\item se $w$ for colocado em $T$, então $w \leadsto r$
-\item logo, $\attrib{\phi(w)}{f} \le \attrib{\phi(r)}{f} = \attrib{r}{f}$
-\item \alert{contradição}
-\end{itemize}
-}
-\only<5>{
-\begin{itemize}
-\item $\attrib{\phi(w)}{f} > \attrib{r}{f}$
-\item por hipótese de indução, quando $r$ for selecionado em $\proc{DFS}(G^T)$,
-$\attrib{w}{f}$ terá sido inserido na árvore de raiz $\phi(w)$.
-\item um vértice é inserido exatamente em uma árvore.
-\end{itemize}
-}
-}
-\end{itemize}
+\item Se $\attrib{v}{d} < \attrib{u}{d}$: argumento simétrico.
 \end{itemize}
 \end{proof}
 
 \end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}
-\frametitle{Teorema da correção}
-\framesubtitle{Correção}
-
-\begin{theorem}[Correção de $\proc{Graph-SCC}$]
-Seja $G$ um grafo dirigido qualquer, $\proc{Graph-SCC}(G)$ calcula
-corretamente os componentes fortemente conectados de $G$.
-\end{theorem}
-
-\pause
-
-\begin{proof}
-\begin{itemize}
-\item indução 
-\item número de árvores de profundidade encontrados em $\proc{DFS}(G^T)$.
-\item mostramos que, assumindo que as árvores anteriores são SCC, 
-  cada nova árvore formada é um SCC
-\item trivial para a primeira árvore (não existe árvores anteriores)
-\end{itemize}
-\end{proof}
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
 \frametitle{Exercícios}
 
 \begin{enumerate}
-\item Como pode evoluir a quantidade de SCC em um grafo quando uma
-  aresta é adicionada? removida?
-\item Seja $G$ um grafo dirigido. O grafo dos componentes de $G$ é o grafo
-  $G^{SCC} = (V^{SCC}, E^{SCC})$, tal que $V^{SCC}$ contem um vértice por
-  SCC de $G$, e $E^{SCC}$ contem a aresta $(u, v)$ se existe uma aresta entre
-  um vértice de $u$ e um vértice de $v$ no grafo $G$.
+\item Desenha uma tabela 3 por 3 com $\id{White}$, $\id{Gray}$ $\id{Black}$ como
+  cabeçalho das linhas e colunas.  
 
-  Mostre que o grafo dos componentes conectados de $G$ é um DAG.
-\item Escreva um algoritmo que calcula o grafo dos componentes de
-  $G=(V, E)$, com complexidade $O(|V|+|E|)$. 
+  Indique em $i, j$ se $\proc{DFS-visit}$ pode encontrar uma aresta entre
+  vértices da cor $i$ e $j$ em um grafo dirigido, e o tipo de aresta correspondente.
 
-  Nota: o grafo resultado deve ter, ao máximo, uma aresta entre cada
-  par de vértices.
+  Repita o exercício para grafos não dirigidos.
 
-\item Um grafo é semi-conectado se, para qualquer par de vértices $(u, v)$,
-  ou $u \leadsto v$ ou $v \leadsto u$.
+\item Considere a afirmação: Em um grafo dirigido, se há um caminho
+de $u$ para $v$, e $\attrib{u}{d} < \attrib{v}{d}$ em uma busca em profundidade,
+então $v$ será um descendente de $u$ na floresta correspondente.
 
-  Escreva um algoritmo eficiente que testa se um grafo é semi-conectado.
-  Mostre que seu algoritmo é correto.
+Dê um contra-exemplo que invalida esta proposição.
+
+\item Altere $\proc{DFS-visit}$ para imprimir as arestas visitadas e seus tipos. 
+
+É necessário modificações para tratar grafos não dirigidos?
+
+\item $u$ é um vértice com arestas entrando e saindo. Em um percurso em
+  profundidade, $u$ encontra-se o único vértice de uma das árvores da floresta
+  produzida. Como isto é possível?
 \end{enumerate}
 
 \end{frame}
-
 
 \end{document}

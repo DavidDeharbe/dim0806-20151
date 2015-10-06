@@ -12,18 +12,13 @@
   Programa de Pós-graduação em Sistemas e Computação \\
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
-  Departamento de Informática e Matemáica Aplicada}
-\date{04 de março de 2015}
+  Departamento de Informática e Matemática Aplicada}
+\date{}
 
 \begin{document}
 \selectlanguage{brazil}
 \begin{frame}
   \titlepage
-\end{frame}
-
-\begin{frame}
-  \frametitle{Plano da aula}
-  \tableofcontents
 \end{frame}
 
 \section{Introdução}
@@ -43,11 +38,11 @@
   \frametitle{Estrutura da apresentação}
 
   \begin{description}
-  \item[11/02] arcabouço teórico;
-  \item[23/02] melhor caso, pior caso, caso médio;
-  \item[25/02] notações assintóticas; $O$, $\Omega$, $\Theta$;
-  \item[02/03] análise de algoritmos não recursivos;
-  \item[04/03] \alert{análise de algoritmos recursivos}.
+  \item[1] arcabouço teórico;
+  \item[2] melhor caso, pior caso, caso médio;
+  \item[3] notações asintóticas; $O$, $\Omega$, $\Theta$;
+  \item[4] análise de algoritmos não recursivos;
+  \item[5] \alert{análise de algoritmos recursivos}.
   \end{description}
 \end{frame}
 
@@ -56,7 +51,7 @@
   \frametitle{Bibliografia usada}
 
   \begin{center}
-    \includegraphics[height=.8\textheight]{../img/capa-levitin.jpg}
+    \includegraphics[height=.8\textheight]{img/capa-levitin.jpg}
   \end{center}
   (seções 2.4, 2.5)
 \end{frame}
@@ -67,11 +62,7 @@
   \frametitle{Exemplo introdutório}
 
   \begin{example}[Fatorial]
-\begin{codebox}
-\Procname{$\proc{F}(n)$}
-\li \If $n = 0$ \kw{then} \Return $1$
-\li \Else \Return $n \times F(n-1)$
-\end{codebox}
+    \input{algos/Fatorial.tex}
   \end{example}
   \pause
 
@@ -86,6 +77,11 @@
 \item $M$ é definida por recorrência. Como encontrar uma expressão fechada,
 não recursiva, de $M(n)$?
 \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Plano da aula}
+  \tableofcontents
 \end{frame}
 
 \begin{frame}
@@ -139,34 +135,15 @@ situação.  (Wikipedia)
 \begin{frame}
 \frametitle{Resolução (recursiva)}
 
-\begin{codebox}
-\Procname{$\proc{Hanoi}(N, \id{src}, \id{dest}, \id{aux})$} 
-\li \If $n = 1$
-\li \Then
-\li \Return $\proc{Move}(\id{src}, \id{dest})$
-\li \Else
-\li   $\proc{Hanoi}(N-1, \id{src}, \id{aux}, \id{dest})$
-\li   $\proc{Move}(\id{src}, \id{dest})$
-\li   $\proc{Hanoi}(N-1, \id{aux}, \id{dest}, \id{src})$
-    \End
-\end{codebox}
+\input{algos/Hanoi.tex}
+
 \end{frame}
 
 \begin{frame}
 \frametitle{Aplicação da estratégia}
 
 \begin{small}
-\begin{codebox}
-\Procname{$\proc{Hanoi}(N, \id{src}, \id{dest}, \id{aux})$} 
-\li \If $n = 1$
-\li \Then
-\li \Return $\proc{Move}(\id{src}, \id{dest})$
-\li \Else
-\li   $\proc{Hanoi}(N-1, \id{src}, \id{aux}, \id{dest})$
-\li   $\proc{Move}(\id{src}, \id{dest})$
-\li   $\proc{Hanoi}(N-1, \id{aux}, \id{dest}, \id{src})$
-    \End
-\end{codebox}
+\input{algos/Hanoi.tex}
 \end{small}
 \begin{itemize}
 \item Tamanho da entrada: $n$
@@ -221,30 +198,14 @@ Permite visualizar todas as chamadas realizadas por um algoritmo recursivo: pode
 \begin{frame}
 \frametitle{Número de algarismos binários de um inteiro}
 
-\begin{codebox}
-\Procname{$\proc{Binary}(n$)} 
-\li \If $n \le 1$
-\li \Then
-\li   \Return $1$
-\li \Else
-\li   \Return $\proc{Binary}(\lfloor n/2 \rfloor)$ + 1
-    \End
-\end{codebox}
+\input{algos/Binary_rec.tex}
 
 \end{frame}
 
 \begin{frame}
 \frametitle{Aplicação da estratégia}
 \begin{small}
-\begin{codebox}
-\Procname{$\proc{Binary}(n$)} 
-\li \If $n \le 1$
-\li \Then
-\li   \Return $1$
-\li \Else
-\li   \Return $\proc{Binary}(\lfloor n/2 \rfloor)$ + 1
-    \End
-\end{codebox}
+\input{algos/Binary_rec.tex}
 \end{small}
 \begin{itemize}
 \item Tamanho da entrada: $n$
@@ -550,7 +511,7 @@ A sequência é definida por recorrência:
 
 \item Com as condições iniciais, temos $\alpha + \beta = 0$ e $\frac{1+\sqrt{5}}{2}\alpha + \frac{1-\sqrt{5}}{2}\beta = 1$.
 
-\item $F(n) = \frac{1}{\sqrt{5}}(\frac{1+\sqrt{5}}{2})^n - \frac{1}{\sqrt{5}}(\frac{1+\sqrt{5}}{2})^n = \frac{1}{\sqrt{5}}(\phi^n - \hat{\phi}^n) \in \Theta(\phi^n)$.
+\item $F(n) = \frac{1}{\sqrt{5}}(\frac{1+\sqrt{5}}{2})^n - \frac{1}{\sqrt{5}}(\frac{1-\sqrt{5}}{2})^n = \frac{1}{\sqrt{5}}(\phi^n - \hat{\phi}^n) \in \Theta(\phi^n)$.
 \end{itemize}
 $\phi \approx 1,61803$ e $\hat{\phi} \approx - 0,61803$
 \end{frame}
@@ -559,11 +520,7 @@ $\phi \approx 1,61803$ e $\hat{\phi} \approx - 0,61803$
 \frametitle{Sequência de Fibonacci}
 
 \begin{example}[Fibonacci]
-\begin{codebox}
-\Procname{$\proc{Fib}(n)$}
-\li \If $n \le 1$ \kw{then} \Return $n$
-\li \Else \Return $\proc{Fib}(n-1) + \proc{Fib}(n-2)$
-\end{codebox}
+\input{algos/Fib.tex}
 \end{example}
 \pause
 \begin{itemize}
@@ -599,25 +556,9 @@ $\phi \approx 1,61803$ e $\hat{\phi} \approx - 0,61803$
 
 \begin{itemize}
 \item Sem recursividade
-\begin{codebox}
-\Procname{$\proc{Fib-NR}(n)$}
-\li $F[0] \gets 0, F[1] \gets 1$
-\li \For $i \gets 2$ \To $n$
-\li \Do $F[i] \gets F[i-1] + F[i-2]$
-    \End
-\li \Return $F[n]$
-\end{codebox}
+\input{algos/Fib_iter.tex}
 \item Com recursividade
-\begin{codebox}
-\Procname{$\proc{Fib-Acc}(n, k, x, y)$}
-\li \If $n = k$ \kw{then} \Return $x+y$
-\li \Else \Return $\proc{Fib-Acc}(n, k+1, y, x+y)$
-\end{codebox}
-\begin{codebox}
-\Procname{$\proc{Fib-R}(n)$}
-\li \If $n \le 1$ \kw{then} \Return $n$
-\li \Else \Return $\proc{Fib-Acc}(n, 2, 0, 1)$
-\end{codebox}
+\input{algos/Fib_rec.tex}
 \end{itemize}
 
 \end{frame}

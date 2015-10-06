@@ -10,13 +10,13 @@
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
   Departamento de Informática e Matemática Aplicada}
-\date{29 de abril de 2015}
+\date{}
 
 \begin{document}
 \selectlanguage{brazil}
 \begin{frame}
   \titlepage
-  Download me from \url{http://ufrn.academia.edu/DavidDeharbe}.
+  Download me from \url{http://DavidDeharbe.github.io}.
 \end{frame}
 
 \begin{frame}
@@ -157,49 +157,8 @@
 \end{frame}
 
 \begin{frame}
+
 \frametitle{Aplicação}
-
-
-\begin{itemize}
-
-  \item Criação de um novo grupo $\proc{Make-Set}(x)$
-
-    \begin{itemize}
-
-      \item registro $x$
-
-      \item resultado: o grupo criado
-
-    \end{itemize}
-
-  \item Busca do grupo $\proc{Find-Set}(x)$
-
-    \begin{itemize}
-
-      \item registro $x$
-
-      \item resultado: o grupo de $x$
-
-    \end{itemize}
-    
-  \item Junção de dois grupos $\proc{Union-Set}(x, y)$
-
-    \begin{itemize}
-
-      \item registros $x$, $y$
-
-      \item resultado: o grupo com $x$, $y$, e todos os elementos
-        que estavam com $x$ e com $y$
-
-    \end{itemize}
-
-\end{itemize}
-
-\end{frame}
-
-\begin{frame}
-
-\frametitle{Exemplo de aplicação}
 
 \begin{codebox}
 \Procname{$\proc{Graph-SCC}(G)$}
@@ -300,7 +259,8 @@ Para cada registro $x$
 \li \Repeat
 \li   $\attrib{x}{rep} \gets r_1$
 \li   $x \gets \attrib{x}{next}$
-\li \Until $x \isequal r_2$
+\li \Until $\attrib{x}{next} \isequal r_2$
+\li $\attrib{x}{rep} \gets r_1$
 \li $\attrib{x}{next} \gets tmp$
 \li \Return $r_1$
 \end{codebox}
@@ -395,7 +355,7 @@ Complexidade: $\Theta( | \id{grupo}(x_2) |)$
 
 \begin{frame}
 \frametitle{União}
-\framesubtitle{Implementação por lista}
+\framesubtitle{Implementação por árvores}
 
 \begin{codebox}
 \Procname{$\proc{Union-Set}(x_1, x_2)$}
@@ -410,7 +370,7 @@ Complexidade: $\Theta( | \id{grupo}(x_2) |)$
 
 \begin{frame}
 \frametitle{Ilustração da união}
-\framesubtitle{Implementação por lista}
+\framesubtitle{Implementação por árvores}
 
 \only<1-9>{
 \begin{tabular}[t]{c}
@@ -469,7 +429,7 @@ sem & com \\
 \\
 \includegraphics[width=.25\textwidth]{fig/qu-300-300}
 &
-\includegraphics[width=.7\textwidth,align=top]{fig/wqu-300-300}
+\includegraphics[width=.7\textwidth]{fig/wqu-300-300}
 \end{tabular}
 
 \end{frame}
@@ -578,7 +538,7 @@ Após duas buscas de 1, com compressão por divisão
 
 \begin{frame}
 \frametitle{Estudo experimental}
-
+\framesubtitle{Após aplicação de $\proc{Graph-SCC}$}
 \begin{center}
 \begin{tabular}[t]{c}
 Compressão completa: \\
@@ -599,6 +559,7 @@ União por tamanho, sem compressão: \\
 
 \begin{frame}
 \frametitle{Estudo experimental}
+\framesubtitle{Após aplicação de $\proc{Graph-SCC}$ e 300 buscas}
 
 \begin{center}
 \begin{tabular}[t]{c}
