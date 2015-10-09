@@ -7,19 +7,21 @@
 \usepackage{pgf}
 \usepackage{tikz}
 
-\title{Aula 22: Extensão de estruturas de dados}
+\title{Aula 23: Extensão de estruturas de dados}
 \author{David Déharbe \\
   Programa de Pós-graduação em Sistemas e Computação \\
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
-  Departamento de Informática e Matemáica Aplicada}
-\date{06 de maio de 2015}
+  Departamento de Informática e Matemática Aplicada}
+\date{}
 
 \begin{document}
 \selectlanguage{brazil}
 
 \begin{frame}
   \titlepage
+
+  Download me from \url{http://DavidDeharbe.github.io}
 \end{frame}
 
 \begin{frame}
@@ -198,12 +200,22 @@ Referência: Cormen, cap 15.
 \end{frame}
 
 \begin{frame}
+\frametitle{Exercício}
+
+\begin{itemize}
+\item Escrever o algoritmo de rotação dupla com atualização do 
+  atributo $\id{size}$.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
 \frametitle{Como atualizar o atributo $\id{size}$?}
 \framesubtitle{Remoção}
 
 \begin{itemize}
 \item descida até o ponto de inserção: decremento de $\id{size}$  \only<2>{\alert{$O(\log n)$}}
-\item possívelmente remoção auxiliar
+\item possívelmente remoção auxiliar \only<2>{\alert{$O(\log n)$}}
 \item eliminação de um vértice \only<2>{\alert{$O(1)$}}
 \item número finito de rotações \only<2>{\alert{$O(1)$}}
 \end{itemize}
@@ -262,9 +274,9 @@ $i$: intervalo
 
 comparação de intervalos
 \begin{enumerate}
-\item $\attrib{i}{low} \le \attrib{i'}{high}$ e $\attrib{i'}{low} \le \attrib{i}{high}$: $i$ e $i'$ tem sobreposição
-\item $\attrib{i}{high} < \attrib{i'}{low}$: $i$ antes de $i'$
-\item $\attrib{i'}{low} < \attrib{i}{high}$: $i$ depois de $i'$
+\item $\attrib{i}{low} \le \attrib{i'}{upp}$ e $\attrib{i'}{low} \le \attrib{i}{upp}$: $i$ e $i'$ tem sobreposição
+\item $\attrib{i}{upp} < \attrib{i'}{low}$: $i$ antes de $i'$
+\item $\attrib{i'}{low} < \attrib{i}{upp}$: $i$ depois de $i'$
 \end{enumerate}
 
 \end{frame}
@@ -317,17 +329,9 @@ Operações:
 \begin{frame}
 \frametitle{Novas operações}
 
-\begin{codebox}
-\Procname{$\proc{Interval-Search}(T, i)$}
-\li $x \gets \attrib{T}{root}$
-\li \While $x \neq \const{Nil}$ and not $\proc{Overlap}(i, \attrib{x}{int})$ 
-\li \Do \If $\attrib{x}{left} \neq \const{Nil}$ and $\attrib{\attrib{x}{left}}{max} \ge \attrib{i}{low}$
-\li      \Then $x \gets \attrib{x}{left}$
-\li      \Else $x \gets \attrib{x}{right}$
-         \End
-    \End
-\li \Return $x$
-\end{codebox}
+\begin{itemize}
+\item $\proc{Interval-Search}(T, i)$
+\end{itemize}
 
 \end{frame}
 
@@ -336,17 +340,7 @@ Operações:
 
 \vspace*{-5mm}
 \begin{small}
-\begin{codebox}
-\Procname{$\proc{Interval-Search}(T, i)$}
-\li $x \gets \attrib{T}{root}$
-\li \While $x \neq \const{Nil}$ and not $\proc{Overlap}(i, \attrib{x}{int})$ 
-\li \Do \If $\attrib{x}{left} \neq \const{Nil}$ and $\attrib{\attrib{x}{left}}{max} \ge i$
-\li      \Then $x \gets \attrib{x}{left}$
-\li      \Else $x \gets \attrib{x}{right}$
-         \End
-    \End
-\li \Return $x$
-\end{codebox}
+\input{algos/Interval-Search.tex}
 \end{small}
 
 \pause
@@ -377,17 +371,7 @@ $i = [11, 14]$ \\
 \begin{frame}
 \frametitle{Busca}
 
-\begin{codebox}
-\Procname{$\proc{Interval-Search}(T, i)$}
-\li $x \gets \attrib{T}{root}$
-\li \While $x \neq \const{Nil}$ and not $\proc{Overlap}(i, \attrib{x}{int})$ 
-\li \Do \If $\attrib{x}{left} \neq \const{Nil}$ and $\attrib{\attrib{x}{left}}{max} \ge i$
-\li      \Then $x \gets \attrib{x}{left}$
-\li      \Else $x \gets \attrib{x}{right}$
-         \End
-    \End
-\li \Return $x$
-\end{codebox}
+\input{algos/Interval-Search.tex}
 
 \alert{Complexidade}: $O(\log n)$
 \pause
@@ -402,10 +386,10 @@ $i = [11, 14]$ \\
 \item Escrever uma operação que
 \begin{itemize}
 \item tem como parâmetro um intervalo $i$ e,
-\item retorna um intervalo que se sobrepões a $i$, com o menor limite
+\item retorna um intervalo que se sobrepõe a $i$, com o menor limite
   inferior, ou $\const{Nil}$ se não existir.
 \end{itemize}
-\item Adapte a estrutura de dados união/fusão para ter a operação que
+\item Adapte a estrutura de dados união/busca para ter a operação que
   retorna o número de elementos de um conjunto.
 \end{enumerate}
 \end{frame}

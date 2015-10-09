@@ -13,7 +13,7 @@
   Programa de Pós-graduação em Sistemas e Computação \\
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
-  Departamento de Informática e Matemáica Aplicada}
+  Departamento de Informática e Matemática Aplicada}
 \date{}
 
 \begin{document}
@@ -902,37 +902,56 @@ Caso 1 &
 \end{frame}
 
 \begin{frame}
-\frametitle{Análise amortizada: método do contador}
+\frametitle{Interlúdio matemático}
+\framesubtitle{Seja $a$, $b$ dois números reais quaisquer}
+
+\begin{eqnarray*}
+0 & \le & (a-b)^2 = a^2-2ab+b^2\\
+4ab & \le & a^2+2ab+b^2 \\
+ab & \le & \frac{(a+b)^2}{4}\\
+ab^{\frac{1}{2}} & \le & \frac{a+b}{2} \\
+\log (ab^{\frac{1}{2}}) & \le & \log\frac{a+b}{2} \\
+\log (a^{\frac{1}{2}}) + \log(b^{\frac{1}{2}}) & \le & \log\frac{a+b}{2} \\
+\frac{1}{2}\times\log a + \frac{1}{2}\times\log b & \le & \log\frac{a+b}{2} \\
+\frac{(\log a + \log b)}{2} & \le & \log\frac{a+b}{2}
+\end{eqnarray*}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Análise amortizada: método do potencial}
 \begin{itemize}
-\item os nós guardam créditos ($\gamma(x)$)
-\item créditos pagam para efetuar rotações
-\item o preço de $\proc{Splay}$ é $O(\log n)$
-\item invariante: $\gamma(x) = \lfloor \log | T(x) | \rfloor$
+\item seja $T_i(x)$ a sub-árvore enraizada em $x$ após a operação $i$.
+\item $|T|$: número de nós em $T$
+\item o potencial fica distribuído entre os nós ($\phi_i = \sum_x \gamma_i(x)$)
+\item invariante: $\gamma_i(x) = \lfloor \log | T_i(x) | \rfloor$
+\item a complexidade amortizada de $\proc{Splay}$ é $O(\log n)$
 
   $T(x)$: sub-árvore enraizada em $x$
 
-\item propriedade: $3 \times (\gamma(T) - \gamma(x) + O(1))$ créditos paga $\proc{Splay}(T, x)$ e mantem o invariante. (\alert{vamos mostrar isto depois})
+\item propriedade: o custo de $\proc{Splay}(T, x)$ e manter o invariante
+  é menor ou igual a $3 \times (\gamma(T) - \gamma(x)) + O(1)$. 
+(\alert{vamos mostrar isto depois})
 \item logo $\proc{Splay}$ custa no máximo $3 \lfloor \log n \rfloor + O(1) \in |\Theta(\log n)$.
 \item para pagar inserção, busca ou remoção, basta pagar $O(\log n)$.
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{Análise amortizada: método do contador}
+\frametitle{Análise amortizada: método do potencial}
 \begin{itemize}
-\item $\gamma(x)$ e $\gamma'(x)$: quantidade de créditos em $x$ antes
-e depois das rotações nos casos 1, 2 e 3
-\item $\proc{Splay}$ cai $k \ge 0$ vezes nos casos 2 e 3 e
-  possivelmente uma vez no caso 1.
+\item $\gamma(x)$ e $\gamma'(x)$: potencial em $x$ antes e depois das rotações
+  nos casos 1, 2 e 3
+\item $\proc{Splay}$ cai $k \ge 0$ vezes nos casos 2 e 3 e possivelmente uma vez
+  no caso 1.
 \item vamos mostrar que o custo em cada caso é
 \begin{itemize}
-\item caso 1: $3 \times(\gamma'(x) - \gamma(x)) + O(1)$
+\item caso 1: $\gamma'(x) - \gamma(x) + O(1)$
 \item caso 2: $3 \times(\gamma'(x) - \gamma(x))$
 \item caso 3: $3 \times(\gamma'(x) - \gamma(x))$
 \end{itemize}
 \item somando, obtemos $3(\gamma(T) - \gamma(x)) + O(1)$
 
-$\gamma(x)$: número de créditos em $\gamma$ antes do $\proc{Splay}$
 \end{itemize}
 \end{frame}
 
@@ -940,80 +959,87 @@ $\gamma(x)$: número de créditos em $\gamma$ antes do $\proc{Splay}$
 \frametitle{Caso 1}
 \framesubtitle{$y = \attrib{x}{up}, \attrib{y}{up} = \const{Nil}$}
 
+$\gamma'$: potencial depois, $\gamma$: potencial antes
+
 \begin{itemize}
-\item $\gamma'(x) = \gamma(y)$, $\gamma'(y) \le \gamma'(x)$,
+\item os únicos nós que alteram seu potencial são $x$ e $y$,
+\item logo $\phi' - \phi = (\gamma'(x)+\gamma'(y))-(\gamma(x)+\gamma(y))$
+\item $\gamma'(x) = \gamma(y)$, $\gamma'(y) \le \gamma'(x)$, $\gamma(x) \le \gamma'(x)$
 \item logo 
 \begin{eqnarray*}
 \gamma'(x) + \gamma'(y) - \gamma(x) - \gamma(y) & = & \gamma'(y) - \gamma(x) \\
 & \le & \gamma'(x) - \gamma(x) \\
 & \le & 3 \times(\gamma'(x) - \gamma(x))
 \end{eqnarray*}
+\item é necessária apenas uma rotação:
+$$a = c + \phi'- \phi \le 1 + \gamma'(x) - \gamma(x)$$
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Caso 2}
-\framesubtitle{$y = \attrib{x}{up}, x = \attrib{x}{left}, z = \attrib{y}{up}, y = \attrib{z}{left}$}
+\framesubtitle{$y = \attrib{x}{up}, x = \attrib{y}{left}, z = \attrib{y}{up}, y = \attrib{z}{left}$}
 
 \begin{itemize}
 \item temos: $\gamma'(x) = \gamma(z)$, $\gamma'(y) \le \gamma'(x)$,
 $\gamma'(z) \le \gamma'(x)$, $\gamma(y) \ge \gamma(x)$
 \item logo 
 \begin{eqnarray*}
-\lefteqn{\gamma'(x) + \gamma'(y) + \gamma'(z) - \gamma(x) - \gamma(y) - \gamma(z)} \\
- & = & 
-\gamma'(y) + \gamma'(z) - \gamma(x) - \gamma(y) \\
-& = & (\gamma'(y) - \gamma(x)) + (\gamma'(z) - \gamma(y)) \\
-& \le & (\gamma'(x) - \gamma(x)) + (\gamma'(x) - \gamma(x)) \\
-& \le & 2 \times(\gamma'(x) - \gamma(x))
+\lefteqn{a = c + \phi'(x) - \phi(x)} \\
+& = & 2 + \gamma'(x) - \gamma(x) + \gamma'(y) - \gamma(y) + \gamma'(z) - \gamma(z) \\
+ & = & 2 + (\gamma'(x) - \gamma(z)) + \gamma'(y) + \gamma'(z) - \gamma(x) - \gamma(y) \\
+& = & 2 + \gamma'(y) + \gamma'(z) - \gamma(x)) - \gamma(y) \\
+& \le & 2 + \gamma'(x) + \gamma'(z) - \gamma(x) - \gamma(x) \\
+& = & 2 + \gamma'(x) + \gamma'(z) - 2 \times \gamma(x)
 \end{eqnarray*}
-\item resta $\gamma'(x) - \gamma(x)$ créditos para efetuar a rotação.
+\item Vamos substituir $\gamma'(z)$ nesta expressão...
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Caso 2 (continuação)}
-\framesubtitle{Mostramos que há créditos para a rotação}
 
-Resta $\gamma'(x) - \gamma(x)$:
+\begin{eqnarray*}
+\frac{\log a + \log b} 2 & \le & \log \left( \frac{a+b}{2} \right)
+\end{eqnarray*}
+
+\begin{eqnarray*}
+\gamma(x) + \gamma'(z) & = & \log |T(x)| + \log |T'(z)| \\
+& \le & 2 \times \log \left( \frac{|T(x)| + |T'(z)|}{2} \right)
+\end{eqnarray*}
 \begin{itemize}
-\item se $\gamma(x) \neq \gamma'(x)$, então resta $\gamma'(x) - \gamma(x) > 0$ créditos para efetuar a rotação
-\pause
-\item se $\gamma(x) = \gamma'(x)$, mostramos que
-$\gamma'(x) + \gamma'(y) + \gamma'(z) < \gamma(x) + \gamma(y) + \gamma(z)$.
-\item neste caso, é preciso menos créditos na árvore para manter o invariante
-\item este crédito é usado para efetuar a rotação
-\item roteiro da prova:
-\begin{itemize}
-\item supor que 
-$\gamma'(x) + \gamma'(y) + \gamma'(z) \ge \gamma(x) + \gamma(y) + \gamma(z)$.
-\item chegar a uma contradição
+\item observe que $|T(x)| + |T'(z)| \le |T'(x)|$
 \end{itemize}
-\end{itemize}
+\begin{eqnarray*}
+\gamma(x) + \gamma'(z) & \le & 2 \times \log \left( \frac{|T'(x)|}{2} \right) \\
+ & = & 2 \times \log |T'(x)| - 2 \times \log 2 \\
+ & = & 2 \times \gamma'(x) - 2
+\end{eqnarray*}
+Logo:
+\begin{eqnarray*}
+\gamma'(z) & \le & 2 \times \gamma'(x) - 2 - \gamma(x)
+\end{eqnarray*}
 \end{frame}
 
 \begin{frame}
-
 \frametitle{Caso 2 (continuação)}
-\framesubtitle{o caso 2 pode liberar créditos para a rotação}
 
-Supondo
-$\gamma'(x) + \gamma'(y) + \gamma'(z) \ge \gamma(x) + \gamma(y) + \gamma(z)$,
-temos
-\begin{itemize}
-\item $\gamma(x) \le \gamma(y) \le \gamma(z)$
-\item $\gamma'(z) \le \gamma'(y) \le \gamma'(x)$
-\item $\gamma'(x) = \gamma(z)$
-\item logo temos que $\gamma(x) = \gamma(z) = \gamma(y)$
-\item e $\gamma'(x) = \gamma'(y) = \gamma'(z)$
-\item pela definição de $\gamma$, temos
-$\lfloor \log_2 (a + b + 1) \rfloor = \lfloor \log_2 a \rfloor = \lfloor \log_2 b \rfloor$
-\begin{itemize}
-\item se $a \le b$ então $\lfloor \log_2 (a+b+1) \rfloor \ge \lfloor \log_2 2a \rfloor = 1 + \lfloor \log_2 a \rfloor > \lfloor \log_2 a \rfloor$
-\item se $a > b$ então $\lfloor \log_2 (a+b+1) \rfloor \ge \lfloor \log_2 2b \rfloor = 1 + \lfloor \log_2 b \rfloor > \lfloor \log_2 b \rfloor$
-\end{itemize}
-\item em ambos casos chegamos a uma contradição.
-\end{itemize}
+Temos:
+\begin{eqnarray*}
+\lefteqn{a = c + \phi'(x) - \phi(x)} \\
+& \le & 2 + \gamma'(x) + \gamma'(z) - 2 \times \gamma(x)
+\end{eqnarray*}
+e:
+\begin{eqnarray*}
+\gamma'(z) & \le & 2 \times \gamma'(x) - 2 - \gamma(x).
+\end{eqnarray*}
+Logo, podemos prosseguir:
+\begin{eqnarray*}
+a & \le & 2 + \gamma'(x) + \gamma'(z) - 2 \times \gamma(x) \\
+  & \le & 2 + \gamma'(x) + 2 \times \gamma'(x) - 2 - \gamma(x) - 2 \times \gamma(x) \\
+  & = & 3 \times \gamma'(x) - 3 \times \gamma(x) \\
+  & = & 3 \times (\gamma'(x) - \gamma(x))
+\end{eqnarray*}
 \end{frame}
 
 \begin{frame}
@@ -1022,8 +1048,23 @@ $\lfloor \log_2 (a + b + 1) \rfloor = \lfloor \log_2 a \rfloor = \lfloor \log_2 
 
 \begin{itemize}
 \item Análogo ao caso 2
-\item deixado como exercício
+\item Lemas úteis:
+\begin{enumerate}
+\item $\gamma'(x) = \gamma(z)$;
+\item $\gamma(y) \ge \gamma(x)$;
+\item $\gamma'(y)+\gamma'(z) \le 2 \times \gamma'(x) - 2$.
+\item $\gamma(x) \le \gamma'(x)$.
+\end{enumerate}
 \end{itemize}
+
+\begin{eqnarray*}
+a & = & c + [\gamma'(x)+\gamma'(y)+\gamma'(z)] - [\gamma(x)+\gamma(y)+\gamma(z)]\\
+& = & 2 + \gamma'(y)+\gamma'(z)-\gamma(x)-\gamma(y) \quad \mbox{ por 1)}\\
+& \le & 2 + \gamma'(y)+\gamma'(z) - 2 \times \gamma(x) \quad \mbox{ por 2)}\\
+& \le & 2 + 2 \times \gamma'(x) - 2 - 2 \times \gamma(x) \quad \mbox{ por 3)}\\
+& = & 2 \times (\gamma'(x) - \gamma(x)) \\
+& \le & 3 \times (\gamma'(x) - \gamma(x))
+\end{eqnarray*}
 
 \end{frame}
 

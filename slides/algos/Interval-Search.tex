@@ -1,0 +1,11 @@
+\begin{codebox}
+\Procname{$\proc{Interval-Search}(T, i)$}
+\li $x \gets \attrib{T}{root}$
+\li \While $x \neq \const{Nil}$ and not $\proc{Overlap}(i, \attrib{x}{int})$ 
+\li \Do \If $\attrib{x}{left} \neq \const{Nil}$ and $\attrib{\attrib{x}{left}}{max} \ge \attrib{i}{low}$
+\li      \Then $x \gets \attrib{x}{left}$
+\li      \Else $x \gets \attrib{x}{right}$
+         \End
+    \End
+\li \Return $x$
+\end{codebox}
