@@ -3,19 +3,21 @@
 
 \input{preamble}
 
-\title{Aula 24: Grafos: algoritmos elementares (II)}
+\title{Aula 25: Grafos: algoritmos elementares (II)}
 \author{David Déharbe \\
   Programa de Pós-graduação em Sistemas e Computação \\
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
   Departamento de Informática e Matemática Aplicada}
-\date{18 de maio de 2015}
+\date{}
 
 \begin{document}
 \selectlanguage{brazil}
 
 \begin{frame}
   \titlepage
+
+  Download me from \url{http://DavidDeharbe.github.io}
 \end{frame}
 
 \begin{frame}
@@ -276,7 +278,7 @@ o grafo dirigido $G^T = (V, E^T)$, onde $E^T = \{ (u, v) | (v, u) \in E\}$.
 \includegraphics[height=.4\textheight]{fig/scc-4.pdf}
 \end{center}
 
-\only<2-3>{\alert{Complexidade?}}\only<3>{$Theta(|V|+|E|)$}
+\only<2-3>{\alert{Complexidade?}}\only<3>{$\Theta(|V|+|E|)$}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -369,7 +371,7 @@ $$
 \framesubtitle{Correção}
 
 \begin{lemma}[Caminhos entre vértices de um mesmo SCC]
-Seja $u$ e $v$ dois vértices quaisqueres de um mesmo SCC. Então todos
+Seja $u$ e $v$ dois vértices quaisquer de um mesmo SCC. Então todos
 os vértices nos caminhos entre $u$ e $v$ estão neste mesmo SCC.
 \end{lemma}
 \pause
@@ -483,7 +485,7 @@ ancestro de $u$.
 \end{theorem}
 \pause
 \begin{proof}
-Por caso sobre a cor de $\phi(u)$ na etapa $\attrib{d}{u}$
+Por caso sobre a cor de $\phi(u)$ na etapa $\attrib{u}{d}$
 \only<3-5>{
 \begin{itemize}
 \item 
@@ -635,7 +637,7 @@ $\attrib{\phi(w)}{f} > \attrib{r}{f}$, $w$ não pertence a $T$
 \begin{itemize}
 \item $\attrib{\phi(w)}{f} < \attrib{r}{f}$
 \item se $w$ for colocado em $T$, então $w \leadsto r$
-\item logo, $\attrib{\phi(w)}{f} \le \attrib{\phi(r)}{f} = \attrib{r}{f}$
+\item logo, $\attrib{\phi(w)}{f} \ge \attrib{\phi(r)}{f} = \attrib{r}{f}$
 \item \alert{contradição}
 \end{itemize}
 }
@@ -652,30 +654,6 @@ $\attrib{w}{f}$ terá sido inserido na árvore de raiz $\phi(w)$.
 \end{itemize}
 \end{proof}
 
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}
-\frametitle{Teorema da correção}
-\framesubtitle{Correção}
-
-\begin{theorem}[Correção de $\proc{Graph-SCC}$]
-Seja $G$ um grafo dirigido qualquer, $\proc{Graph-SCC}(G)$ calcula
-corretamente os componentes fortemente conectados de $G$.
-\end{theorem}
-
-\pause
-
-\begin{proof}
-\begin{itemize}
-\item indução 
-\item número de árvores de profundidade encontrados em $\proc{DFS}(G^T)$.
-\item mostramos que, assumindo que as árvores anteriores são SCC, 
-  cada nova árvore formada é um SCC
-\item trivial para a primeira árvore (não existe árvores anteriores)
-\end{itemize}
-\end{proof}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

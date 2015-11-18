@@ -7,20 +7,22 @@
 
 \input{preamble}
 
-\title{Aula 26: Grafos: caminho de custo mínimo}
+\title{Aula 27: Grafos: caminho de custo mínimo}
 \subtitle{Árvores de extensão mínima}
 \author{David Déharbe \\
   Programa de Pós-graduação em Sistemas e Computação \\
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
   Departamento de Informática e Matemática Aplicada}
-\date{22 de maio de 2015}
+\date{}
 
 \begin{document}
 \selectlanguage{brazil}
 
 \begin{frame}
   \titlepage
+
+  Download me from \url{http://DavidDeharbe.github.io}
 \end{frame}
 
 \begin{frame}
@@ -328,7 +330,7 @@ inicialização:
 \begin{itemize}
 \item $\delta(s, s) = 0$ ou $\delta(s, s) = -\infty$ (se $s$ estiver em um ciclo de peso negativo)
 \item em todo caso $\attrib{s}{d} \ge \delta(s, s)$.
-\item para $v \neq s$, $\attrib{s}{d} = \infty \ge \delta(s, v)$.
+\item para $v \neq s$, $\attrib{v}{d} = \infty \ge \delta(s, v)$.
 \end{itemize}
 }
 \only<3>{
@@ -342,7 +344,7 @@ $$
   & < & \delta(s, v) \le \delta(s, u) + W(u, v)
 \end{array}
 $$
-\item logo $\attrib{u}{d} < \delta(s, v)$
+\item logo $\attrib{u}{d} < \delta(s, u)$
 \item contradiz que $v$ foi o $1^{o}$ vértice t.q. $\attrib{v}{d} < \delta(s, v)$.
 \end{itemize}
 }
@@ -355,7 +357,7 @@ $$
 \framesubtitle{Propriedades}
 
 \begin{corollary}[Vértices não alcançáveis]
-Depois de executar $\proc{Init-Relax}(G,s)$, para qualquer vértice $v$ não alcançável, temos que $\attrib{v}{d} = \delta(s, v)$.
+Depois de executar $\proc{Init-Relax}(G,s)$, para qualquer vértice $v$ não alcançável a partir de $s$, temos que $\attrib{v}{d} = \delta(s, v)$.
 
 A execução de $\proc{Relax}(u, v, W)$ mantem $\attrib{v}{d} = \delta(s, v)$.
 \end{corollary}
@@ -403,10 +405,11 @@ $$
 \framesubtitle{Princípios}
 
 \begin{itemize}
+\item Restrito a grafos com custos positivos.
 \item Mantem um conjunto de vértices $S = \{ v \cdot \attrib{v}{d} = \delta(s, v)\}$.
 \item Escolhe um vértice $u$ a inserir em $S$
 \begin{itemize}
-\item custo mínimo de $S$ para $u$
+\item custo mínimo de $s$ até $u$
 \end{itemize}
 \item Relaxa com as arestas adjacentes a $u$
 \item abordagem \alert{gulosa}
@@ -486,7 +489,7 @@ Cada vez que $u$ é inserido em $S$, $\attrib{u}{d} = \delta(s, u)$
 \only<8->{, $s \leadsto v$}
 \only<9->{, $p = p_1 (x, y) p_2$, $s \overset{p_1}{\leadsto} x \rightarrow y \overset{p_2} \leadsto v$, $p_1 \subseteq S$, $W(p) = \delta(s, v)$}
 \only<11->{, $\attrib{y}{d} = \delta(s, y)$}
-\only<13->{, $\delta(s, y) \le \delta(s, v)$}
+\only<13->{, $\delta(s, y) \le \attrib{v}{d}$}
 \only<5>{\item logo $S \neq \emptyset$ quand $v$ é inserido em $S$.}
 \only<7>{\item necessariamente há um caminho de $s$ até $v$
 \begin{enumerate}
@@ -495,8 +498,8 @@ Cada vez que $u$ é inserido em $S$, $\attrib{u}{d} = \delta(s, u)$
 \end{enumerate}
 }
 \only<8>{
-\item logo existe um caminho de custo mínimo entre $s$ e $v$, digamos $p$ (não necessariamente todo em $S$).
-\item seja $y$ o primeiro vértice de $p$ em $V-S$ e e $x$ o predecessor de $y$ em $p$
+\item logo existe um caminho de custo mínimo entre $s$ e $v$, digamos $p$ (necessariamente $\nsubseteq S$).
+\item seja $y$ o primeiro vértice de $p$ em $V-S$ e $x$ o predecessor de $y$ em $p$
 }
 \only<10>{
 \item necessariamente $\attrib{x}{d} = \delta(s, x)$,
@@ -508,7 +511,7 @@ Cada vez que $u$ é inserido em $S$, $\attrib{u}{d} = \delta(s, u)$
 \item os pesos não são negativos
 \item logo $\delta(s, y) \le \delta(s, v)$
 \item pelo lema do invariante $\delta(s, v) \le \attrib{v}{d}$, 
-\item por transitividade de $\le$, deduzimos que $\delta(s, y) \le \delta(s, v)$
+\item por transitividade de $\le$, deduzimos que $\delta(s, y) \le \attrib{v}{d}$
 }
 \only<14>{
 \item $v \gets \proc{Extract-Min}(Q)$
@@ -523,7 +526,7 @@ Cada vez que $u$ é inserido em $S$, $\attrib{u}{d} = \delta(s, u)$
 \frametitle{Teorema}
 
 \begin{theorem}[Correção do algoritmo de Dijkstra]
-O algoritmo $\proc{Single-Source-Shortest-Path}(G, s)$ calcular corretamente o 
+O algoritmo $\proc{Single-Source-Shortest-Path}(G, s)$ calcula corretamente o 
 custo dos caminhos de custo mínimo de $s$ até cada vértice de $G$.
 \end{theorem}
 \pause
@@ -545,7 +548,7 @@ Omitimos a prova que os caminhos de custo mínimo são calculados corretamente (
 
 \begin{itemize}
 \item leva em conta arestas negativas
-\item detecta e reporta se existe ciclos de custo mínimo
+\item detecta e reporta se existe ciclos de custo mínimo negativo
 \item também baseado na relaxação
 \end{itemize}
 
@@ -557,7 +560,7 @@ Omitimos a prova que os caminhos de custo mínimo são calculados corretamente (
 \begin{codebox}
 \Procname{$\proc{Single-Source-Shortest-Paths}(G, s)$}
 \li $\proc{Init-Relax}(G, s)$
-\li \For $i \gets 1 to |\attrib{G}{V}| - 1$
+\li \For $i \gets 1 \To |\attrib{G}{V}| - 1$
 \li \Do \For $(u, v) \in \attrib{G}{E}$
 \li   \Do $\proc{Relax}(u, v, \attrib{G}{W})$
       \End
@@ -620,7 +623,7 @@ No quadro
 
 \begin{lemma}[Bellman-Ford sem ciclos de custo negativo]
 Se $G$ não possui ciclos de custo negativo, então, após executar o algoritmo de Bellman-Ford
-a $G$ e $s$, temos que $\attrib{v}{d} = \delta(s, v)$ para todas as arestas alcançáveis de $s$.
+com $G$ e $s$, temos que $\attrib{v}{d} = \delta(s, v)$ para todas as arestas alcançáveis de $s$.
 \end{lemma}
 \pause
 \begin{proof}

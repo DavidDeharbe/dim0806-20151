@@ -4,14 +4,14 @@
 
 \input{preamble}
 
-\title{Aula 28: Algoritmos gulosos}
+\title{Aula 29: Algoritmos gulosos}
 \subtitle{\textit{Greedy}}
 \author{David Déharbe \\
   Programa de Pós-graduação em Sistemas e Computação \\
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
   Departamento de Informática e Matemática Aplicada}
-\date{27 de maio de 2015}
+\date{}
 
 \begin{document}
 \selectlanguage{brazil}
@@ -20,6 +20,8 @@
 
 \begin{frame}
   \titlepage
+
+  Download me from \url{http://DavidDeharbe.github.io}
 \end{frame}
 
 \begin{frame}
@@ -162,7 +164,7 @@ Por qual razão este algoritmo é qualificado de \alert{guloso}?
 \li $A \gets \{ 1 \}$
 \li $j \gets 1$
 \li \For $i \gets 2 \To n$ \Comment{\assert{$\Theta(n)$ repetições}}
-\li \Do \If $s_i \ge f_i$ \Comment{\assert{$O(1)$ por repetição}}
+\li \Do \If $s_i \ge f_j$ \Comment{\assert{$O(1)$ por repetição}}
 \li   \Then $A \gets A \cup \{ i \}$
 \li     $j \gets i$
       \End
@@ -378,6 +380,7 @@ a codificação de $s_1$ não é prefixo da codificação de $s_2$.
 \item sem sub-árvore: símbolo decodificado no vértice
 \item 0: selecionar sub-árvore esquerda
 \item 1: selecionar sub-árvore direita
+\end{itemize}
 \item Exemplo:
 \begin{center}
 \begin{tabular}{r|c|c|c|c|c|c|}
@@ -388,7 +391,6 @@ código de tamanho fixo & 000 & 001 & 010 & 011 & 100 & 101 \\
 código de tamanho variável & 0 & 101 & 100 & 111 & 1101 & 1100
 \end{tabular}
 \end{center}
-\end{itemize}
 \end{itemize}
 \end{frame}
 
@@ -405,9 +407,11 @@ código de tamanho variável & 0 & 101 & 100 & 111 & 1101 & 1100
 \item Seja $T$ uma árvore de codificação ótima. Dada a frequência $f(A, c)$ de cada
   caractere $c$ em um arquivo $A$, qual o tamanho da representação de $A$ com
   $T$?  \pause
-$$ B(A, T) = \sum_{c} f(A, c) d_T(c) \text{ onde $d_T(c)$ é a profundidade de
-    $c$ em $T$} $$
-é o \alert{custo} de $T$.
+$$ B(A, T) = \sum_{c} f(A, c) d_T(c)$$
+
+  onde $d_T(c)$ é a profundidade de $c$ em $T$
+
+  $\Longrightarrow$ o \alert{custo} de $T$.
 \pause
 \item Dada $f(A, c)$ para cada $c$, como construir uma árvore de codificação ótima? \pause \alert{Códificação de Huffman}
 

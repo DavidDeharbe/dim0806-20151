@@ -3,20 +3,22 @@
 
 \input{preamble}
 
-\title{Aula 25: Grafos: árvores geradoras mínimas}
+\title{Aula 26: Grafos: árvores geradoras mínimas}
 \subtitle{Árvores de extensão mínima}
 \author{David Déharbe \\
   Programa de Pós-graduação em Sistemas e Computação \\
   Universidade Federal do Rio Grande do Norte \\
   Centro de Ciências Exatas e da Terra \\
   Departamento de Informática e Matemática Aplicada}
-\date{20 de maio de 2015}
+\date{}
 
 \begin{document}
 \selectlanguage{brazil}
 
 \begin{frame}
   \titlepage
+
+  Download me from \url{http://DavidDeharbe.github.io}
 \end{frame}
 
 \begin{frame}
@@ -108,21 +110,6 @@ Referência: Cormen, cap 24.
 \frametitle{Crescendo uma árvore geradora mínima}
 \framesubtitle{Algoritmo abstrato}
 
-\begin{itemize}
-\item $A$: sub-conjunto de uma árvore geradora mínima
-\item iterativamente uma aresta $(u, v)$ é adicionada a $A$
-\begin{itemize}
-\item $(u, v)$ é \alert{segura} se $A \cup \{(u, v)\}$ é uma árvore geradora mínima.
-\end{itemize}
-\item $A$ continua um sub-conjunto de uma árvore geradora mínima
-\item término: $A$ cobre todo o grafo
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Crescendo uma árvore geradora mínima}
-\framesubtitle{Algoritmo abstrato}
-
 \begin{codebox}
 \Procname{$\proc{MST-Abstract}(G)$}
 \zi $A \gets \emptyset$
@@ -149,7 +136,7 @@ Referência: Cormen, cap 24.
 \end{itemize}
 \item Propriedades
 \begin{itemize}
-\item teorema: arestas leves e subconjunto de árvores geradora mínima
+\item teorema: arestas leves e subconjunto de árvores geradoras mínimas
 \item corolário (fundamentação dos algoritmos de Prim e Kruskal):
   componentes conectados e arestas leves.
 \end{itemize}
@@ -170,8 +157,8 @@ $G$.
 \begin{itemize}
 \item A aresta $(u, v)$ \alert{cruza} o corte se $u \in S$ e $v \in
   V-S$.
-\item O conjunto de arestas $A \subseteq E$ \alert{respeita} o corte
-  se nenhuma aresta de $A$ cruza o corte.
+\item O conjunto de arestas $A \subseteq E$ \alert{é compatível com} o
+  corte se nenhuma aresta de $A$ cruza o corte.
 \item Se $G$ é um grafo com pesos, a aresta $(u, v) \in E$ é uma
   \alert{aresta leve} se atravessa o corte e tem o menor peso entre
   todas as arestas cruzando o corte.
@@ -190,7 +177,7 @@ $G$.
 
 \begin{itemize}
 \item corte, aresta cruzando corte, aresta leve, conjunto de arestas
-respeitando o corte
+compatível com o corte
 \end{itemize}
 
 \end{frame}
@@ -202,10 +189,10 @@ respeitando o corte
 O teorema seguinte fornece um critério para escolher arestas
 no algoritmo abstrato:
 \begin{theorem}[Critério da arestas leve]
-Seja $G = (V, E, w)$ um grafo não dirigido conectado com pesos. 
-Seja $A \subseteq E$, tal que $A$ é um sub-conjunto de uma árvore de
-cobertura mínima. Seja $(S, V-S)$ um corte que respeita $A$, e $(u, v)$
-uma aresta leve cruzando $(S, V-S)$. Então $(u, v)$ é seguro para $A$.
+Seja $G = (V, E, w)$ um grafo não dirigido conectado com pesos.  Seja
+$A \subseteq E$, tal que $A$ é um sub-conjunto de uma árvore geradora
+mínima. Seja $(S, V-S)$ um corte compatível com $A$, e $(u, v)$ uma
+aresta leve cruzando $(S, V-S)$. Então $(u, v)$ é seguro para $A$.
 \end{theorem}
 \end{frame}
 
@@ -238,7 +225,7 @@ uma aresta leve cruzando $(S, V-S)$. Então $(u, v)$ é seguro para $A$.
 $(u, v)$ é seguro para $A$:
 \begin{itemize}
 \item $A$ é um sub-conjunto de uma árvore geradora mínima. 
-\item $(S, V-S)$ respeita $A$, 
+\item $A$ é compatível com $(S, V-S)$, 
 \item $(u, v)$ uma aresta leve cruzando $(S, V-S)$. 
 \end{itemize}
 
@@ -250,10 +237,11 @@ $(u, v)$ é seguro para $A$:
 
 \only<1-2>{
 \begin{theorem}[Critério da arestas leve]
-Seja $G = (V, E, w)$ um grafo não dirigido conectado com pesos. 
-Seja $A \subseteq E$, tal que $A$ é um sub-conjunto de uma árvore de
-cobertura mínima. Seja $(S, V-S)$ um corte que respeita $A$, e $(u, v)$
-uma aresta leve cruzando $(S, V-S)$. Então $(u, v)$ é seguro para $A$.
+Seja $G = (V, E, w)$ um grafo não dirigido conectado com pesos.  Seja
+$A \subseteq E$, tal que $A$ é um sub-conjunto de uma árvore geradora
+mínima. Seja $(S, V-S)$ um corte com o qual $A$ é compatível, e $(u,
+v)$ uma aresta leve cruzando $(S, V-S)$. Então $(u, v)$ é seguro para
+$A$.
 \end{theorem}
 }
 \only<2->{
@@ -285,7 +273,7 @@ uma aresta leve cruzando $(S, V-S)$. Então $(u, v)$ é seguro para $A$.
 \only<5->{
 \only<5>{
 \item existe $(x, y) \in p$ tal que $(x, y)$ cruza $(S, V-S)$.
-\item hipótese 3: $A$ respeita $(S, V-S)$, logo $(x, y) \not\in A$.
+\item hipótese 3: $A$ é compatível com $(S, V-S)$, logo $(x, y) \not\in A$.
 }
 \only<6>{
 \item $T - \{(x, y)\}$ resulta em duas árvores não conexas
@@ -310,9 +298,9 @@ uma aresta leve cruzando $(S, V-S)$. Então $(u, v)$ é seguro para $A$.
 \framesubtitle{Corolário}
 
 \begin{corollary}
-Seja $G = (V, E, w)$ um grafo não dirigido conectado com pesos. 
-Seja $A \subseteq E$, tal que $A$ é um sub-conjunto de uma árvore de
-cobertura mínima. Seja $C$ uma árvore na floresta $G_A = (V, A)$,
+Seja $G = (V, E, w)$ um grafo não dirigido conectado com pesos.  Seja
+$A \subseteq E$, tal que $A$ é um sub-conjunto de uma árvore geradora
+mínima. Seja $C$ uma árvore na floresta $G_A = (V, A)$,
 
 Se $(u, v)$ é uma aresta leve conectando $C$ a uma outra árvore
 de $G_A$, então $(u, v)$ é segura para $A$.
@@ -320,7 +308,7 @@ de $G_A$, então $(u, v)$ é segura para $A$.
 
 \begin{proof}
 \begin{itemize}
-\item Por definição, $(C, V-C)$ é um corte que respeita $A$. 
+\item Por definição, $A$ é compatível com o corte $(C, V-C)$. 
 \item A aresta $(u, v)$ é uma aresta leve cruzando $(C, V-C)$
 \item O teorema diz que $(u, v)$ é uma aresta segura para $A$.
 \end{itemize}
@@ -408,7 +396,7 @@ de $G_A$, então $(u, v)$ é segura para $A$.
 \begin{itemize}
 \item $A$ forma uma (única) árvore
 \item a cada iteração uma aresta segura é adicionada a $A$
-\item a aresta acrescentado é aquela que soma o menor peso
+\item a aresta incluída é aquela que soma o menor peso
 \item abordagem gulosa
 \item ponto principal: como identificar eficazmente a aresta que soma o menor peso
 \begin{itemize}
@@ -473,7 +461,7 @@ de $G_A$, então $(u, v)$ é segura para $A$.
 \li \Do $u \gets \proc{Extract-Min}(Q)$ \assert{\Comment $O(\lg V)$}
 \li   \For $v \in \attrib{u}{adj}$ \assert{\Comment total: $\Theta(E)$}
 \li   \Do \If $v \in Q$ e $w(u, v) < \attrib{v}{key}$ 
-\li     \Then $\attrib{v}{up} \gets u$ \assert{\Comment $O(\lg v)$}
+\li     \Then $\attrib{v}{up} \gets u$ \assert{\Comment $\Theta(1)$}
 \li       $\attrib{v}{key} \gets w(u, v)$  \assert{\Comment $O(\lg v)$}
         \End
       \End
